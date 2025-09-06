@@ -8,8 +8,13 @@ package chess;
  */
 public class ChessBoard {
 
+    /*TODO - Create a data structure that represents the chess board. (an 8x8 grid of some kind) A reminder
+    *  That the data structure of choice must be an object type of the ChessPiece class. */
+
+    ChessPiece[][] gameBoard = new ChessPiece[8][8];
+
     public ChessBoard() {
-        
+
     }
 
     /**
@@ -19,9 +24,8 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        throw new RuntimeException("Not implemented");
+        gameBoard[position.getRow()][position.getColumn()] = piece;
     }
-
     /**
      * Gets a chess piece on the chessboard
      *
@@ -30,7 +34,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        throw new RuntimeException("Not implemented");
+        return gameBoard[position.getRow()][position.getColumn()];
     }
 
     /**
