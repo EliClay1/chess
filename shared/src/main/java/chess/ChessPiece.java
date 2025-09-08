@@ -12,7 +12,12 @@ import java.util.List;
  */
 public class ChessPiece {
 
+    private final ChessGame.TeamColor pieceColor;
+    private final PieceType type;
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+        this.pieceColor = pieceColor;
+        this.type = type;
     }
 
     /**
@@ -31,14 +36,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+        return pieceColor;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        throw new RuntimeException("Not implemented");
+        return type;
     }
 
     /**
@@ -49,6 +54,25 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        if (getPieceType() == PieceType.KING) {
+            // King Logic. Needs to be moved to its own class later on, but right now this is good.
+        }
+        if (getPieceType() == PieceType.QUEEN) {
+            // Queen Logic. Needs to be moved to its own class later on, but right now this is good.
+        }
+        if (getPieceType() == PieceType.BISHOP) {
+            // Bishop Logic. Needs to be moved to its own class later on, but right now this is good.
+        }
+        if (getPieceType() == PieceType.KNIGHT) {
+            // Knight Logic. Needs to be moved to its own class later on, but right now this is good.
+        }
+        if (getPieceType() == PieceType.ROOK) {
+            // Rook Logic. Needs to be moved to its own class later on, but right now this is good.
+        }
+        if (getPieceType() == PieceType.PAWN) {
+            // Pawn Logic. Needs to be moved to its own class later on, but right now this is good.
+        }
+
         return List.of();
     }
 }
