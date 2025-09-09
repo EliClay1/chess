@@ -13,16 +13,24 @@ public class PieceLogicHelper {
             *
             * */
 
+            System.out.println(currentPosition);
+
+            /* 9/9/2025 - Changed to ArrayList because listOfMoves.add was complaining, and when running the code, I ran into
+            some immutable errors, not exactly sure what is going on here.
+             */
+            List<ChessMove> listOfMoves = new java.util.ArrayList<>(List.of());
+
             for (int x = currentPosition.getRow() - 1; x <= currentPosition.getRow() + 1; x++) {
                 for (int y = currentPosition.getColumn() - 1; y <= currentPosition.getColumn() + 1; y++) {
                     ChessPosition newPositionToAdd = new ChessPosition(x, y);
-                    if (newPositionToAdd.equals(currentPosition)) {
-                        System.out.println("match found!");
+
+                    if (!currentPosition.equals(newPositionToAdd)) {
+                        listOfMoves.add(new ChessMove(currentPosition, newPositionToAdd, null));
                     }
                 }
             }
 
-            return List.of(new ChessMove(new ChessPosition(1, 5), new ChessPosition(2, 6), null));
+            return listOfMoves;
 
         }
 
