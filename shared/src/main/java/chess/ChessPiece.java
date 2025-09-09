@@ -1,7 +1,6 @@
 package chess;
 
 import java.util.Collection;
-import java.lang.Math;
 import java.util.List;
 
 /**
@@ -54,25 +53,10 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        if (getPieceType() == PieceType.KING) {
-            // King Logic. Needs to be moved to its own class later on, but right now this is good.
-        }
-        if (getPieceType() == PieceType.QUEEN) {
-            // Queen Logic. Needs to be moved to its own class later on, but right now this is good.
-        }
-        if (getPieceType() == PieceType.BISHOP) {
-            // Bishop Logic. Needs to be moved to its own class later on, but right now this is good.
-        }
-        if (getPieceType() == PieceType.KNIGHT) {
-            // Knight Logic. Needs to be moved to its own class later on, but right now this is good.
-        }
-        if (getPieceType() == PieceType.ROOK) {
-            // Rook Logic. Needs to be moved to its own class later on, but right now this is good.
-        }
-        if (getPieceType() == PieceType.PAWN) {
-            // Pawn Logic. Needs to be moved to its own class later on, but right now this is good.
-        }
 
-        return List.of();
+//        ChessPiece piece = board.getPiece(myPosition);
+//        return List.of(new ChessMove(new ChessPosition(1, 5), new ChessPosition(2, 6), null));
+
+        return new PieceLogicHelper().definePieceLogic(board, myPosition, type);
     }
 }
