@@ -11,7 +11,7 @@ public class ChessBoard {
     /*TODO - Create a data structure that represents the chess board. (an 8x8 grid of some kind) A reminder
     *  That the data structure of choice must be an object type of the ChessPiece class. */
 
-    ChessPiece[][] gameBoard = new ChessPiece[8][8];
+    final ChessPiece[][] gameBoard = new ChessPiece[8][8];
 
     public ChessBoard() {
 
@@ -24,7 +24,8 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        gameBoard[position.getRow()][position.getColumn()] = piece;
+        // this is an array base 0, we need it to be an array base 1.
+        gameBoard[position.getRow() - 1][position.getColumn() - 1] = piece;
     }
     /**
      * Gets a chess piece on the chessboard
@@ -34,7 +35,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return gameBoard[position.getRow()][position.getColumn()];
+        return gameBoard[position.getRow()-1][position.getColumn()-1];
     }
 
     /**

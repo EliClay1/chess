@@ -1,7 +1,9 @@
 package chess;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -57,6 +59,25 @@ public class ChessPiece {
 //        ChessPiece piece = board.getPiece(myPosition);
 //        return List.of(new ChessMove(new ChessPosition(1, 5), new ChessPosition(2, 6), null));
 
+        var moves = new HashSet<ChessMove>();
+        moves.add(new ChessMove(new ChessPosition(5,4), new ChessPosition(6,5), null));
+
+//        return moves;
+
         return new PieceLogicHelper().definePieceLogic(board, myPosition, type);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
     }
 }

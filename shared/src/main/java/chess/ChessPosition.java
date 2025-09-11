@@ -51,4 +51,9 @@ public class ChessPosition {
         }
         return row == that.row && col == that.col;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(row, col);
+    }
 }
