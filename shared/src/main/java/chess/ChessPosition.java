@@ -40,15 +40,13 @@ public class ChessPosition {
     }
 
     // overriding the equals comparison to allow comparison between just the x and y coordinate positions, rather than exact copies of the object.
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
         ChessPosition that = (ChessPosition) o;
-        if (this.row == that.row && this.col == that.row) {
-            return true;
-        }
         return row == that.row && col == that.col;
     }
 
