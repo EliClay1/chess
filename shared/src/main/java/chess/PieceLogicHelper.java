@@ -30,7 +30,9 @@ public class PieceLogicHelper {
                         if (board.getPiece(newPositionToAdd) != null) {
                             if (board.getPiece(newPositionToAdd).getTeamColor() != board.getPiece(currentPosition).getTeamColor()) {
                                 listOfAttackableMoves.add(new ChessMove(currentPosition, newPositionToAdd, null));
+                                listOfPossibleMoves.add(new ChessMove(currentPosition, newPositionToAdd, null));
                             }
+                            continue;
                         }
                         listOfPossibleMoves.add(new ChessMove(currentPosition, newPositionToAdd, null));
                     }
