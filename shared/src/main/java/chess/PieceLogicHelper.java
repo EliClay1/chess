@@ -7,6 +7,7 @@ public class PieceLogicHelper {
 
     List<ChessPosition> listOfPossibleMoves = new java.util.ArrayList<>(List.of());
     int[][] possibleBishopDirections = {{1,1}, {-1,1}, {1,-1}, {-1,-1}};
+    int[][] possibleRookDirections = {{0,1}, {0,-1}, {1,0}, {-1,0}};
     int[][] possibleRoyaltyDirections = {{1,1}, {1,0}, {1,-1}, {0,1}, {0,-1}, {-1,1}, {-1,0}, {-1,-1}};
 
     public Collection<ChessMove> definePieceLogic (ChessBoard board, ChessPosition currentPosition, ChessPiece.PieceType typeOfPiece) {
@@ -31,7 +32,11 @@ public class PieceLogicHelper {
         }
 
         if (typeOfPiece == ChessPiece.PieceType.QUEEN) {
-            throw new RuntimeException("Not implemented");
+            for (int[] dir : possibleRoyaltyDirections) {
+                var dx = dir[0];
+                var dy = dir[1];
+                directionalHelper(board, currentPosition.getRow(), currentPosition.getColumn(), dx, dy, teamColor, ChessPiece.PieceType.QUEEN);
+            }
         }
 
         if (typeOfPiece == ChessPiece.PieceType.KNIGHT) {
@@ -39,7 +44,11 @@ public class PieceLogicHelper {
         }
 
         if (typeOfPiece == ChessPiece.PieceType.ROOK) {
-            throw new RuntimeException("Not implemented");
+            for (int[] dir : possibleRookDirections) {
+                var dx = dir[0];
+                var dy = dir[1];
+                directionalHelper(board, currentPosition.getRow(), currentPosition.getColumn(), dx, dy, teamColor, ChessPiece.PieceType.ROOK);
+            }
         }
 
         if (typeOfPiece == ChessPiece.PieceType.PAWN) {
