@@ -6,45 +6,27 @@ import java.util.List;
 public class PieceLogicHelper {
 
     List<ChessPosition> listOfPossibleMoves = new java.util.ArrayList<>(List.of());
+    int[][] possibleBishopDirections = {{1,1}, {-1,1}, {1,-1}, {-1,-1}};
+    int[][] possibleRoyaltyDirections = {{1,1}, {1,0}, {1,-1}, {0,1}, {0,-1}, {-1,1}, {-1,0}, {-1,-1}};
 
     public Collection<ChessMove> definePieceLogic (ChessBoard board, ChessPosition currentPosition, ChessPiece.PieceType typeOfPiece) {
 
         ChessGame.TeamColor teamColor = board.getPiece(currentPosition).getTeamColor();
 
         if (typeOfPiece == ChessPiece.PieceType.KING) {
-            for (int x = currentPosition.getRow() - 1; x <= currentPosition.getRow() + 1; x++) {
-                for (int y = currentPosition.getColumn() - 1; y <= currentPosition.getColumn() + 1; y++) {
 
-                    if (isNotWithinBoardBounds(board, x, y)) {
-                        continue;
-                    }
-
-                    ChessPosition newPosition = new ChessPosition(x, y);
-                    if (newPosition.equals(currentPosition)) {
-                        continue;
-                    }
-
-                    // TODO - This entire block should be able to be turned into a helper function.
-                    ChessPiece pieceAtNewPosition = board.getPiece(newPosition);
-
-                    if (pieceAtNewPosition != null) {
-                        if (pieceAtNewPosition.getTeamColor() != teamColor) {
-                            listOfPossibleMoves.add(newPosition);
-                        }
-                        continue;
-                    }
-                    listOfPossibleMoves.add(newPosition);
-                }
+            for (int[] dir : possibleRoyaltyDirections) {
+                var dx = dir[0];
+                var dy = dir[1];
+                directionalHelper(board, currentPosition.getRow(), currentPosition.getColumn(), dx, dy, teamColor, ChessPiece.PieceType.KING);
             }
         }
 
         if (typeOfPiece == ChessPiece.PieceType.BISHOP) {
-
-            int[][] possibleDirections = {{1,1}, {-1,1}, {1,-1}, {-1,-1}};
-            for (int[] dir : possibleDirections) {
+            for (int[] dir : possibleBishopDirections) {
                 var dx = dir[0];
                 var dy = dir[1];
-                directionalHelper(board, currentPosition.getRow(), currentPosition.getColumn(), dx, dy, teamColor);
+                directionalHelper(board, currentPosition.getRow(), currentPosition.getColumn(), dx, dy, teamColor, ChessPiece.PieceType.BISHOP);
             }
         }
 
@@ -77,7 +59,7 @@ public class PieceLogicHelper {
         return row > boardDimensions || col > boardDimensions || row <= 0 || col <= 0;
     }
 
-    public void directionalHelper(ChessBoard board, int x, int y, int directionX, int directionY, ChessGame.TeamColor teamColor) {
+    public void directionalHelper(ChessBoard board, int x, int y, int directionX, int directionY, ChessGame.TeamColor teamColor, ChessPiece.PieceType pieceType) {
         var nextX = x + directionX;
         var nextY = y + directionY;
 
@@ -89,7 +71,9 @@ public class PieceLogicHelper {
 
         if (pieceAtNextPosition == null) {
             listOfPossibleMoves.add(new ChessPosition(nextX, nextY));
-            directionalHelper(board, nextX, nextY, directionX, directionY, teamColor);
+            if (pieceType != ChessPiece.PieceType.KING) {
+                directionalHelper(board, nextX, nextY, directionX, directionY, teamColor, pieceType);
+            }
         } else if (pieceAtNextPosition.getTeamColor() != teamColor) {
             listOfPossibleMoves.add(new ChessPosition(nextX, nextY));
         }
