@@ -4,12 +4,15 @@ import java.util.Collection;
 import java.util.List;
 
 public class PieceLogicHelper {
+
+    List<ChessMove> listOfPossibleMoves = new java.util.ArrayList<>(List.of());
+
     public Collection<ChessMove> definePieceLogic (ChessBoard board, ChessPosition currentPosition, ChessPiece.PieceType typeOfPiece) {
+        /**
+         * Implementation of the King Piece logic. This works with everything EXCEPT checks on if the king is in danger.
+         */
 
-        // TODO - re-modifying to make the code more concise.
         if (typeOfPiece == ChessPiece.PieceType.KING) {
-            List<ChessMove> listOfPossibleMoves = new java.util.ArrayList<>(List.of());
-
             for (int x = currentPosition.getRow() - 1; x <= currentPosition.getRow() + 1; x++) {
                 for (int y = currentPosition.getColumn() - 1; y <= currentPosition.getColumn() + 1; y++) {
 
@@ -22,6 +25,7 @@ public class PieceLogicHelper {
                         continue;
                     }
 
+                    // TODO - This entire block should be able to be turned into a helper function.
                     ChessPiece pieceAtNewPosition = board.getPiece(newPosition);
                     ChessPiece pieceAtCurrentPosition = board.getPiece(currentPosition);
 
@@ -43,6 +47,10 @@ public class PieceLogicHelper {
         }
 
         if (typeOfPiece == ChessPiece.PieceType.BISHOP) {
+
+
+
+
             throw new RuntimeException("Not implemented");
         }
 
@@ -65,12 +73,29 @@ public class PieceLogicHelper {
     public boolean isWithinBoardBounds(ChessBoard board, int row, int col) {
         // changed to -1 to account for the fact that the board goes 1 - 8, while the array goes 0 - 7
         int boardDimensions = board.gameBoard.length - 1;
-        return row <= 7 && col <= 7 && row >= 0 && col >= 0;
+        return row <= boardDimensions && col <= boardDimensions && row >= 0 && col >= 0;
     }
 
-    // TODO - finish implementation of helper function;
-    public boolean isEnemyPieceAt(ChessBoard board, ChessPosition position, ChessPiece piece) {
-        var teamColor = piece.getTeamColor();
-        return false;
+    public void bishopHelper(ChessBoard board, int x, int y) {
+
+        if (isWithinBoardBounds(board, x, y)) {
+
+            ChessPosition currentPosition = new ChessPosition(x, y);
+            ChessPosition newPosition = new ChessPosition(x + 1, y + 1);
+
+            ChessPiece pieceAtNewPosition = board.getPiece(newPosition);
+            ChessPiece pieceAtCurrentPosition = board.getPiece(currentPosition);
+
+            // is not on the team color
+            if (pieceAtNewPosition.getTeamColor() == pieceAtCurrentPosition.getTeamColor()) {
+                // not a viable move
+                return;
+            }
+            if (pieceAtNewPosition.getTeamColor() != pieceAtCurrentPosition.getTeamColor()) {
+                // is a viable move, but no moves can be made further in this direction.
+                listOfPossibleMoves.add(new ChessMove(currentPosition, newPosition, null));
+            }
+            bishopHelper(board, x + 1, y + 1);
+        }
     }
 }
