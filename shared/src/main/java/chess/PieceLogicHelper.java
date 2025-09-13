@@ -26,10 +26,9 @@ public class PieceLogicHelper {
 
                     // TODO - This entire block should be able to be turned into a helper function.
                     ChessPiece pieceAtNewPosition = board.getPiece(newPosition);
-                    ChessPiece pieceAtCurrentPosition = board.getPiece(currentPosition);
 
                     if (pieceAtNewPosition != null) {
-                        if (pieceAtNewPosition.getTeamColor() != pieceAtCurrentPosition.getTeamColor()) {
+                        if (pieceAtNewPosition.getTeamColor() != teamColor) {
                             listOfPossibleMoves.add(newPosition);
                         }
                         continue;
@@ -39,12 +38,12 @@ public class PieceLogicHelper {
             }
         }
 
-
-        if (typeOfPiece == ChessPiece.PieceType.QUEEN) {
-            throw new RuntimeException("Not implemented");
-        }
-
         if (typeOfPiece == ChessPiece.PieceType.BISHOP) {
+
+            /*
+            * TODO - Turn this into a loop so it is a smaller function rather than the 4 separate ones. Should allow
+            *  for an easier time designing the queen.
+            * */
 
             // checks up-right
             bishopHelper(board, currentPosition.getRow(), currentPosition.getColumn(), 1, 1, teamColor);
@@ -54,6 +53,10 @@ public class PieceLogicHelper {
             bishopHelper(board, currentPosition.getRow(), currentPosition.getColumn(), 1, -1, teamColor);
 //            // checks down-left
             bishopHelper(board, currentPosition.getRow(), currentPosition.getColumn(), -1, -1, teamColor);
+        }
+
+        if (typeOfPiece == ChessPiece.PieceType.QUEEN) {
+            throw new RuntimeException("Not implemented");
         }
 
         if (typeOfPiece == ChessPiece.PieceType.KNIGHT) {
@@ -77,8 +80,7 @@ public class PieceLogicHelper {
     }
 
     public boolean isNotWithinBoardBounds(ChessBoard board, int row, int col) {
-        // changed to -1 to account for the fact that the board goes 1 - 8, while the array goes 0 - 7
-        int boardDimensions = board.gameBoard.length - 1;
+        int boardDimensions = board.gameBoard.length;
         return row > boardDimensions || col > boardDimensions || row <= 0 || col <= 0;
     }
 
