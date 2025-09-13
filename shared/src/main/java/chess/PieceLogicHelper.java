@@ -40,19 +40,12 @@ public class PieceLogicHelper {
 
         if (typeOfPiece == ChessPiece.PieceType.BISHOP) {
 
-            /*
-            * TODO - Turn this into a loop so it is a smaller function rather than the 4 separate ones. Should allow
-            *  for an easier time designing the queen.
-            * */
-
-            // checks up-right
-            bishopHelper(board, currentPosition.getRow(), currentPosition.getColumn(), 1, 1, teamColor);
-//             checks up-left
-            bishopHelper(board, currentPosition.getRow(), currentPosition.getColumn(), -1, 1, teamColor);
-//            // checks down-right
-            bishopHelper(board, currentPosition.getRow(), currentPosition.getColumn(), 1, -1, teamColor);
-//            // checks down-left
-            bishopHelper(board, currentPosition.getRow(), currentPosition.getColumn(), -1, -1, teamColor);
+            int[][] possibleDirections = {{1,1}, {-1,1}, {1,-1}, {-1,-1}};
+            for (int[] dir : possibleDirections) {
+                var dx = dir[0];
+                var dy = dir[1];
+                directionalHelper(board, currentPosition.getRow(), currentPosition.getColumn(), dx, dy, teamColor);
+            }
         }
 
         if (typeOfPiece == ChessPiece.PieceType.QUEEN) {
@@ -84,7 +77,7 @@ public class PieceLogicHelper {
         return row > boardDimensions || col > boardDimensions || row <= 0 || col <= 0;
     }
 
-    public void bishopHelper(ChessBoard board, int x, int y, int directionX, int directionY, ChessGame.TeamColor teamColor) {
+    public void directionalHelper(ChessBoard board, int x, int y, int directionX, int directionY, ChessGame.TeamColor teamColor) {
         var nextX = x + directionX;
         var nextY = y + directionY;
 
@@ -96,7 +89,7 @@ public class PieceLogicHelper {
 
         if (pieceAtNextPosition == null) {
             listOfPossibleMoves.add(new ChessPosition(nextX, nextY));
-            bishopHelper(board, nextX, nextY, directionX, directionY, teamColor);
+            directionalHelper(board, nextX, nextY, directionX, directionY, teamColor);
         } else if (pieceAtNextPosition.getTeamColor() != teamColor) {
             listOfPossibleMoves.add(new ChessPosition(nextX, nextY));
         }
