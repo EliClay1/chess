@@ -9,6 +9,7 @@ public class PieceLogicHelper {
     int[][] possibleBishopDirections = {{1,1}, {-1,1}, {1,-1}, {-1,-1}};
     int[][] possibleRookDirections = {{0,1}, {0,-1}, {1,0}, {-1,0}};
     int[][] possibleRoyaltyDirections = {{1,1}, {1,0}, {1,-1}, {0,1}, {0,-1}, {-1,1}, {-1,0}, {-1,-1}};
+    int[][] possibleKnightDirections = {{-1,2}, {-2,1}, {-1,-2}, {-2,-1}, {1,-2}, {2,-1}, {1,2}, {2,1}};
 
     public Collection<ChessMove> definePieceLogic (ChessBoard board, ChessPosition currentPosition, ChessPiece.PieceType typeOfPiece) {
 
@@ -39,10 +40,6 @@ public class PieceLogicHelper {
             }
         }
 
-        if (typeOfPiece == ChessPiece.PieceType.KNIGHT) {
-            throw new RuntimeException("Not implemented");
-        }
-
         if (typeOfPiece == ChessPiece.PieceType.ROOK) {
             for (int[] dir : possibleRookDirections) {
                 var dx = dir[0];
@@ -51,7 +48,28 @@ public class PieceLogicHelper {
             }
         }
 
+        if (typeOfPiece == ChessPiece.PieceType.KNIGHT) {
+            for (int[] dir : possibleKnightDirections) {
+                var dx = currentPosition.getRow() + dir[0];
+                var dy = currentPosition.getColumn() + dir[1];
+                if (isNotWithinBoardBounds(board, dx, dy)) {
+                    continue;
+                }
+                ChessPiece pieceAtNextPosition = board.getPiece(new ChessPosition(dx, dy));
+                if (pieceAtNextPosition == null) {
+                    listOfPossibleMoves.add(new ChessPosition(dx, dy));
+                    continue;
+                }
+                if (pieceAtNextPosition.getTeamColor() == teamColor) {
+                    continue;
+                }
+                listOfPossibleMoves.add(new ChessPosition(dx, dy));
+            }
+        }
+
         if (typeOfPiece == ChessPiece.PieceType.PAWN) {
+
+
             throw new RuntimeException("Not implemented");
         }
 
