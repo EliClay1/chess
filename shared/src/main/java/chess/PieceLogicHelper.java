@@ -68,59 +68,8 @@ public class PieceLogicHelper {
         }
 
         if (typeOfPiece == ChessPiece.PieceType.PAWN) {
-
-            /*
-            * TODO - Pawns are special because if they reach the end of the board they get promoted. Also, if the piece
-            *  is a at a starting position they have the ability to move twice, while any time afterwards only once.
-            * The system for something like this will need to be two different types, where the code will change depending on
-            * which team the piece is on.
-            * Additionally, the pawn cannot ever be on the first row of it's team. It must start on the second row.
-            * */
-
-            // white team - starts at rows 1 and 2
-            // if on row two, allow for 2 movements forward, otherwise don't. Write a helper function to determine if the piece is in starting.
-            var x = currentPosition.getRow();
-            var y = currentPosition.getColumn();
-
-            // check the next available space and if it is blocked, do not allow a move, otherwise do.
-            // the 1 in (y+1) should be able to be changed accordingly if it is the starting piece.
-            if (board.getPiece(new ChessPosition(x, y+1)) != null) {
-                System.out.println("This move is not allowed.");
-            } else {
-                System.out.println("Good to go!");
-            }
-
-            // check the diagonals to see if there are any pieces there. Allow moves if this is the case
-            // check if the movable positions are within bounds. This is only the case for diagonal movements.
-
-            if (isNotWithinBoardBounds(board, x + 1, y + 1)) {
-                System.out.println("This move is not allowed.");
-            }
-            var diagonalMove1 = board.getPiece(new ChessPosition(x+1, y+1));
-
-            if (isNotWithinBoardBounds(board, x - 1, y + 1)) {
-                System.out.println("This move is not allowed.");
-            }
-
-            var diagonalMove2 = board.getPiece(new ChessPosition(x-1, y+1));
-
-            if (((diagonalMove1 != null) && (diagonalMove1.getTeamColor() != teamColor))
-                    || ((diagonalMove2 != null) && (diagonalMove2.getTeamColor() != teamColor))) {
-                System.out.println("Good to go!");
-            } else {
-                System.out.println("This move is not allowed.");
-            }
-
-            if (isStartingPiece(board, currentPosition)) {
-                System.out.println("Hey, I'm a starting pawn! I'm allowed to take 2 steps forward!");
-            }
-
+            pawnHelper(board, isStartingPiece(board, currentPosition), currentPosition, teamColor);
             // TODO - Promotional Ability
-
-            // black team - starts at rows 8 and 7
-            // changing the above code to a negative on the y-axis should be the only change that needs to be made.
-            // Find a way to make it a helper function.
-
         }
 
         List<ChessMove> chessMoves = new java.util.ArrayList<>(List.of());
@@ -172,5 +121,43 @@ public class PieceLogicHelper {
     }
 
     public void pawnHelper(ChessBoard board, Boolean isStartingPiece, ChessPosition position, ChessGame.TeamColor teamColor) {
+        int direction = getTeamDirection(teamColor);
+        var x = position.getRow();
+        var y = position.getColumn();
+
+        if (board.getPiece(new ChessPosition(x+direction, y)) != null) {
+            // check pawn diagonals first before returning. If all of these return true
+            System.out.println("This move is not allowed.");
+            return;
+        }
+
+        if (isStartingPiece) {
+            if (board.getPiece(new ChessPosition(x+direction+direction, y)) != null) {
+                System.out.println("This move is not allowed.");
+                return;
+            }
+        }
+
+        // Checking diagonal directions.
+        if (isNotWithinBoardBounds(board, x+direction, y+1)) {
+            System.out.println("This move is not allowed.");
+        }
+        var diagonalMove1 = board.getPiece(new ChessPosition(x+direction, y+1));
+        if (diagonalMove1 != null && diagonalMove1.getTeamColor() != teamColor) {
+            listOfPossibleMoves.add(new ChessPosition(x+direction, y+1));
+        }
+
+        if (isNotWithinBoardBounds(board, x+direction, y-1)) {
+            System.out.println("This move is not allowed.");
+        }
+        var diagonalMove2 = board.getPiece(new ChessPosition(x+direction, y-1));
+        if (diagonalMove2 != null && diagonalMove2.getTeamColor() != teamColor) {
+            listOfPossibleMoves.add(new ChessPosition(x+direction, y-1));
+        }
+
+        listOfPossibleMoves.add(new ChessPosition(x+direction, y));
+        if (isStartingPiece) {
+            listOfPossibleMoves.add(new ChessPosition(x+direction+direction, y));
+        }
     }
 }
