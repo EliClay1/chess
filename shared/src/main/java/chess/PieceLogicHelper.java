@@ -119,13 +119,34 @@ public class PieceLogicHelper {
         }
     }
 
+    public boolean canPromote(ChessPosition position, ChessGame.TeamColor teamColor) {
+        return (teamColor == ChessGame.TeamColor.WHITE && position.getRow() + 1 == 8)
+                || (teamColor == ChessGame.TeamColor.BLACK && position.getRow() - 1 == 1);
+    }
+
+    public List<ChessPosition> promotionHelper(ChessBoard board, ChessPosition promotionPieceLocation, ChessGame.TeamColor teamColor) {
+        List<ChessPosition> promotionalMoves = new java.util.ArrayList<>(List.of());
+        return promotionalMoves;
+    }
+
     public void pawnHelper(ChessBoard board, Boolean isStartingPiece, ChessPosition position, ChessGame.TeamColor teamColor) {
         int direction = getTeamDirection(teamColor);
-        var x = position.getRow();
-        var y = position.getColumn();
+        int[][] possiblePawnDirections = {{0,1}, {1,1}, {-1,1}};
+//        var x = position.getRow();
+//        var y = position.getColumn();
         boolean frontBlocked = false;
+        boolean promotePiece = false;
+
+
+
+        for (var dir: possiblePawnDirections) {
+            var x = dir[1];
+            var y = dir[0];
+            if ()
+        }
 
         if (board.getPiece(new ChessPosition(x+direction, y)) == null) {
+            promotePiece = canPromote(position, teamColor);
             listOfPossibleMoves.add(new ChessPosition(x+direction, y));
             frontBlocked = true;
         }
@@ -142,6 +163,7 @@ public class PieceLogicHelper {
             if (diagonalMove1 != null && diagonalMove1.getTeamColor() != teamColor) {
                 listOfPossibleMoves.add(new ChessPosition(x+direction, y+1));
             }
+            promotePiece = canPromote(position, teamColor);
         }
 
         if (!isNotWithinBoardBounds(board, x+direction, y-1)) {
@@ -149,8 +171,17 @@ public class PieceLogicHelper {
             if (diagonalMove2 != null && diagonalMove2.getTeamColor() != teamColor) {
                 listOfPossibleMoves.add(new ChessPosition(x+direction, y-1));
             }
+            promotePiece = canPromote(position, teamColor);
         }
 
         // TODO - Promotion Logic
+        if (promotePiece) {
+            System.out.println("This is a promotable piece.");
+            var promotedPiece = new ChessPiece(teamColor, ChessPiece.PieceType.QUEEN);
+            promotedPiece.pieceMoves(board, )
+
+
+            System.out.println(promotedPiece);
+        }
     }
 }

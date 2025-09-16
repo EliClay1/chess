@@ -59,8 +59,8 @@ public class ChessPiece {
 //        ChessPiece piece = board.getPiece(myPosition);
 //        return List.of(new ChessMove(new ChessPosition(1, 5), new ChessPosition(2, 6), null));
 
-        var moves = new HashSet<ChessMove>();
-        moves.add(new ChessMove(new ChessPosition(5,4), new ChessPosition(6,5), null));
+//        var moves = new HashSet<ChessMove>();
+//        moves.add(new ChessMove(new ChessPosition(5,4), new ChessPosition(6,5), null));
 
 //        return moves;
 
