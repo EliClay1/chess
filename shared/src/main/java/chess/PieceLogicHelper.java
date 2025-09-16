@@ -136,7 +136,13 @@ public class PieceLogicHelper {
             if (dir[0] == 0) {
                 if (board.getPiece(nextPosition) == null) {
                     if (canPromote(nextRow, teamColor)) {
-                        listOfPossibleMoves.add(new ChessMove(position, nextPosition, ChessPiece.PieceType.QUEEN));
+                        for (ChessPiece.PieceType piece : List.of(ChessPiece.PieceType.QUEEN,
+                                ChessPiece.PieceType.ROOK,
+                                ChessPiece.PieceType.BISHOP,
+                                ChessPiece.PieceType.KNIGHT)) {
+                            listOfPossibleMoves.add(new ChessMove(position, nextPosition, piece));
+                        }
+                        continue;
                     }
                     listOfPossibleMoves.add(new ChessMove(position, nextPosition, null));
                     if (isStartingPiece) {
@@ -150,7 +156,13 @@ public class PieceLogicHelper {
                 // diagonal code
                 if (board.getPiece(nextPosition) != null && board.getPiece(nextPosition).getTeamColor() != teamColor) {
                     if (canPromote(nextRow, teamColor)) {
-                        listOfPossibleMoves.add(new ChessMove(position, nextPosition, ChessPiece.PieceType.QUEEN));
+                        for (ChessPiece.PieceType piece : List.of(ChessPiece.PieceType.QUEEN,
+                                ChessPiece.PieceType.ROOK,
+                                ChessPiece.PieceType.BISHOP,
+                                ChessPiece.PieceType.KNIGHT)) {
+                            listOfPossibleMoves.add(new ChessMove(position, nextPosition, piece));
+                        }
+                        continue;
                     }
                     listOfPossibleMoves.add(new ChessMove(position, nextPosition, null));
                 }

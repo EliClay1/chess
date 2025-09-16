@@ -56,17 +56,8 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
 
-//        ChessPiece piece = board.getPiece(myPosition);
-//        return List.of(new ChessMove(new ChessPosition(1, 5), new ChessPosition(2, 6), null));
-
-//        var moves = new HashSet<ChessMove>();
-//        moves.add(new ChessMove(new ChessPosition(5,4), new ChessPosition(6,5), null));
-
-//        return moves;
-
-        // Rather than just returning that function, I could instead return the list, and... yeah I got nothing.
-        // YOU ARE GENERATING POSITIONS, NOT MOVES. YOU NEED TO GENERATE MOVES. PLEASE FOR THE LOVE OF-
         return new PieceLogicHelper().definePieceLogic(board, myPosition, type);
+
     }
 
     @Override
