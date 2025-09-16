@@ -64,6 +64,8 @@ public class ChessPiece {
 
 //        return moves;
 
+        // Rather than just returning that function, I could instead return the list, and... yeah I got nothing.
+        // YOU ARE GENERATING POSITIONS, NOT MOVES. YOU NEED TO GENERATE MOVES. PLEASE FOR THE LOVE OF-
         return new PieceLogicHelper().definePieceLogic(board, myPosition, type);
     }
 

@@ -5,7 +5,7 @@ import java.util.List;
 
 public class PieceLogicHelper {
 
-    List<ChessPosition> listOfPossibleMoves = new java.util.ArrayList<>(List.of());
+    List<ChessMove> listOfPossibleMoves = new java.util.ArrayList<>(List.of());
     int[][] possibleBishopDirections = {{1,1}, {-1,1}, {1,-1}, {-1,-1}};
     int[][] possibleRookDirections = {{0,1}, {0,-1}, {1,0}, {-1,0}};
     int[][] possibleRoyaltyDirections = {{1,1}, {1,0}, {1,-1}, {0,1}, {0,-1}, {-1,1}, {-1,0}, {-1,-1}};
@@ -20,7 +20,7 @@ public class PieceLogicHelper {
             for (int[] dir : possibleRoyaltyDirections) {
                 var dx = dir[0];
                 var dy = dir[1];
-                directionalHelper(board, currentPosition.getRow(), currentPosition.getColumn(), dx, dy, teamColor, ChessPiece.PieceType.KING);
+                directionalHelper(board, currentPosition, currentPosition.getRow(), currentPosition.getColumn(), dx, dy, teamColor, ChessPiece.PieceType.KING);
             }
         }
 
@@ -28,7 +28,7 @@ public class PieceLogicHelper {
             for (int[] dir : possibleBishopDirections) {
                 var dx = dir[0];
                 var dy = dir[1];
-                directionalHelper(board, currentPosition.getRow(), currentPosition.getColumn(), dx, dy, teamColor, ChessPiece.PieceType.BISHOP);
+                directionalHelper(board, currentPosition, currentPosition.getRow(), currentPosition.getColumn(), dx, dy, teamColor, ChessPiece.PieceType.BISHOP);
             }
         }
 
@@ -36,7 +36,7 @@ public class PieceLogicHelper {
             for (int[] dir : possibleRoyaltyDirections) {
                 var dx = dir[0];
                 var dy = dir[1];
-                directionalHelper(board, currentPosition.getRow(), currentPosition.getColumn(), dx, dy, teamColor, ChessPiece.PieceType.QUEEN);
+                directionalHelper(board, currentPosition, currentPosition.getRow(), currentPosition.getColumn(), dx, dy, teamColor, ChessPiece.PieceType.QUEEN);
             }
         }
 
@@ -44,7 +44,7 @@ public class PieceLogicHelper {
             for (int[] dir : possibleRookDirections) {
                 var dx = dir[0];
                 var dy = dir[1];
-                directionalHelper(board, currentPosition.getRow(), currentPosition.getColumn(), dx, dy, teamColor, ChessPiece.PieceType.ROOK);
+                directionalHelper(board, currentPosition, currentPosition.getRow(), currentPosition.getColumn(), dx, dy, teamColor, ChessPiece.PieceType.ROOK);
             }
         }
 
@@ -57,13 +57,13 @@ public class PieceLogicHelper {
                 }
                 ChessPiece pieceAtNextPosition = board.getPiece(new ChessPosition(dx, dy));
                 if (pieceAtNextPosition == null) {
-                    listOfPossibleMoves.add(new ChessPosition(dx, dy));
+                    listOfPossibleMoves.add(new ChessMove(currentPosition, new ChessPosition(dx, dy), null));
                     continue;
                 }
                 if (pieceAtNextPosition.getTeamColor() == teamColor) {
                     continue;
                 }
-                listOfPossibleMoves.add(new ChessPosition(dx, dy));
+                listOfPossibleMoves.add(new ChessMove(currentPosition, new ChessPosition(dx, dy), null));
             }
         }
 
@@ -71,12 +71,7 @@ public class PieceLogicHelper {
             pawnHelper(board, isStartingPiece(board, currentPosition), currentPosition, teamColor);
         }
 
-        List<ChessMove> chessMoves = new java.util.ArrayList<>(List.of());
-        for (var nextPosition : listOfPossibleMoves) {
-            chessMoves.add(new ChessMove(currentPosition, nextPosition, null));
-        }
-
-        return chessMoves;
+        return listOfPossibleMoves;
     }
 
     public boolean isNotWithinBoardBounds(ChessBoard board, int row, int col) {
@@ -91,7 +86,7 @@ public class PieceLogicHelper {
         } else return piece.getTeamColor() == ChessGame.TeamColor.BLACK && position.getRow() == 7;
     }
 
-    public void directionalHelper(ChessBoard board, int x, int y, int directionX, int directionY, ChessGame.TeamColor teamColor, ChessPiece.PieceType pieceType) {
+    public void directionalHelper(ChessBoard board, ChessPosition basePosition, int x, int y, int directionX, int directionY, ChessGame.TeamColor teamColor, ChessPiece.PieceType pieceType) {
         var nextX = x + directionX;
         var nextY = y + directionY;
 
@@ -102,12 +97,12 @@ public class PieceLogicHelper {
         ChessPiece pieceAtNextPosition = board.getPiece(new ChessPosition(nextX, nextY));
 
         if (pieceAtNextPosition == null) {
-            listOfPossibleMoves.add(new ChessPosition(nextX, nextY));
+            listOfPossibleMoves.add(new ChessMove(basePosition, new ChessPosition(nextX, nextY), null));
             if (pieceType != ChessPiece.PieceType.KING) {
-                directionalHelper(board, nextX, nextY, directionX, directionY, teamColor, pieceType);
+                directionalHelper(board, basePosition, nextX, nextY, directionX, directionY, teamColor, pieceType);
             }
         } else if (pieceAtNextPosition.getTeamColor() != teamColor) {
-            listOfPossibleMoves.add(new ChessPosition(nextX, nextY));
+            listOfPossibleMoves.add(new ChessMove(basePosition, new ChessPosition(nextX, nextY), null));
         }
     }
 
@@ -119,39 +114,46 @@ public class PieceLogicHelper {
         }
     }
 
-    public boolean canPromote(ChessPosition position, ChessGame.TeamColor teamColor) {
-        return (teamColor == ChessGame.TeamColor.WHITE && position.getRow() + 1 == 8)
-                || (teamColor == ChessGame.TeamColor.BLACK && position.getRow() - 1 == 1);
+    public boolean canPromote(int currentRow, ChessGame.TeamColor teamColor) {
+        return (teamColor == ChessGame.TeamColor.WHITE && currentRow == 8)
+                || (teamColor == ChessGame.TeamColor.BLACK && currentRow == 1);
     }
-
-    public boolean canMoveForward(ChessBoard board, ChessPosition position, int direction) {
-        return (board.getPiece(new ChessPosition(position.getRow()+direction, position.getColumn())) == null);
-    }
-
-//    public List<ChessPosition> promotionHelper(ChessBoard board, ChessPosition promotionPieceLocation, ChessGame.TeamColor teamColor) {
-//        List<ChessPosition> promotionalMoves = new java.util.ArrayList<>(List.of());
-//        return promotionalMoves;
-//    }
 
     public void pawnHelper(ChessBoard board, Boolean isStartingPiece, ChessPosition position, ChessGame.TeamColor teamColor) {
         int direction = getTeamDirection(teamColor);
         int[][] possiblePawnDirections = {{0,1}, {1,1}, {-1,1}};
 
         for (var dir: possiblePawnDirections) {
-            var x = dir[1];
-            var y = dir[0];
+            var nextRow = position.getRow() + direction;
+            var nextCol = position.getColumn() + dir[0];
             // if is within board bounds,
-            if (!isNotWithinBoardBounds(board, x, y) && canMoveForward(board, position, direction)
-                    || board.getPiece(new ChessPosition(x * direction, y)).getTeamColor() != teamColor) {
-                if (canPromote(new ChessPosition(x * direction, y), teamColor)) {
-                    //add promotional logic
+            if (isNotWithinBoardBounds(board, nextRow, nextCol)) {
+                continue;
+            }
+
+            // check for forward move, so if dir[0] is == 0
+            var nextPosition = new ChessPosition(nextRow, nextCol);
+            if (dir[0] == 0) {
+                if (board.getPiece(nextPosition) == null) {
+                    if (canPromote(nextRow, teamColor)) {
+                        listOfPossibleMoves.add(new ChessMove(position, nextPosition, ChessPiece.PieceType.QUEEN));
+                    }
+                    listOfPossibleMoves.add(new ChessMove(position, nextPosition, null));
+                    if (isStartingPiece) {
+                        var secondNextPosition = new ChessPosition(nextRow + direction, nextCol);
+                        if (board.getPiece(nextPosition) == null && board.getPiece(secondNextPosition) == null) {
+                            listOfPossibleMoves.add(new ChessMove(position, secondNextPosition, null));
+                        }
+                    }
                 }
             } else {
-                listOfPossibleMoves.add(new ChessPosition(x * direction, y));
-            }
-            if (isStartingPiece && canMoveForward(board, position, direction)
-                    && board.getPiece(new ChessPosition(x * direction + direction, y)) == null) {
-                listOfPossibleMoves.add(new ChessPosition(x * direction + direction, y));
+                // diagonal code
+                if (board.getPiece(nextPosition) != null && board.getPiece(nextPosition).getTeamColor() != teamColor) {
+                    if (canPromote(nextRow, teamColor)) {
+                        listOfPossibleMoves.add(new ChessMove(position, nextPosition, ChessPiece.PieceType.QUEEN));
+                    }
+                    listOfPossibleMoves.add(new ChessMove(position, nextPosition, null));
+                }
             }
         }
     }
