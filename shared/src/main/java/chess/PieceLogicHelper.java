@@ -69,7 +69,6 @@ public class PieceLogicHelper {
 
         if (typeOfPiece == ChessPiece.PieceType.PAWN) {
             pawnHelper(board, isStartingPiece(board, currentPosition), currentPosition, teamColor);
-            // TODO - Promotional Ability
         }
 
         List<ChessMove> chessMoves = new java.util.ArrayList<>(List.of());
@@ -124,40 +123,34 @@ public class PieceLogicHelper {
         int direction = getTeamDirection(teamColor);
         var x = position.getRow();
         var y = position.getColumn();
+        boolean frontBlocked = false;
 
-        if (board.getPiece(new ChessPosition(x+direction, y)) != null) {
-            // check pawn diagonals first before returning. If all of these return true
-            System.out.println("This move is not allowed.");
-            return;
+        if (board.getPiece(new ChessPosition(x+direction, y)) == null) {
+            listOfPossibleMoves.add(new ChessPosition(x+direction, y));
+            frontBlocked = true;
         }
 
-        if (isStartingPiece) {
-            if (board.getPiece(new ChessPosition(x+direction+direction, y)) != null) {
-                System.out.println("This move is not allowed.");
-                return;
+        if (isStartingPiece && frontBlocked) {
+            if (board.getPiece(new ChessPosition(x+direction+direction, y)) == null) {
+                listOfPossibleMoves.add(new ChessPosition(x+direction+direction, y));
             }
         }
 
         // Checking diagonal directions.
-        if (isNotWithinBoardBounds(board, x+direction, y+1)) {
-            System.out.println("This move is not allowed.");
-        }
-        var diagonalMove1 = board.getPiece(new ChessPosition(x+direction, y+1));
-        if (diagonalMove1 != null && diagonalMove1.getTeamColor() != teamColor) {
-            listOfPossibleMoves.add(new ChessPosition(x+direction, y+1));
-        }
-
-        if (isNotWithinBoardBounds(board, x+direction, y-1)) {
-            System.out.println("This move is not allowed.");
-        }
-        var diagonalMove2 = board.getPiece(new ChessPosition(x+direction, y-1));
-        if (diagonalMove2 != null && diagonalMove2.getTeamColor() != teamColor) {
-            listOfPossibleMoves.add(new ChessPosition(x+direction, y-1));
+        if (!isNotWithinBoardBounds(board, x+direction, y+1)) {
+            var diagonalMove1 = board.getPiece(new ChessPosition(x+direction, y+1));
+            if (diagonalMove1 != null && diagonalMove1.getTeamColor() != teamColor) {
+                listOfPossibleMoves.add(new ChessPosition(x+direction, y+1));
+            }
         }
 
-        listOfPossibleMoves.add(new ChessPosition(x+direction, y));
-        if (isStartingPiece) {
-            listOfPossibleMoves.add(new ChessPosition(x+direction+direction, y));
+        if (!isNotWithinBoardBounds(board, x+direction, y-1)) {
+            var diagonalMove2 = board.getPiece(new ChessPosition(x+direction, y-1));
+            if (diagonalMove2 != null && diagonalMove2.getTeamColor() != teamColor) {
+                listOfPossibleMoves.add(new ChessPosition(x+direction, y-1));
+            }
         }
+
+        // TODO - Promotion Logic
     }
 }
