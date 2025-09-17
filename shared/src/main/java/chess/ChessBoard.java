@@ -46,22 +46,16 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        // creates home-row
         ChessPiece.PieceType[] frontRowPieces = {ChessPiece.PieceType.ROOK, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.BISHOP,
-                ChessPiece.PieceType.KING, ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.KING, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.KNIGHT,
                 ChessPiece.PieceType.ROOK};
 
         for (int col = 1; col <= 8; col++) {
             addPiece(new ChessPosition(1, col), new ChessPiece(ChessGame.TeamColor.WHITE, frontRowPieces[col - 1]));
             addPiece(new ChessPosition(8, col), new ChessPiece(ChessGame.TeamColor.BLACK, frontRowPieces[col - 1]));
-        }
-
-        // creates all the pawns
-        for (int col = 1; col <= 8; col++) {
             addPiece(new ChessPosition(2, col), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
             addPiece(new ChessPosition(7, col), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
         }
-
     }
 
     @Override
