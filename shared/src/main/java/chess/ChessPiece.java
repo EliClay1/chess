@@ -56,7 +56,7 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
 
-        return new PieceLogicHelper().definePieceLogic(board, myPosition, type);
+        return new PieceLogicHelper().definePieceLogic(board, myPosition);
 
     }
 

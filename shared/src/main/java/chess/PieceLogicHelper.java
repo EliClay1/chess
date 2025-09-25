@@ -1,173 +1,165 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.ArrayList;
 
 public class PieceLogicHelper {
+    List<ChessMove> listOfMoves = new ArrayList<>(List.of());
 
-    List<ChessMove> listOfPossibleMoves = new java.util.ArrayList<>(List.of());
-    int[][] possibleBishopDirections = {{1,1}, {-1,1}, {1,-1}, {-1,-1}};
-    int[][] possibleRookDirections = {{0,1}, {0,-1}, {1,0}, {-1,0}};
-    int[][] possibleRoyaltyDirections = {{1,1}, {1,0}, {1,-1}, {0,1}, {0,-1}, {-1,1}, {-1,0}, {-1,-1}};
-    int[][] possibleKnightDirections = {{-1,2}, {-2,1}, {-1,-2}, {-2,-1}, {1,-2}, {2,-1}, {1,2}, {2,1}};
+    Collection<ChessMove> definePieceLogic(ChessBoard board, ChessPosition currentPosition) {
+        int[][] royaltyMoves = {{1,1}, {-1, 1}, {-1, -1}, {1, -1}, {1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+        int[][] knightMoves = {{2, 1}, {1, 2}, {-1, 2}, {-2, 1}, {-2, -1}, {-1, -2}, {1, -2}, {2, -1}};
+        int[][] bishopMoves = {{1,1}, {-1, 1}, {-1, -1}, {1, -1}};
+        int[][] rookMoves = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+        int[][] pawnMoves = {{1, 0}, {1, -1}, {1, 1}};
 
-    public Collection<ChessMove> definePieceLogic (ChessBoard board, ChessPosition currentPosition, ChessPiece.PieceType typeOfPiece) {
+        ChessPiece currentPiece = board.getPiece(currentPosition);
 
-        ChessGame.TeamColor teamColor = board.getPiece(currentPosition).getTeamColor();
 
-        if (typeOfPiece == ChessPiece.PieceType.KING) {
-
-            for (int[] dir : possibleRoyaltyDirections) {
-                var dx = dir[0];
-                var dy = dir[1];
-                directionalHelper(board, currentPosition, currentPosition.getRow(), currentPosition.getColumn(), dx, dy, teamColor, ChessPiece.PieceType.KING);
+        if (currentPiece.getPieceType() == ChessPiece.PieceType.KING) {
+            for (var dir : royaltyMoves) {
+                int dRow = dir[0];
+                int dCol = dir[1];
+                directionalHelper(board, currentPosition, currentPosition, dRow, dCol, currentPiece.getTeamColor(), false);
             }
         }
 
-        if (typeOfPiece == ChessPiece.PieceType.BISHOP) {
-            for (int[] dir : possibleBishopDirections) {
-                var dx = dir[0];
-                var dy = dir[1];
-                directionalHelper(board, currentPosition, currentPosition.getRow(), currentPosition.getColumn(), dx, dy, teamColor, ChessPiece.PieceType.BISHOP);
+        if (currentPiece.getPieceType() == ChessPiece.PieceType.QUEEN) {
+            for (var dir : royaltyMoves) {
+                int dRow = dir[0];
+                int dCol = dir[1];
+                directionalHelper(board, currentPosition, currentPosition, dRow, dCol, currentPiece.getTeamColor(), true);
             }
         }
 
-        if (typeOfPiece == ChessPiece.PieceType.QUEEN) {
-            for (int[] dir : possibleRoyaltyDirections) {
-                var dx = dir[0];
-                var dy = dir[1];
-                directionalHelper(board, currentPosition, currentPosition.getRow(), currentPosition.getColumn(), dx, dy, teamColor, ChessPiece.PieceType.QUEEN);
+        if (currentPiece.getPieceType() == ChessPiece.PieceType.BISHOP) {
+            for (var dir : bishopMoves) {
+                int dRow = dir[0];
+                int dCol = dir[1];
+                directionalHelper(board, currentPosition, currentPosition, dRow, dCol, currentPiece.getTeamColor(), true);
             }
         }
 
-        if (typeOfPiece == ChessPiece.PieceType.ROOK) {
-            for (int[] dir : possibleRookDirections) {
-                var dx = dir[0];
-                var dy = dir[1];
-                directionalHelper(board, currentPosition, currentPosition.getRow(), currentPosition.getColumn(), dx, dy, teamColor, ChessPiece.PieceType.ROOK);
+        if (currentPiece.getPieceType() == ChessPiece.PieceType.ROOK) {
+            for (var dir : rookMoves) {
+                int dRow = dir[0];
+                int dCol = dir[1];
+                directionalHelper(board, currentPosition, currentPosition, dRow, dCol, currentPiece.getTeamColor(), true);
             }
         }
 
-        if (typeOfPiece == ChessPiece.PieceType.KNIGHT) {
-            for (int[] dir : possibleKnightDirections) {
-                var dx = currentPosition.getRow() + dir[0];
-                var dy = currentPosition.getColumn() + dir[1];
-                if (isNotWithinBoardBounds(board, dx, dy)) {
-                    continue;
-                }
-                ChessPiece pieceAtNextPosition = board.getPiece(new ChessPosition(dx, dy));
-                if (pieceAtNextPosition == null) {
-                    listOfPossibleMoves.add(new ChessMove(currentPosition, new ChessPosition(dx, dy), null));
-                    continue;
-                }
-                if (pieceAtNextPosition.getTeamColor() == teamColor) {
-                    continue;
-                }
-                listOfPossibleMoves.add(new ChessMove(currentPosition, new ChessPosition(dx, dy), null));
+        if (currentPiece.getPieceType() == ChessPiece.PieceType.KNIGHT) {
+            for (var dir : knightMoves) {
+                int dRow = dir[0];
+                int dCol = dir[1];
+                directionalHelper(board, currentPosition, currentPosition, dRow, dCol, currentPiece.getTeamColor(), false);
             }
         }
 
-        if (typeOfPiece == ChessPiece.PieceType.PAWN) {
-            pawnHelper(board, isStartingPiece(board, currentPosition), currentPosition, teamColor);
+        if (currentPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
+            for (var dir : pawnMoves) {
+                int dRow = dir[0];
+                int dCol = dir[1];
+                pawnHelper(board, currentPosition, dRow, dCol, currentPiece.getTeamColor());
+            }
         }
 
-        return listOfPossibleMoves;
+        return listOfMoves;
     }
 
-    public boolean isNotWithinBoardBounds(ChessBoard board, int row, int col) {
-        int boardDimensions = board.gameBoard.length;
-        return row > boardDimensions || col > boardDimensions || row <= 0 || col <= 0;
+    boolean isWithinBounds(ChessBoard board, ChessPosition position) {
+        return (position.getRow() > 0 && position.getRow() <= board.gameBoard.length) && (position.getColumn() > 0 && position.getColumn() <= board.gameBoard.length);
     }
 
-    public boolean isStartingPiece(ChessBoard board, ChessPosition position) {
-        ChessPiece piece = board.getPiece(position);
-        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE && position.getRow() == 2) {
-            return true;
-        } else return piece.getTeamColor() == ChessGame.TeamColor.BLACK && position.getRow() == 7;
-    }
-
-    public void directionalHelper(ChessBoard board, ChessPosition basePosition, int x, int y, int directionX, int directionY, ChessGame.TeamColor teamColor, ChessPiece.PieceType pieceType) {
-        var nextX = x + directionX;
-        var nextY = y + directionY;
-
-        if (isNotWithinBoardBounds(board, nextX, nextY)) {
-            return;
-        }
-
-        ChessPiece pieceAtNextPosition = board.getPiece(new ChessPosition(nextX, nextY));
-
-        if (pieceAtNextPosition == null) {
-            listOfPossibleMoves.add(new ChessMove(basePosition, new ChessPosition(nextX, nextY), null));
-            if (pieceType != ChessPiece.PieceType.KING) {
-                directionalHelper(board, basePosition, nextX, nextY, directionX, directionY, teamColor, pieceType);
-            }
-        } else if (pieceAtNextPosition.getTeamColor() != teamColor) {
-            listOfPossibleMoves.add(new ChessMove(basePosition, new ChessPosition(nextX, nextY), null));
-        }
-    }
-
-    public int getTeamDirection(ChessGame.TeamColor teamColor) {
+    int getDirection(ChessGame.TeamColor teamColor) {
         if (teamColor == ChessGame.TeamColor.WHITE) {
             return 1;
+        }
+        return -1;
+    }
+
+    boolean isStartingPiece(ChessPosition position, ChessGame.TeamColor teamColor) {
+        if (position.getRow() == 2 && teamColor == ChessGame.TeamColor.WHITE) {
+            return true;
+        }
+        if (position.getRow() == 7 && teamColor == ChessGame.TeamColor.BLACK) {
+            return true;
+        }
+
+        return false;
+    }
+
+    void directionalHelper(ChessBoard board, ChessPosition currentPosition, ChessPosition nPosition, int dRow, int dCol, ChessGame.TeamColor currentTeamColor, boolean recurse) {
+        int nextRow = nPosition.getRow() + dRow;
+        int nextCol = nPosition.getColumn() + dCol;
+        ChessPosition nextPosition = new ChessPosition(nextRow, nextCol);
+
+        if (!isWithinBounds(board, nextPosition)) {
+            return;
+        }
+        ChessPiece nextPositionPiece = board.getPiece(nextPosition);
+
+        if (nextPositionPiece == null) {
+            listOfMoves.add(new ChessMove(currentPosition, nextPosition, null));
+            if (recurse) {
+                directionalHelper(board, currentPosition, nextPosition, dRow, dCol, currentTeamColor, true);
+            }
+        } else if (nextPositionPiece.getTeamColor() != currentTeamColor) {
+            listOfMoves.add(new ChessMove(currentPosition, nextPosition, null));
+        }
+    }
+
+    void pawnHelper(ChessBoard board, ChessPosition currentPosition, int dRow, int dCol, ChessGame.TeamColor currentTeamColor) {
+        int direction = getDirection(currentTeamColor);
+        int nextRow = currentPosition.getRow() + dRow * direction;
+        int nextCol = currentPosition.getColumn() + dCol * direction;
+
+        ChessPosition nextPosition = new ChessPosition(nextRow, nextCol);
+        if (!isWithinBounds(board, nextPosition)) {
+            return;
+        }
+        ChessPiece nextPiece = board.getPiece(nextPosition);
+
+        // check for forward motion
+        if (dCol == 0) {
+            if (nextPiece == null) {
+                // Checks promotion
+                if (promotion(currentPosition, nextPosition, currentTeamColor)) {
+                    return;
+                }
+                // checks for starting piece
+                if (isStartingPiece(currentPosition, currentTeamColor)) {
+                    int nextNextRow = nextRow + direction;
+                    ChessPosition nextNextPosition = new ChessPosition(nextNextRow, nextCol);
+                    ChessPiece nextNextPiece = board.getPiece(nextNextPosition);
+                    if (nextNextPiece == null) {
+                        listOfMoves.add(new ChessMove(currentPosition, nextNextPosition, null));
+                    }
+                }
+                listOfMoves.add(new ChessMove(currentPosition, nextPosition, null));
+            }
         } else {
-            return -1;
+            if (nextPiece != null && nextPiece.getTeamColor() != currentTeamColor) {
+                if (promotion(currentPosition, nextPosition, currentTeamColor)) {
+                    return;
+                }
+                listOfMoves.add(new ChessMove(currentPosition, nextPosition, null));
+            }
         }
     }
 
-    public boolean canPromote(int currentRow, ChessGame.TeamColor teamColor) {
-        return (teamColor == ChessGame.TeamColor.WHITE && currentRow == 8)
-                || (teamColor == ChessGame.TeamColor.BLACK && currentRow == 1);
-    }
+    boolean promotion(ChessPosition currentPosition, ChessPosition nextPosition, ChessGame.TeamColor teamColor) {
+        List<ChessPiece.PieceType> promotionPieces = List.of(ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.ROOK, ChessPiece.PieceType.BISHOP);
 
-    public void pawnHelper(ChessBoard board, Boolean isStartingPiece, ChessPosition position, ChessGame.TeamColor teamColor) {
-        int direction = getTeamDirection(teamColor);
-        int[][] possiblePawnDirections = {{0,1}, {1,1}, {-1,1}};
-
-        for (var dir: possiblePawnDirections) {
-            var nextRow = position.getRow() + direction;
-            var nextCol = position.getColumn() + dir[0];
-            // if is within board bounds,
-            if (isNotWithinBoardBounds(board, nextRow, nextCol)) {
-                continue;
+        if ((nextPosition.getRow() == 8 && teamColor == ChessGame.TeamColor.WHITE) ||
+                nextPosition.getRow() == 1 && teamColor == ChessGame.TeamColor.BLACK) {
+            for (var piece : promotionPieces) {
+                listOfMoves.add(new ChessMove(currentPosition, nextPosition, piece));
             }
-
-            // check for forward move, so if dir[0] is == 0
-            var nextPosition = new ChessPosition(nextRow, nextCol);
-            if (dir[0] == 0) {
-                if (board.getPiece(nextPosition) == null) {
-                    if (canPromote(nextRow, teamColor)) {
-                        for (ChessPiece.PieceType piece : List.of(ChessPiece.PieceType.QUEEN,
-                                ChessPiece.PieceType.ROOK,
-                                ChessPiece.PieceType.BISHOP,
-                                ChessPiece.PieceType.KNIGHT)) {
-                            listOfPossibleMoves.add(new ChessMove(position, nextPosition, piece));
-                        }
-                        continue;
-                    }
-                    listOfPossibleMoves.add(new ChessMove(position, nextPosition, null));
-                    if (isStartingPiece) {
-                        var secondNextPosition = new ChessPosition(nextRow + direction, nextCol);
-                        if (board.getPiece(nextPosition) == null && board.getPiece(secondNextPosition) == null) {
-                            listOfPossibleMoves.add(new ChessMove(position, secondNextPosition, null));
-                        }
-                    }
-                }
-            } else {
-                // diagonal code
-                if (board.getPiece(nextPosition) != null && board.getPiece(nextPosition).getTeamColor() != teamColor) {
-                    if (canPromote(nextRow, teamColor)) {
-                        for (ChessPiece.PieceType piece : List.of(ChessPiece.PieceType.QUEEN,
-                                ChessPiece.PieceType.ROOK,
-                                ChessPiece.PieceType.BISHOP,
-                                ChessPiece.PieceType.KNIGHT)) {
-                            listOfPossibleMoves.add(new ChessMove(position, nextPosition, piece));
-                        }
-                        continue;
-                    }
-                    listOfPossibleMoves.add(new ChessMove(position, nextPosition, null));
-                }
-            }
+            return true;
         }
+        return false;
     }
 }
