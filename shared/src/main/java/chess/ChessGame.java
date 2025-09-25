@@ -10,6 +10,8 @@ import java.util.Collection;
  */
 public class ChessGame {
 
+    final private ChessBoard startingBoard = new ChessBoard();
+
     public ChessGame() {
 
     }
@@ -46,7 +48,15 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        // TODO - Figure out what the heck is going on here. Also, look into prior code design; match the principles.
+
+        // if the board is empty at the beginning of the game, this will be nullified. Big no-no. Initialize the board first.
+        Collection<ChessMove> listOfValidMoves = getBoard().getPiece(startPosition).pieceMoves(getBoard(), startPosition);
+
+        if (listOfValidMoves == null) {
+            return null;
+        }
+        return listOfValidMoves;
     }
 
     /**
@@ -96,7 +106,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        board.resetBoard();
     }
 
     /**
@@ -105,6 +115,8 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return startingBoard;
     }
+
+    // TODO - Implement Hash & Equals, as well as toString().
 }

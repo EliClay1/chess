@@ -68,8 +68,8 @@ public class PieceLogicHelper {
         return listOfMoves;
     }
 
-    boolean isWithinBounds(ChessBoard board, ChessPosition position) {
-        return (position.getRow() > 0 && position.getRow() <= board.gameBoard.length) && (position.getColumn() > 0 && position.getColumn() <= board.gameBoard.length);
+    boolean isNotWithinBounds(ChessBoard board, ChessPosition position) {
+        return (position.getRow() <= 0 || position.getRow() > board.gameBoard.length) || (position.getColumn() <= 0 || position.getColumn() > board.gameBoard.length);
     }
 
     int getDirection(ChessGame.TeamColor teamColor) {
@@ -83,11 +83,7 @@ public class PieceLogicHelper {
         if (position.getRow() == 2 && teamColor == ChessGame.TeamColor.WHITE) {
             return true;
         }
-        if (position.getRow() == 7 && teamColor == ChessGame.TeamColor.BLACK) {
-            return true;
-        }
-
-        return false;
+        return position.getRow() == 7 && teamColor == ChessGame.TeamColor.BLACK;
     }
 
     void directionalHelper(ChessBoard board, ChessPosition currentPosition, ChessPosition nPosition, int dRow, int dCol, ChessGame.TeamColor currentTeamColor, boolean recurse) {
@@ -95,7 +91,7 @@ public class PieceLogicHelper {
         int nextCol = nPosition.getColumn() + dCol;
         ChessPosition nextPosition = new ChessPosition(nextRow, nextCol);
 
-        if (!isWithinBounds(board, nextPosition)) {
+        if (isNotWithinBounds(board, nextPosition)) {
             return;
         }
         ChessPiece nextPositionPiece = board.getPiece(nextPosition);
@@ -116,7 +112,7 @@ public class PieceLogicHelper {
         int nextCol = currentPosition.getColumn() + dCol * direction;
 
         ChessPosition nextPosition = new ChessPosition(nextRow, nextCol);
-        if (!isWithinBounds(board, nextPosition)) {
+        if (isNotWithinBounds(board, nextPosition)) {
             return;
         }
         ChessPiece nextPiece = board.getPiece(nextPosition);
