@@ -125,7 +125,7 @@ public class ChessGame {
         * also be its own function, but specifically returns all the possible moves of every enemy piece in the game.
         * */
 
-        List<ChessPiece> pieces = new BoardIterator().returnPieceLocationList(getBoard(), ChessPiece.PieceType.KING);
+        List<ChessPiece> pieces = new BoardIterator().returnPieceLocationList(getBoard(), ChessPiece.PieceType.KING, currentTurn);
 
         return false;
     }
