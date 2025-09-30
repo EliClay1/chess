@@ -92,6 +92,7 @@ public class ChessGame {
         for (var possibleMove : validMoves) {
             if (possibleMove != move) {
                 notinMoves = true;
+                break;
             }
         }
         if (notinMoves) {
@@ -125,7 +126,20 @@ public class ChessGame {
         * also be its own function, but specifically returns all the possible moves of every enemy piece in the game.
         * */
 
-        List<ChessPiece> pieces = new BoardIterator().returnPieceLocationList(getBoard(), ChessPiece.PieceType.KING, currentTurn);
+//        ChessPosition kingsPosition;
+//        PieceFilter myFilter = piece -> piece.getPieceType() == ChessPiece.PieceType.ROOK && piece.getTeamColor() == TeamColor.BLACK;
+//        List<ChessPosition> positions = new BoardIterator().findChessPieces(getBoard(), myFilter);
+//        for (var position : positions) {
+//            kingsPosition = position;
+//            System.out.println(kingsPosition);
+//        }
+
+        PieceFilter onlyBlackPieces = piece -> piece.getTeamColor() == TeamColor.BLACK;
+        List<ChessPosition> positions = new BoardIterator().findChessPieces(getBoard(), onlyBlackPieces);
+        for (var position : positions) {
+            System.out.println(position);
+        }
+
 
         return false;
     }
@@ -193,7 +207,9 @@ public class ChessGame {
         }
     }
 
-    // TODO - Implement Hash & Equals, as well as toString().
+    private void removeMoves() {
+        // TODO - will take two lists of moves from two different teams, and any that clash get removed? Workshop this, but the idea is there.
+    }
 
     @Override
     public boolean equals(Object o) {

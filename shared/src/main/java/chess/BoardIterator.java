@@ -3,23 +3,30 @@ package chess;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BoardIterator {
+public class BoardIterator implements PieceFilter {
+    @Override
+    public boolean matches(ChessPiece piece) {
+        return false;
+    }
 
-    List<ChessPiece> returnPieceLocationList(ChessBoard board, ChessPiece.PieceType pieceType, ChessGame.TeamColor teamColor) {
-        List<ChessPiece> listOfPieces = new ArrayList<>(List.of());
-
-        for (int row = 1; row <= board.gameBoard.length; row++) {
-            for (int col = 1; col <= board.gameBoard.length; col++) {
-                ChessPosition position = new ChessPosition(row, col);
-                ChessPiece piece = board.getPiece(position);
-                if (piece == null) {
-                    continue;
-                }
-                if (piece.getTeamColor() == teamColor && piece.getPieceType() == pieceType) {
-                    listOfPieces.add(piece);
-                }
+    List<ChessPosition> findChessPieces(ChessBoard board, PieceFilter filter) {
+        List<ChessPosition> matchedPositions = new ArrayList<>();
+        for (ChessPosition position : allBoardLocations(board)) {
+            ChessPiece piece = board.getPiece(position);
+            if (piece != null && filter.matches(piece)) {
+                matchedPositions.add(position);
             }
         }
-        return listOfPieces;
+        return matchedPositions;
+    }
+
+    List<ChessPosition> allBoardLocations(ChessBoard board) {
+        List<ChessPosition> locations = new ArrayList<>();
+        for (int row = 1; row <= board.gameBoard.length; row++) {
+            for (int col = 1; col <= board.gameBoard.length; col++) {
+                locations.add(new ChessPosition(row, col));
+            }
+        }
+        return locations;
     }
 }
