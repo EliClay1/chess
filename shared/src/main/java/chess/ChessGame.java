@@ -80,43 +80,33 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        // Validate that it’s the current player’s piece.
+        // Validate that it’s the current player’s piece. ✅
         //
-        //Check that the move is valid according to validMoves for that piece.
+        //Check that the move is valid according to validMoves for that piece. ✅
         //
-        //Update the board to reflect the move.
+        //Update the board to reflect the move. ✅
         //
-        //Switch the turn to the other player.
+        //Switch the turn to the other player. ✅
         //
-        //Throw InvalidMoveException if move not valid.
+        //Throw InvalidMoveException if move not valid. ✅
 
         ChessPosition startingPosition = move.getStartPosition();
-
-        var piece = getBoard().getPiece(startingPosition);
+        ChessPiece piece = getBoard().getPiece(startingPosition);
         if (piece == null || piece.getTeamColor() != currentTurn) {
             throw new InvalidMoveException("That isn't a valid move!");
         }
 
-        // TODO - This needs to be redone. Think through the code design.
-        var validMoves = validMoves(startingPosition);
-        boolean notinMoves = false;
-        for (var possibleMove : validMoves) {
-            if (possibleMove != move) {
-                notinMoves = true;
-                break;
-            }
-        }
-        if (notinMoves) {
+        // this should scan through the entire collection and find any kind of match. Found this through research, but I might look into
+        // changing other parts of the code to match this same style as it is a much more simplified version.
+        boolean isValid = validMoves(startingPosition).stream().anyMatch(chessMove -> chessMove.equals(move));
+
+        if (!isValid) {
             throw new InvalidMoveException("That isn't a valid move!");
         }
 
-        // TODO - Need to create the function that makes moves possible.
-//        getBoard().makeMove(move);
+        getBoard().makeMove(move);
+
         switchTurn();
-
-
-
-        throw new RuntimeException("Not implemented");
     }
 
     /**
@@ -153,10 +143,10 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        if (!isInCheck(teamColor)) {
+        if (isInCheck(teamColor)) {
             return false;
         }
-        return getAllPositions(teamColor).isEmpty();
+        return !hasValidMoves(teamColor);
     }
 
     /**
@@ -218,14 +208,9 @@ public class ChessGame {
 
     private boolean hasValidMoves(TeamColor teamColor) {
         PieceFilter currentTeamPieces = piece -> piece.getTeamColor() == teamColor;
-        // t
         for (var position : new BoardSearcher().findChessPieces(getBoard(), currentTeamPieces)) {
-            for (ChessMove move : validMoves(position)) {
-                ChessGame copy = this.deepCopy();
-                copy.getBoard().makeMove(move);
-                if (!copy.isInCheck(teamColor)) {
-                    return true;
-                }
+            if (!validMoves(position).isEmpty()) {
+                return true;
             }
         }
         return false;
