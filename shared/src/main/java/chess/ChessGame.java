@@ -218,6 +218,7 @@ public class ChessGame {
 
     private boolean hasValidMoves(TeamColor teamColor) {
         PieceFilter currentTeamPieces = piece -> piece.getTeamColor() == teamColor;
+        // t
         for (var position : new BoardSearcher().findChessPieces(getBoard(), currentTeamPieces)) {
             for (ChessMove move : validMoves(position)) {
                 ChessGame copy = this.deepCopy();
