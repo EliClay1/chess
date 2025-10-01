@@ -63,7 +63,7 @@ public class ChessGame {
         Collection<ChessMove> possibleMoves = piece.pieceMoves(getBoard(), startPosition);
 
         for (ChessMove chessMove : possibleMoves) {
-            ChessGame clonedGame = deepCopy();
+            ChessGame clonedGame = this.deepCopy();
             clonedGame.getBoard().makeMove(chessMove);
             // don't forget to add checkmate and stalemate checking.
             if (!clonedGame.isInCheck(teamColor)) {
@@ -127,7 +127,7 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         ChessPosition kingsPosition = findKingsPosition(teamColor);
-        List<ChessPosition> allEnemyPositions = getAllEnemyPositions(getOppositeTeamColor(teamColor));
+        List<ChessPosition> allEnemyPositions = getAllPositions(getOppositeTeamColor(teamColor));
         return new BoardSearcher().isPositionAttacked(getBoard(), kingsPosition, allEnemyPositions);
     }
 
@@ -139,13 +139,10 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
 
-        /*
-        * 1. run isInCheck(); if this returns true, then check if any valid move from the teamColor could get out of check
-        * if this returns false, then return false for this function as well.
-        *
-        * 2. If no such move exists, return true;
-        * */
-        throw new RuntimeException("Not implemented");
+        if (isInCheck(teamColor)) {
+            return !canGetOutOfCheck(teamColor);
+        }
+        return false;
     }
 
     /**
@@ -156,15 +153,10 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        /*
-        * 1. run isInCheck();
-        * if this is false, return false;
-        *
-        * 2. Check if teamColor has any valid moves. If the list is empty, return true;
-        * */
-
-
-        throw new RuntimeException("Not implemented");
+        if (!isInCheck(teamColor)) {
+            return false;
+        }
+        return getAllPositions(teamColor).isEmpty();
     }
 
     /**
@@ -185,7 +177,6 @@ public class ChessGame {
         return startingBoard;
     }
 
-    // function to switch the player turn after the move has been made.
     private void switchTurn() {
         if (currentTurn == TeamColor.WHITE) {
             currentTurn =TeamColor.BLACK;
@@ -210,9 +201,38 @@ public class ChessGame {
         return kingsPosition;
     }
 
-    private List<ChessPosition> getAllEnemyPositions(TeamColor enemyColor) {
-        PieceFilter enemyPositions = piece -> piece.getTeamColor() == enemyColor;
-        return new ArrayList<>(new BoardSearcher().findChessPieces(getBoard(), enemyPositions));
+    private boolean canGetOutOfCheck(TeamColor teamColor) {
+        PieceFilter currentTeamPieces = piece -> piece.getTeamColor() == teamColor;
+        for (var position : new BoardSearcher().findChessPieces(getBoard(), currentTeamPieces)) {
+            ChessPiece piece = getBoard().getPiece(position);
+            for (ChessMove move : validMoves(position)) {
+                ChessGame copy = this.deepCopy();
+                copy.getBoard().makeMove(move);
+                if (!copy.isInCheck(teamColor)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean hasValidMoves(TeamColor teamColor) {
+        PieceFilter currentTeamPieces = piece -> piece.getTeamColor() == teamColor;
+        for (var position : new BoardSearcher().findChessPieces(getBoard(), currentTeamPieces)) {
+            for (ChessMove move : validMoves(position)) {
+                ChessGame copy = this.deepCopy();
+                copy.getBoard().makeMove(move);
+                if (!copy.isInCheck(teamColor)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private List<ChessPosition> getAllPositions(TeamColor teamColor) {
+        PieceFilter positions = piece -> piece.getTeamColor() == teamColor;
+        return new ArrayList<>(new BoardSearcher().findChessPieces(getBoard(), positions));
     }
 
     public ChessGame deepCopy() {
