@@ -7,6 +7,7 @@ import java.util.ArrayList;
 public class PieceLogicHelper {
     List<ChessMove> listOfMoves = new ArrayList<>(List.of());
 
+    //
     Collection<ChessMove> definePieceLogic(ChessBoard board, ChessPosition currentPosition) {
         int[][] royaltyMoves = {{1,1}, {-1, 1}, {-1, -1}, {1, -1}, {1, 0}, {0, 1}, {-1, 0}, {0, -1}};
         int[][] knightMoves = {{2, 1}, {1, 2}, {-1, 2}, {-2, 1}, {-2, -1}, {-1, -2}, {1, -2}, {2, -1}};
