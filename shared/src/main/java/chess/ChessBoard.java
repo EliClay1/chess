@@ -43,6 +43,16 @@ public class ChessBoard {
         return gameBoard[position.getRow()-1][position.getColumn()-1];
     }
 
+    public void removePiece(ChessPosition position) {
+        gameBoard[position.getRow()-1][position.getColumn()-1] = null;
+    }
+
+    public void makeMove(ChessMove move) {
+        ChessPiece movingPiece = getPiece(move.getStartPosition());
+        removePiece(move.getStartPosition());
+        addPiece(move.getEndPosition(), movingPiece);
+    }
+
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
@@ -58,6 +68,28 @@ public class ChessBoard {
             addPiece(new ChessPosition(2, col), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
             addPiece(new ChessPosition(7, col), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
         }
+    }
+
+    public ChessBoard deepCopy() {
+        ChessBoard board = new ChessBoard();
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPiece piece = this.gameBoard[i][j];
+                if (piece != null) {
+                    // Use the copy constructor or clone method of ChessPiece as appropriate
+                    board.gameBoard[i][j] = new ChessPiece(piece.getTeamColor(), piece.getPieceType()); // Or piece.clone()
+                } else {
+                    board.gameBoard[i][j] = null;
+                }
+            }
+        }
+        return board;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+
+        return super.clone();
     }
 
     @Override

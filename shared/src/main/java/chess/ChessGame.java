@@ -53,14 +53,24 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         // TODO - Figure out what the heck is going on here. Also, look into prior code design; match the principles.
-        var piece = getBoard().getPiece(startPosition);
+        Collection<ChessMove> validMoves = new ArrayList<>();
+
+        ChessPiece piece = getBoard().getPiece(startPosition);
         if (piece == null) {
             return List.of();
         }
+        TeamColor teamColor = piece.getTeamColor();
+        Collection<ChessMove> possibleMoves = piece.pieceMoves(getBoard(), startPosition);
 
-        isInCheck(currentTurn);
-        // if the board is empty at the beginning of the game, this will be nullified. Big no-no. Initialize the board first.
-        return piece.pieceMoves(getBoard(), startPosition);
+        for (ChessMove chessMove : possibleMoves) {
+            ChessGame clonedGame = deepCopy();
+            clonedGame.getBoard().makeMove(chessMove);
+            // don't forget to add checkmate and stalemate checking.
+            if (!clonedGame.isInCheck(teamColor)) {
+                validMoves.add(chessMove);
+            }
+        }
+        return validMoves;
     }
 
     /**
@@ -116,20 +126,8 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-
-        /* implementing a base version of this first, then optimizing later.
-        Find the King’s Position ✅
-        Write a helper that returns the position of the king for a given team color.
-
-        Find All Enemy Moves ✅
-        Write a helper that collects all possible moves for all enemy pieces.
-
-        Check if King is Attacked ✅
-        Write a helper that checks if the king’s position is in the set of enemy moves.
-         */
-
-        ChessPosition kingsPosition = findKingsPosition(currentTurn);
-        List<ChessPosition> allEnemyPositions = getAllEnemyPositions(getOppositeTeamColor());
+        ChessPosition kingsPosition = findKingsPosition(teamColor);
+        List<ChessPosition> allEnemyPositions = getAllEnemyPositions(getOppositeTeamColor(teamColor));
         return new BoardSearcher().isPositionAttacked(getBoard(), kingsPosition, allEnemyPositions);
     }
 
@@ -196,8 +194,8 @@ public class ChessGame {
         }
     }
 
-    private TeamColor getOppositeTeamColor() {
-        if (currentTurn == TeamColor.WHITE) {
+    private TeamColor getOppositeTeamColor(TeamColor color) {
+        if (color == TeamColor.WHITE) {
             return TeamColor.BLACK;
         }
         return TeamColor.WHITE;
@@ -215,6 +213,13 @@ public class ChessGame {
     private List<ChessPosition> getAllEnemyPositions(TeamColor enemyColor) {
         PieceFilter enemyPositions = piece -> piece.getTeamColor() == enemyColor;
         return new ArrayList<>(new BoardSearcher().findChessPieces(getBoard(), enemyPositions));
+    }
+
+    public ChessGame deepCopy() {
+        ChessGame copy = new ChessGame();
+        copy.startingBoard = this.getBoard().deepCopy();
+        copy.currentTurn = this.currentTurn;
+        return copy;
     }
 
     @Override

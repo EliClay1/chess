@@ -35,7 +35,7 @@ public class BoardSearcher implements PieceFilter {
         for (ChessPosition enemyPosition : enemyPositions) {
             Collection<ChessMove> possibleEnemyMoves = board.getPiece(enemyPosition).pieceMoves(board, enemyPosition);
             for (ChessMove move : possibleEnemyMoves) {
-                if (move.getEndPosition() == position) {
+                if (move.getEndPosition().equals(position)) {
                     return true;
                 }
             }
