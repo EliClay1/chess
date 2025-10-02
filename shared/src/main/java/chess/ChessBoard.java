@@ -1,8 +1,6 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -20,6 +18,12 @@ public class ChessBoard {
 
     public ChessBoard() {
 
+    }
+
+    public ChessBoard createStartingBoard() {
+        ChessBoard board = new ChessBoard();
+        board.resetBoard();
+        return board;
     }
 
     /**
@@ -50,8 +54,22 @@ public class ChessBoard {
     public void makeMove(ChessMove move) {
         ChessPiece movingPiece = getPiece(move.getStartPosition());
         removePiece(move.getStartPosition());
+
+        ChessGame.TeamColor teamColor = movingPiece.getTeamColor();
+
+        boolean readyForPromotion = move.getEndPosition().getRow() == 8 && teamColor == ChessGame.TeamColor.WHITE ||
+                move.getEndPosition().getRow() == 1 && teamColor == ChessGame.TeamColor.BLACK;
+
+        if (movingPiece.getPieceType() == ChessPiece.PieceType.PAWN && readyForPromotion) {
+            ChessPiece promotionPiece = new ChessPiece(teamColor, move.getPromotionPiece());
+            addPiece(move.getEndPosition(), promotionPiece);
+            return;
+        }
+
         addPiece(move.getEndPosition(), movingPiece);
     }
+
+
 
     /**
      * Sets the board to the default starting board
