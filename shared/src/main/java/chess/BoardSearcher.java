@@ -1,9 +1,10 @@
 package chess;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-public class BoardIterator implements PieceFilter {
+public class BoardSearcher implements PieceFilter {
     @Override
     public boolean matches(ChessPiece piece) {
         return false;
@@ -28,5 +29,17 @@ public class BoardIterator implements PieceFilter {
             }
         }
         return locations;
+    }
+
+    boolean isPositionAttacked(ChessBoard board, ChessPosition position, List<ChessPosition> enemyPositions) {
+        for (ChessPosition enemyPosition : enemyPositions) {
+            Collection<ChessMove> possibleEnemyMoves = board.getPiece(enemyPosition).pieceMoves(board, enemyPosition);
+            for (ChessMove move : possibleEnemyMoves) {
+                if (move.getEndPosition() == position) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

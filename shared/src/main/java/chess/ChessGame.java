@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -117,31 +118,19 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
 
         /* implementing a base version of this first, then optimizing later.
-        *
-        * 1. Get the King for the current team. Do this by iterating or recursively running through the gameboard.
-        * This could be a function that takes in any kind of piece, and it will return all positions for that piece. King
-        * would only return one location, because there is only one king.
-        *
-        * 2. Check if any of the other team's pieces could access the king. If this is the case, then return true. This should
-        * also be its own function, but specifically returns all the possible moves of every enemy piece in the game.
-        * */
+        Find the King’s Position ✅
+        Write a helper that returns the position of the king for a given team color.
 
-//        ChessPosition kingsPosition;
-//        PieceFilter myFilter = piece -> piece.getPieceType() == ChessPiece.PieceType.ROOK && piece.getTeamColor() == TeamColor.BLACK;
-//        List<ChessPosition> positions = new BoardIterator().findChessPieces(getBoard(), myFilter);
-//        for (var position : positions) {
-//            kingsPosition = position;
-//            System.out.println(kingsPosition);
-//        }
+        Find All Enemy Moves ✅
+        Write a helper that collects all possible moves for all enemy pieces.
 
-        PieceFilter onlyBlackPieces = piece -> piece.getTeamColor() == TeamColor.BLACK;
-        List<ChessPosition> positions = new BoardIterator().findChessPieces(getBoard(), onlyBlackPieces);
-        for (var position : positions) {
-            System.out.println(position);
-        }
+        Check if King is Attacked ✅
+        Write a helper that checks if the king’s position is in the set of enemy moves.
+         */
 
-
-        return false;
+        ChessPosition kingsPosition = findKingsPosition(currentTurn);
+        List<ChessPosition> allEnemyPositions = getAllEnemyPositions(getOppositeTeamColor());
+        return new BoardSearcher().isPositionAttacked(getBoard(), kingsPosition, allEnemyPositions);
     }
 
     /**
@@ -207,8 +196,25 @@ public class ChessGame {
         }
     }
 
-    private void removeMoves() {
-        // TODO - will take two lists of moves from two different teams, and any that clash get removed? Workshop this, but the idea is there.
+    private TeamColor getOppositeTeamColor() {
+        if (currentTurn == TeamColor.WHITE) {
+            return TeamColor.BLACK;
+        }
+        return TeamColor.WHITE;
+    }
+
+    private ChessPosition findKingsPosition(TeamColor teamColor) {
+        ChessPosition kingsPosition = null;
+        PieceFilter currentTeamKingPosition = piece -> piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor;
+        for (var position : new BoardSearcher().findChessPieces(getBoard(), currentTeamKingPosition)) {
+            kingsPosition = position;
+        }
+        return kingsPosition;
+    }
+
+    private List<ChessPosition> getAllEnemyPositions(TeamColor enemyColor) {
+        PieceFilter enemyPositions = piece -> piece.getTeamColor() == enemyColor;
+        return new ArrayList<>(new BoardSearcher().findChessPieces(getBoard(), enemyPositions));
     }
 
     @Override
