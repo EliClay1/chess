@@ -28,7 +28,18 @@ public class UserDAO {
 //    }
 
     void createUser(String username, String password, String email) {
+        UserData userModel = new UserData(username, password, email);
+        System.out.println(userModel.email());
+    }
+
+    void getUser(String username) {
 
     }
+
+    void createAuth(UserData user, String authToken) {
+
+    }
+
+
 
 }
