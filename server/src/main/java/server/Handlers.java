@@ -2,7 +2,7 @@ package server;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
+import exceptions.MissingFieldException;
 import io.javalin.http.Context;
 
 import java.util.Map;
@@ -10,12 +10,19 @@ import java.util.UUID;
 
 public class Handlers {
 
-    void register(Context ctx) {
+    void register(Context ctx) throws MissingFieldException {
         var serializer = new Gson();
         String requestJson = ctx.body();
         var request = serializer.fromJson(requestJson, Map.class);
         // check for inputValidation
-        areInputsValid(request);
+        try {
+            areInputsValid(request);
+        } catch (Exception e) {
+            var response = Map.of("message", "Error: bad request");
+            ctx.status(400);
+            ctx.result(serializer.toJson(response));
+            return;
+        }
 
         // call to the service and register
 
@@ -24,14 +31,13 @@ public class Handlers {
         ctx.result(serializer.toJson(response));
     }
 
-    public static <K, V> void areInputsValid(Map<K, V> inputMap) {
-        // currently this only checks if the username is "username", etc.
+    public static <K, V> void areInputsValid(Map<K, V> inputMap) throws Exception {
         for (var key : inputMap.keySet()) {
             var value = inputMap.get(key);
             if (value == null) {
-                System.out.println("ERROR: YOU ARE MISSING SOME KIND OF VALUE!");
+                throw new Exception();
             } else if (value instanceof String && ((String) value).isEmpty()) {
-                System.out.println("ERROR: YOU ARE MISSING SOME KIND OF VALUE!");
+                throw new Exception();
             }
             // TODO: Check for sanitization, preventing SQL injection. Not required, but would be cool to add...
         }

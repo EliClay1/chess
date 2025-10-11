@@ -18,11 +18,6 @@ public class Server {
         // TODO: REGISTER
         javalinServer.post("user", handlers::register);
 
-        // TODO: LOGIN
-//        javalinServer.post("user", handlers::register);
-
-        // TODO:
-//        javalinServer.post("user", handlers::register);
     }
 
     public int run(int desiredPort) {
