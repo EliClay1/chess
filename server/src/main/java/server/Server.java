@@ -16,7 +16,7 @@ public class Server {
         javalinServer.delete("db", ctx -> ctx.result("{}"));
         // ctx -> register(ctx) ===== this::register
         // TODO: REGISTER
-        javalinServer.post("user", handlers::register);
+        javalinServer.post("user", handlers::registerHandler);
 
     }
 

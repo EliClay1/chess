@@ -4,19 +4,24 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import exceptions.MissingFieldException;
 import io.javalin.http.Context;
+import service.UserService;
+import service.requests.RegisterRequest;
+import service.responses.RegisterResponse;
 
 import java.util.Map;
 import java.util.UUID;
 
 public class Handlers {
 
-    void register(Context ctx) throws MissingFieldException {
+    void registerHandler(Context ctx) throws MissingFieldException {
         var serializer = new Gson();
         String requestJson = ctx.body();
-        var request = serializer.fromJson(requestJson, Map.class);
+        RegisterRequest request = serializer.fromJson(requestJson, RegisterRequest.class);
         // check for inputValidation
         try {
-            areInputsValid(request);
+            // TODO - FIX input Validation
+//            areInputsValid();
+            System.out.println("Input Validation");
         } catch (Exception e) {
             var response = Map.of("message", "Error: bad request");
             ctx.status(400);
@@ -26,9 +31,11 @@ public class Handlers {
 
         // call to the service and register
 
+        RegisterResponse response = new UserService().request(request);
+
         // this is targeted for specifically register, but this needs to be generalized for any kind of input. This is the HANDLER.
-        var response = Map.of("username", request.get("username"), "authToken", UUID.randomUUID().toString());
-        ctx.result(serializer.toJson(response));
+//        var response = Map.of("username", request.get("username"), "authToken", UUID.randomUUID().toString());
+//        ctx.result(serializer.toJson(response));
     }
 
     public static <K, V> void areInputsValid(Map<K, V> inputMap) throws Exception {
