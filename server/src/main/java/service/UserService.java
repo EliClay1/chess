@@ -18,30 +18,22 @@ public class UserService {
 
 
     public AuthData register(UserData user) throws Exception {
-
-
-
-        /*
-        Does user already exist? call dao.getUser(request.username)
-        If so, raise UserAlreadyExistsError
-        Otherwise:
-        Generate random token
-        Create new UserData, AuthData
-        dao.insertUser, dao.insertAuth
-        return RegisterResponse(username, authToken)
-         */
-
         String username = user.username();
 
-        // TODO - Check if user already exits
-
-        UserData testUser = dataAccess.getUser(username);
-
-        if (testUser != null) {
+        if (dataAccess.getUser(username) != null) {
             throw new AlreadyTakenException("Username has already been taken.");
+        } else {
+            dataAccess.createUser(user);
         }
-        dataAccess.createUser(user);
+        AuthData authData = new AuthData(username, generateAuthToken());
 
-        return new AuthData(username, UUID.randomUUID().toString());
+
+        // TODO - Add auth data to the data access
+
+        return authData;
+    }
+
+    private String generateAuthToken() {
+        return UUID.randomUUID().toString();
     }
 }

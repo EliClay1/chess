@@ -1,5 +1,6 @@
 package dataaccess;
 
+import model.AuthData;
 import model.UserData;
 
 public interface DataAccess {
@@ -8,7 +9,11 @@ public interface DataAccess {
 
     void createUser(UserData user);
 
-    UserData getUser(String username);
+    UserData getUserByName(String username);
+
+    void addAuth(AuthData authData);
+
+    AuthData getUserByAuth(String authToken);
 
 
 
