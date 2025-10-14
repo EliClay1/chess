@@ -1,10 +1,25 @@
 package service;
 
-import service.requests.RegisterRequest;
-import service.responses.RegisterResponse;
+import dataaccess.DataAccess;
+import model.AuthData;
+import model.UserData;
+
+import java.util.UUID;
 
 public class UserService {
-    public RegisterResponse request(RegisterRequest registerRequest) {
+
+    private final DataAccess dataAccess;
+
+    public UserService(DataAccess dataAccess) {
+        this.dataAccess = dataAccess;
+    }
+
+
+
+    public AuthData register(UserData user) throws Exception {
+
+
+
         /*
         Does user already exist? call dao.getUser(request.username)
         If so, raise UserAlreadyExistsError
@@ -15,7 +30,18 @@ public class UserService {
         return RegisterResponse(username, authToken)
          */
 
-        System.out.println("request sent!");
-        return new RegisterResponse("user", "auth");
+        String username = user.username();
+
+        // TODO - Check if user already exits
+
+        if (dataAccess.getUser(username) != null) {
+            throw new Exception("Uh oh, that's an error");
+        }
+//        UserDAO userDAO = new UserDAO();
+//        if (userDAO.getUser(username).equals(user)) {
+//            // Big bad, that means it exists.
+//        }
+
+        return new AuthData(username, UUID.randomUUID().toString());
     }
 }

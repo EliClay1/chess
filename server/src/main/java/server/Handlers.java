@@ -2,21 +2,28 @@ package server;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
+import dataaccess.MemoryDataAccess;
+import exceptions.AlreadyTakenException;
 import exceptions.MissingFieldException;
 import io.javalin.http.Context;
+import model.AuthData;
+import model.UserData;
 import service.UserService;
-import service.requests.RegisterRequest;
-import service.responses.RegisterResponse;
 
 import java.util.Map;
-import java.util.UUID;
 
 public class Handlers {
 
-    void registerHandler(Context ctx) throws MissingFieldException {
+    UserService userService;
+
+    void registerHandler(Context ctx) throws Exception {
+
+        var dataAccess = new MemoryDataAccess();
+        var userService = new UserService(dataAccess);
+
         var serializer = new Gson();
         String requestJson = ctx.body();
-        RegisterRequest request = serializer.fromJson(requestJson, RegisterRequest.class);
+        UserData request = serializer.fromJson(requestJson, UserData.class);
         // check for inputValidation
         try {
             // TODO - FIX input Validation
@@ -30,12 +37,15 @@ public class Handlers {
         }
 
         // call to the service and register
+        try {
+            AuthData response = userService.register(request);
+            ctx.result(serializer.toJson(response));
+        } catch (Exception e) {
+            var msg = String.format("{ \"message\": \"Error: already taken\" }", e.getMessage());
+            ctx.status(401).result(msg);
+        }
 
-        RegisterResponse response = new UserService().request(request);
 
-        // this is targeted for specifically register, but this needs to be generalized for any kind of input. This is the HANDLER.
-//        var response = Map.of("username", request.get("username"), "authToken", UUID.randomUUID().toString());
-//        ctx.result(serializer.toJson(response));
     }
 
     public static <K, V> void areInputsValid(Map<K, V> inputMap) throws Exception {
