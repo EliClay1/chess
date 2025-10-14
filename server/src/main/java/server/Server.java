@@ -13,7 +13,7 @@ public class Server {
 
         // Register your endpoints and exception handlers here.
 
-        javalinServer.delete("db", ctx -> ctx.result("{}"));
+        javalinServer.delete("db", handlers::clearHandler);
         // ctx -> register(ctx) ===== this::register
         // TODO: REGISTER
         javalinServer.post("user", handlers::registerHandler);

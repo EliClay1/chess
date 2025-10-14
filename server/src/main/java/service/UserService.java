@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.DataAccess;
+import exceptions.AlreadyTakenException;
 import model.AuthData;
 import model.UserData;
 
@@ -34,13 +35,12 @@ public class UserService {
 
         // TODO - Check if user already exits
 
-        if (dataAccess.getUser(username) != null) {
-            throw new Exception("Uh oh, that's an error");
+        UserData testUser = dataAccess.getUser(username);
+
+        if (testUser != null) {
+            throw new AlreadyTakenException("Username has already been taken.");
         }
-//        UserDAO userDAO = new UserDAO();
-//        if (userDAO.getUser(username).equals(user)) {
-//            // Big bad, that means it exists.
-//        }
+        dataAccess.createUser(user);
 
         return new AuthData(username, UUID.randomUUID().toString());
     }

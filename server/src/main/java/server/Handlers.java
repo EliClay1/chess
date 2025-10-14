@@ -3,8 +3,6 @@ package server;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.MemoryDataAccess;
-import exceptions.AlreadyTakenException;
-import exceptions.MissingFieldException;
 import io.javalin.http.Context;
 import model.AuthData;
 import model.UserData;
@@ -15,10 +13,9 @@ import java.util.Map;
 public class Handlers {
 
     UserService userService;
+    private final MemoryDataAccess dataAccess = new MemoryDataAccess();
 
     void registerHandler(Context ctx) throws Exception {
-
-        var dataAccess = new MemoryDataAccess();
         var userService = new UserService(dataAccess);
 
         var serializer = new Gson();
@@ -42,9 +39,15 @@ public class Handlers {
             ctx.result(serializer.toJson(response));
         } catch (Exception e) {
             var msg = String.format("{ \"message\": \"Error: already taken\" }", e.getMessage());
-            ctx.status(401).result(msg);
+            ctx.status(403).result(msg);
         }
 
+
+    }
+
+    void clearHandler(Context ctx) {
+        dataAccess.clear();
+        ctx.status(200).result("{}");
 
     }
 
