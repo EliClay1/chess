@@ -3,6 +3,8 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.MemoryDataAccess;
 import exceptions.AlreadyTakenException;
+import exceptions.DoesntExistException;
+import exceptions.InvalidPasswordException;
 import exceptions.MissingFieldException;
 import io.javalin.http.Context;
 import model.AuthData;
@@ -65,8 +67,10 @@ public class Handlers {
             ctx.result(serializer.toJson(response));
 
         } catch (Exception e) {
-            if (e.equals(new AlreadyTakenException())) {
-                ctx.status(403).result("{ \"message\": \"Error: already taken\" }");
+            if (e.equals(new DoesntExistException())) {
+                ctx.status(400).result("{ \"message\": \"Error: bad request\" }");
+            } else if (e.equals(new InvalidPasswordException())) {
+                ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
             }
         }
     }

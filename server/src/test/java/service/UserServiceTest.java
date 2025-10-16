@@ -38,8 +38,9 @@ class UserServiceTest {
         var db = new MemoryDataAccess();
         var userService = new UserService(db);
         db.createUser(newUser);
-        userService.login(returningUser);
-
-
+        var authData = userService.login(returningUser);
+        assertNotNull(authData);
+        assertEquals(returningUser.username(), authData.username());
+        assertFalse(authData.authToken().isEmpty());
     }
 }
