@@ -37,8 +37,9 @@ public class UserService {
         if (!dataAccess.getUserByName(username).password().equals(user.password())) {
             throw new InvalidPasswordException();
         }
-
-        return null;
+        AuthData authData = new AuthData(username, generateAuthToken());
+        dataAccess.addAuth(authData);
+        return authData;
     }
 
     private String generateAuthToken() {
