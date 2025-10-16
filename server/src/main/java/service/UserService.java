@@ -29,6 +29,7 @@ public class UserService {
 
 
         // TODO - Add auth data to the data access
+        dataAccess.addAuth(authData);
 
         return authData;
     }

@@ -3,6 +3,7 @@ package server;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.MemoryDataAccess;
+import exceptions.AlreadyTakenException;
 import io.javalin.http.Context;
 import model.AuthData;
 import model.UserData;
@@ -21,11 +22,11 @@ public class Handlers {
         var serializer = new Gson();
         String requestJson = ctx.body();
         UserData request = serializer.fromJson(requestJson, UserData.class);
-        // check for inputValidation
+        // checks for input validation
         try {
-            // TODO - FIX input Validation
-//            areInputsValid();
-            System.out.println("Input Validation");
+            if (request.username() == null || request.username().isEmpty()) {throw new AlreadyTakenException("Empty username.");}
+            if (request.email() == null || request.email().isEmpty()) {throw new AlreadyTakenException("Empty email.");}
+            if (request.password() == null || request.password().isEmpty()) {throw new AlreadyTakenException("Empty password.");}
         } catch (Exception e) {
             var response = Map.of("message", "Error: bad request");
             ctx.status(400);
@@ -41,26 +42,12 @@ public class Handlers {
             var msg = String.format("{ \"message\": \"Error: already taken\" }", e.getMessage());
             ctx.status(403).result(msg);
         }
-
-
     }
 
     void clearHandler(Context ctx) {
         dataAccess.clear();
         ctx.status(200).result("{}");
 
-    }
-
-    public static <K, V> void areInputsValid(Map<K, V> inputMap) throws Exception {
-        for (var key : inputMap.keySet()) {
-            var value = inputMap.get(key);
-            if (value == null) {
-                throw new Exception();
-            } else if (value instanceof String && ((String) value).isEmpty()) {
-                throw new Exception();
-            }
-            // TODO: Check for sanitization, preventing SQL injection. Not required, but would be cool to add...
-        }
     }
 
     // code copied from spec
