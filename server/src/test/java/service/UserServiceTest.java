@@ -30,4 +30,9 @@ class UserServiceTest {
         db.createUser(user1);
         assertThrows(AlreadyTakenException.class, () -> userService.register(user2));
     }
+
+    @Test
+    void happyLogin() {
+
+    }
 }
