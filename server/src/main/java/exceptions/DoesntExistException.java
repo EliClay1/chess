@@ -1,6 +1,6 @@
 package exceptions;
 
-public class DoesntExistException extends RuntimeException {
+public class DoesntExistException extends Exception {
     public DoesntExistException() {
     }
 }

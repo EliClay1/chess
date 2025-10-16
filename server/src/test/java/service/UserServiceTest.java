@@ -32,12 +32,13 @@ class UserServiceTest {
     }
 
     @Test
-    void happyLogin() {
-        var user = new UserData("bob", "password", "b@gmail.com");
+    void happyLogin() throws Exception {
+        var newUser = new UserData("bob", "password", "b@gmail.com");
+        var returningUser = new UserData("bob", "password", null);
         var db = new MemoryDataAccess();
-        var userServer = new UserService(db);
-
-
+        var userService = new UserService(db);
+        db.createUser(newUser);
+        userService.login(returningUser);
 
 
     }
