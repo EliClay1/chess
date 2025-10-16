@@ -14,7 +14,4 @@ public interface DataAccess {
     void addAuth(AuthData authData);
 
     AuthData getUserByAuth(String authToken);
-
-
-
 }

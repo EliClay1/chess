@@ -34,4 +34,6 @@ public class MemoryDataAccess implements DataAccess{
     public AuthData getUserByAuth(String authToken) {
         return auth.get(authToken);
     }
+
+
 }

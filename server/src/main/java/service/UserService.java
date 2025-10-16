@@ -20,7 +20,7 @@ public class UserService {
     public AuthData register(UserData user) throws Exception {
         String username = user.username();
 
-        if (dataAccess.getUser(username) != null) {
+        if (dataAccess.getUserByName(username) != null) {
             throw new AlreadyTakenException("Username has already been taken.");
         } else {
             dataAccess.createUser(user);
