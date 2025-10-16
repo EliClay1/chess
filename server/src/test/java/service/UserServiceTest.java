@@ -33,6 +33,12 @@ class UserServiceTest {
 
     @Test
     void happyLogin() {
+        var user = new UserData("bob", "password", "b@gmail.com");
+        var db = new MemoryDataAccess();
+        var userServer = new UserService(db);
+
+
+
 
     }
 }
