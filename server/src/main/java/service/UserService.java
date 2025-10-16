@@ -2,6 +2,8 @@ package service;
 
 import dataaccess.DataAccess;
 import exceptions.AlreadyTakenException;
+import exceptions.DoesntExistException;
+import exceptions.InvalidPasswordException;
 import model.AuthData;
 import model.UserData;
 
@@ -15,23 +17,28 @@ public class UserService {
         this.dataAccess = dataAccess;
     }
 
-
-
     public AuthData register(UserData user) throws Exception {
         String username = user.username();
-
         if (dataAccess.getUserByName(username) != null) {
-            throw new AlreadyTakenException("Username has already been taken.");
+            throw new AlreadyTakenException();
         } else {
             dataAccess.createUser(user);
         }
         AuthData authData = new AuthData(username, generateAuthToken());
-
-
-        // TODO - Add auth data to the data access
         dataAccess.addAuth(authData);
-
         return authData;
+    }
+
+    public AuthData login(UserData user) throws Exception {
+        String username = user.username();
+        if (dataAccess.getUserByName(username) == null) {
+            throw new DoesntExistException();
+        }
+        if (!dataAccess.getUserByName(username).password().equals(user.password())) {
+            throw new InvalidPasswordException();
+        }
+
+        return null;
     }
 
     private String generateAuthToken() {

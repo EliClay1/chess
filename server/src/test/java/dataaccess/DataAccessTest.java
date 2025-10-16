@@ -1,5 +1,6 @@
 package dataaccess;
 
+import model.AuthData;
 import model.UserData;
 import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.Test;
@@ -29,5 +30,21 @@ class DataAccessTest {
 
     @Test
     void getUserByName() {
+    }
+
+    @Test
+    void addAuth() {
+        var db = new MemoryDataAccess();
+        var auth = new AuthData("bob", "123");
+        db.addAuth(auth);
+        assertEquals(auth, db.getUserByAuth(auth.authToken()));
+    }
+
+    @Test
+    void getUserByAuth() {
+        var db = new MemoryDataAccess();
+        var auth = new AuthData("bob", "123");
+        db.addAuth(auth);
+        assertEquals(auth.username(), db.getUserByAuth(auth.authToken()).username());
     }
 }

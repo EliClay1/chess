@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.MemoryDataAccess;
+import exceptions.AlreadyTakenException;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 
@@ -9,14 +10,24 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserServiceTest {
 
     @Test
-    void register() throws Exception {
+    void happyRegister() throws Exception {
         var user = new UserData("bob", "password", "b@gmail.com");
         var db = new MemoryDataAccess();
         var userService = new UserService(db);
         var authData = userService.register(user);
+        // sanitize inputs
         assertNotNull(authData);
         assertEquals(user.username(), authData.username());
-//        assertNotNull(authData.authToken()); below is a better version of this.
-        assertTrue(authData.authToken().isEmpty());
+        assertFalse(authData.authToken().isEmpty());
+    }
+
+    @Test
+    void sadRegister() {
+        var user1 = new UserData("bob", "password", "b@gmail.com");
+        var user2 = new UserData("bob", "password", "b@gmail.com");
+        var db = new MemoryDataAccess();
+        var userService = new UserService(db);
+        db.createUser(user1);
+        assertThrows(AlreadyTakenException.class, () -> userService.register(user2));
     }
 }
