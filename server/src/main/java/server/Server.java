@@ -15,10 +15,18 @@ public class Server {
 
         javalinServer.delete("db", handlers::clearHandler);
         // ctx -> register(ctx) ===== this::register
-        // TODO: REGISTER
         javalinServer.post("user", handlers::registerHandler);
-        // TODO - LOGIN
         javalinServer.post("session", handlers::loginHandler);
+        // TODO - Logout
+        javalinServer.delete("session", handlers::logoutHandler);
+
+        // TODO - List Games
+
+        // TODO - Create Game
+
+        // TODO - Join Game
+
+        // TODO - Clear Application
 
     }
 

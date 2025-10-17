@@ -56,8 +56,7 @@ public class Handlers {
             if (request.password() == null || request.password().isEmpty()) {throw new MissingFieldException();}
         } catch (Exception e) {
             var response = Map.of("message", "Error: bad request");
-            ctx.status(400);
-            ctx.result(serializer.toJson(response));
+            ctx.status(400).result(serializer.toJson(response));
             return;
         }
 
@@ -71,6 +70,34 @@ public class Handlers {
                 ctx.status(401).result("{ \"message\": \"Error: bad request\" }");
             } else if (e instanceof InvalidPasswordException) {
                 ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
+            } else {
+                ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
+            }
+        }
+    }
+
+    void logoutHandler(Context ctx) {
+        String requestJson = ctx.body();
+        AuthData request = serializer.fromJson(requestJson, AuthData.class);
+        // checks for input validation
+//        try {
+//            if (request.authToken() == null || request.authToken().isEmpty()) {throw new MissingFieldException();}
+//        } catch (Exception e) {
+//            var response = Map.of("message", "Error: bad request");
+//            ctx.status(400).result(serializer.toJson(response));
+//            return;
+//        }
+
+        // call to the service and register
+        try {
+            userService.logout(request);
+            ctx.result(serializer.toJson("{}"));
+
+        } catch (Exception e) {
+            if (e instanceof InvalidPasswordException) {
+                ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
+            } else {
+                ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
             }
         }
     }
@@ -80,6 +107,8 @@ public class Handlers {
         ctx.status(200).result("{}");
 
     }
+
+
 
 
 }

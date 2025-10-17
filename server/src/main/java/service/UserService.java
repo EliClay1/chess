@@ -43,6 +43,10 @@ public class UserService {
         return authData;
     }
 
+    public void logout(AuthData authData) {
+
+    }
+
     private String generateAuthToken() {
         return UUID.randomUUID().toString();
     }
