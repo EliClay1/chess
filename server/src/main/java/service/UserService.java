@@ -3,7 +3,7 @@ package service;
 import dataaccess.DataAccess;
 import exceptions.AlreadyTakenException;
 import exceptions.DoesntExistException;
-import exceptions.InvalidPasswordException;
+import exceptions.InvalidException;
 import model.AuthData;
 import model.UserData;
 
@@ -36,15 +36,20 @@ public class UserService {
             throw new DoesntExistException();
         }
         if (!userByName.password().equals(user.password())) {
-            throw new InvalidPasswordException();
+            throw new InvalidException();
         }
         AuthData authData = new AuthData(username, generateAuthToken());
         dataAccess.addAuth(authData);
         return authData;
     }
 
-    public void logout(AuthData authData) {
-
+    public void logout(AuthData authData) throws Exception {
+        String authToken = authData.authToken();
+        AuthData userByAuth = dataAccess.getUserByAuth(authToken);
+        if (userByAuth == null) {
+            throw new InvalidException();
+        }
+        dataAccess.deleteAuth(userByAuth);
     }
 
     private String generateAuthToken() {

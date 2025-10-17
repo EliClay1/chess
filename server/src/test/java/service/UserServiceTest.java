@@ -3,7 +3,7 @@ package service;
 import dataaccess.MemoryDataAccess;
 import exceptions.AlreadyTakenException;
 import exceptions.DoesntExistException;
-import exceptions.InvalidPasswordException;
+import exceptions.InvalidException;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 
@@ -61,6 +61,6 @@ class UserServiceTest {
         var db = new MemoryDataAccess();
         var userService = new UserService(db);
         db.createUser(newUser);
-        assertThrows(InvalidPasswordException.class, () -> userService.login(returningUser));
+        assertThrows(InvalidException.class, () -> userService.login(returningUser));
     }
 }

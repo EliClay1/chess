@@ -4,12 +4,11 @@ import com.google.gson.Gson;
 import dataaccess.MemoryDataAccess;
 import exceptions.AlreadyTakenException;
 import exceptions.DoesntExistException;
-import exceptions.InvalidPasswordException;
+import exceptions.InvalidException;
 import exceptions.MissingFieldException;
 import io.javalin.http.Context;
 import model.AuthData;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 import service.UserService;
 
 import java.util.Map;
@@ -68,7 +67,7 @@ public class Handlers {
         } catch (Exception e) {
             if (e instanceof DoesntExistException) {
                 ctx.status(401).result("{ \"message\": \"Error: bad request\" }");
-            } else if (e instanceof InvalidPasswordException) {
+            } else if (e instanceof InvalidException) {
                 ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
             } else {
                 ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
@@ -94,7 +93,7 @@ public class Handlers {
             ctx.result(serializer.toJson("{}"));
 
         } catch (Exception e) {
-            if (e instanceof InvalidPasswordException) {
+            if (e instanceof InvalidException) {
                 ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
             } else {
                 ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
