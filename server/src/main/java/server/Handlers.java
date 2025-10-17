@@ -76,8 +76,9 @@ public class Handlers {
     }
 
     void logoutHandler(Context ctx) {
-        String requestJson = ctx.body();
-        AuthData request = serializer.fromJson(requestJson, AuthData.class);
+        String requestHeader = ctx.header("authorization");
+//        AuthData request = serializer.fromJson(requestJson, AuthData.class);
+        AuthData request = new AuthData(null, requestHeader);
         // checks for input validation
 //        try {
 //            if (request.authToken() == null || request.authToken().isEmpty()) {throw new MissingFieldException();}
@@ -90,7 +91,7 @@ public class Handlers {
         // call to the service and register
         try {
             userService.logout(request);
-            ctx.result(serializer.toJson("{}"));
+            ctx.result("{ }");
 
         } catch (Exception e) {
             if (e instanceof InvalidException) {
