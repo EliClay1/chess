@@ -31,10 +31,11 @@ public class UserService {
 
     public AuthData login(UserData user) throws Exception {
         String username = user.username();
-        if (dataAccess.getUserByName(username) == null) {
+        UserData userByName = dataAccess.getUserByName(username);
+        if (userByName == null) {
             throw new DoesntExistException();
         }
-        if (!dataAccess.getUserByName(username).password().equals(user.password())) {
+        if (!userByName.password().equals(user.password())) {
             throw new InvalidPasswordException();
         }
         AuthData authData = new AuthData(username, generateAuthToken());

@@ -53,4 +53,14 @@ class UserServiceTest {
         var userService = new UserService(db);
         assertThrows(DoesntExistException.class, () -> userService.login(newUser));
     }
+
+    @Test
+    void passwordIncorrectLogin() {
+        var newUser = new UserData("bob", "password", "b@gmail.com");
+        var returningUser = new UserData("bob", "password!", null);
+        var db = new MemoryDataAccess();
+        var userService = new UserService(db);
+        db.createUser(newUser);
+        assertThrows(InvalidPasswordException.class, () -> userService.login(returningUser));
+    }
 }

@@ -67,9 +67,9 @@ public class Handlers {
             ctx.result(serializer.toJson(response));
 
         } catch (Exception e) {
-            if (e.equals(new DoesntExistException())) {
-                ctx.status(400).result("{ \"message\": \"Error: bad request\" }");
-            } else if (e.equals(new InvalidPasswordException())) {
+            if (e instanceof DoesntExistException) {
+                ctx.status(401).result("{ \"message\": \"Error: bad request\" }");
+            } else if (e instanceof InvalidPasswordException) {
                 ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
             }
         }
