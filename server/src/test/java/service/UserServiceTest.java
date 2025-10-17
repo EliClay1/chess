@@ -2,6 +2,8 @@ package service;
 
 import dataaccess.MemoryDataAccess;
 import exceptions.AlreadyTakenException;
+import exceptions.DoesntExistException;
+import exceptions.InvalidPasswordException;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +24,7 @@ class UserServiceTest {
     }
 
     @Test
-    void sadRegister() {
+    void userAlreadyExistsRegister() {
         var user1 = new UserData("bob", "password", "b@gmail.com");
         var user2 = new UserData("bob", "password", "b@gmail.com");
         var db = new MemoryDataAccess();
@@ -32,7 +34,7 @@ class UserServiceTest {
     }
 
     @Test
-    void happyLogin() throws Exception {
+    void Login() throws Exception {
         var newUser = new UserData("bob", "password", "b@gmail.com");
         var returningUser = new UserData("bob", "password", null);
         var db = new MemoryDataAccess();
@@ -42,5 +44,13 @@ class UserServiceTest {
         assertNotNull(authData);
         assertEquals(returningUser.username(), authData.username());
         assertFalse(authData.authToken().isEmpty());
+    }
+
+    @Test
+    void userDoesntExistLogin() {
+        var newUser = new UserData("bob", "password", "b@gmail.com");
+        var db = new MemoryDataAccess();
+        var userService = new UserService(db);
+        assertThrows(DoesntExistException.class, () -> userService.login(newUser));
     }
 }

@@ -17,6 +17,8 @@ public class Server {
         // ctx -> register(ctx) ===== this::register
         // TODO: REGISTER
         javalinServer.post("user", handlers::registerHandler);
+        // TODO - LOGIN
+        javalinServer.post("session", handlers::loginHandler);
 
     }
 
