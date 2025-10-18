@@ -73,7 +73,6 @@ class GameServiceTest {
         db.addAuth(auth);
         db.addAuth(joiningAuth);
         var gameService = new GameService(db);
-        gameService.createGame("game1", auth.authToken());
         assertThrows(InvalidException.class, () -> gameService.joinGame(joiningAuth.authToken(), 10, "WHITE"));
     }
 

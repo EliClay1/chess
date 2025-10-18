@@ -44,8 +44,10 @@ public class Handlers {
             AuthData response = userService.register(request);
             ctx.result(serializer.toJson(response));
         } catch (Exception e) {
-            if (e.equals(new AlreadyTakenException())) {
+            if (e instanceof AlreadyTakenException) {
                 ctx.status(403).result("{ \"message\": \"Error: already taken\" }");
+            } else {
+                ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
             }
         }
     }
@@ -129,8 +131,28 @@ public class Handlers {
         Type type = new TypeToken<Map<String, String>>() {}.getType();
         Map<String, String> request = serializer.fromJson(requestJson, type);
 
+        /*
+        * String idStr = request.get("gameID");  // use the exact needed key name
+if (idStr != null && !idStr.isEmpty()) {
+    try {
+        gameID = Integer.parseInt(idStr);
+    } catch (NumberFormatException e) {
+        // handle invalid number format if necessary
+        // e.g. log an error, use default, or throw your own exception
+    }
+}*/
+
+        int gameID = -1;
         String teamColor = request.get("playerColor");
-        int gameID = Integer.parseInt(request.get("gameID"));
+        String idAsString = request.get("gameID");
+        if (idAsString != null && !idAsString.isEmpty()) {
+            try {
+                gameID = Integer.parseInt(request.get("gameID"));
+            } catch (NumberFormatException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
 
         // Check if the piece is a valid color
         try {
