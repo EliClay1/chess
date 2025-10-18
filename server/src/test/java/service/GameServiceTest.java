@@ -8,6 +8,8 @@ import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameServiceTest {
@@ -108,11 +110,15 @@ class GameServiceTest {
         var gameService = new GameService(db);
         // loop to create 10 games
         for (int i = 0; i < 10; i++) {
-            GameData game = gameService.createGame(String.format("game%d", i), auth.authToken());
+            gameService.createGame(String.format("game%d", i), auth.authToken());
         }
-        gameService.listGames(auth.authToken());
+        var listOfGames = gameService.listGames(auth.authToken());
 
-
+        assertNotNull(listOfGames);
+        assertInstanceOf(ArrayList.class, listOfGames);
+        assertNotNull(listOfGames.getFirst().get("gameID"));
+        assertNotNull(listOfGames.getLast().get("gameID"));
+        // TODO - what other tests need to go here?
     }
 
 }
