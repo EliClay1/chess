@@ -121,4 +121,18 @@ class GameServiceTest {
         // TODO - what other tests need to go here?
     }
 
+    @Test
+    void noAuthDataListGames() throws Exception {
+        AuthData auth = new AuthData("bob", "1234567890");
+        var db = new MemoryDataAccess();
+        db.addAuth(auth);
+        var gameService = new GameService(db);
+        // loop to create 10 games
+        for (int i = 0; i < 10; i++) {
+            gameService.createGame(String.format("game%d", i), auth.authToken());
+        }
+        db.deleteAuth(auth);
+        assertThrows(UnauthorizedException.class, () -> gameService.listGames(auth.authToken()));
+    }
+
 }
