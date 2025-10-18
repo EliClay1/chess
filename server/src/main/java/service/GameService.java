@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.DataAccess;
 import exceptions.InvalidException;
 import model.AuthData;
@@ -19,7 +20,8 @@ public class GameService {
             throw new InvalidException();
         }
         String username = userByAuth.username();
-        GameData newGame = new GameData();
+        GameData newGame = new GameData(dataAccess.createID(), null, null, gameName, new ChessGame());
+        dataAccess.createGame(newGame);
 
         return null;
     }
