@@ -4,6 +4,8 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 
+import java.util.ArrayList;
+
 public interface DataAccess {
 
     /*
@@ -23,6 +25,7 @@ public interface DataAccess {
     void deleteAuth(AuthData authData);
     void createGame(GameData gameData);
     GameData getGame(Integer gameID);
+    ArrayList<GameData> getAllGames();
     void updateGame(GameData gameData);
     int createID();
 

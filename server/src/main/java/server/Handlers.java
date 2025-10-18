@@ -11,11 +11,9 @@ import model.UserData;
 import service.GameService;
 import service.UserService;
 
+import java.io.InputStream;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Handlers {
 
@@ -163,10 +161,10 @@ public class Handlers {
     void listGamesHandler(Context ctx) {
         String requestHeader = ctx.header("authorization");
         try {
-            ArrayList<GameData> gameList = gameService.listGames(requestHeader);
-
-            // { "games": [{"gameID": 1234, "whiteUsername":"", "blackUsername":"", "gameName:""} ]}
-
+            Map<String, ArrayList<Map<String, String>>> resultMap = new HashMap<>();
+            ArrayList<Map<String, String>> gameList = gameService.listGames(requestHeader);
+            resultMap.put("games", gameList);
+            ctx.status(200).result(serializer.toJson(resultMap));
         } catch (Exception e) {
             if (e instanceof UnauthorizedException) {
                 ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");

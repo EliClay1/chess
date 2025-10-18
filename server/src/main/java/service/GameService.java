@@ -9,6 +9,8 @@ import model.AuthData;
 import model.GameData;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GameService {
     private final DataAccess dataAccess;
@@ -51,17 +53,22 @@ public class GameService {
         dataAccess.updateGame(updatedGame);
     }
 
-    public ArrayList<GameData> listGames(String authToken) throws Exception {
+    public ArrayList<Map<String, String>> listGames(String authToken) throws Exception {
         AuthData userByAuth = dataAccess.getAuth(authToken);
-        // no auth token
         if (userByAuth == null) {
             throw new UnauthorizedException();
         }
-        ArrayList<GameData> listOfGames = new ArrayList<>();
+        var games = dataAccess.getAllGames();
+        ArrayList<Map<String, String>> arrayOfGameData = new ArrayList<>();
 
-        dataAccess.
-
-
-        return listOfGames;
+        for (var game : games) {
+            Map<String, String> mapOfGameData = new HashMap<>();
+            mapOfGameData.put("gameID", String.format("%d", game.gameID()));
+            mapOfGameData.put("whiteUsername", game.whiteUsername());
+            mapOfGameData.put("blackUsername", game.blackUsername());
+            mapOfGameData.put("gameName", game.gameName());
+            arrayOfGameData.add(mapOfGameData);
+        }
+        return arrayOfGameData;
     }
 }
