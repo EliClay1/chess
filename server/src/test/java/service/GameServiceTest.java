@@ -63,12 +63,14 @@ class GameServiceTest {
     }
 
     @Test
-    void invalidGameIDJoinGame() {
+    void invalidGameIDJoinGame() throws Exception {
         AuthData auth = new AuthData("bob", "1234567890");
         AuthData joiningAuth = new AuthData("jerry", "0987654321");
         var db = new MemoryDataAccess();
         db.addAuth(auth);
         db.addAuth(joiningAuth);
+        var gameService = new GameService(db);
+        assertThrows(InvalidException.class, () -> gameService.joinGame(joiningAuth.authToken(), 10, "WHITE"));
     }
 
 }
