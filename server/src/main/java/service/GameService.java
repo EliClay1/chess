@@ -58,7 +58,7 @@ public class GameService {
         if (userByAuth == null) {
             throw new UnauthorizedException();
         }
-        var games = dataAccess.getAllGames();
+        var games = dataAccess.listGames();
         ArrayList<Map<String, String>> arrayOfGameData = new ArrayList<>();
 
         for (var game : games) {

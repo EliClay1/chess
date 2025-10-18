@@ -100,4 +100,19 @@ class GameServiceTest {
         assertThrows(AlreadyTakenException.class, () -> gameService.joinGame(joiningAuth.authToken(), newGame.gameID(), "BLACK"));
     }
 
+    @Test
+    void getGames() throws Exception {
+        AuthData auth = new AuthData("bob", "1234567890");
+        var db = new MemoryDataAccess();
+        db.addAuth(auth);
+        var gameService = new GameService(db);
+        // loop to create 10 games
+        for (int i = 0; i < 10; i++) {
+            GameData game = gameService.createGame(String.format("game%d", i), auth.authToken());
+        }
+        gameService.listGames(auth.authToken());
+
+
+    }
+
 }

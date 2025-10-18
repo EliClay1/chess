@@ -55,7 +55,7 @@ public class MemoryDataAccess implements DataAccess{
     }
 
     @Override
-    public ArrayList<GameData> getAllGames() {
+    public ArrayList<GameData> listGames() {
         ArrayList<GameData> listOfGames = new ArrayList<>();
         for (int id : usedIDs) {
             listOfGames.add(getGame(id));
