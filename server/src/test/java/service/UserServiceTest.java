@@ -72,7 +72,7 @@ class UserServiceTest {
         var userService = new UserService(db);
         db.addAuth(newAuth);
         userService.logout(newAuth);
-        assertNull(db.getUserByAuth(newAuth.authToken()));
+        assertNull(db.getAuth(newAuth.authToken()));
     }
 
     @Test

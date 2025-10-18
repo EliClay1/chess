@@ -2,11 +2,7 @@ package dataaccess;
 
 import model.AuthData;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.Test;
-
-import java.awt.image.MemoryImageSource;
-import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,7 +13,7 @@ class DataAccessTest {
         var dataBase = new MemoryDataAccess();
         dataBase.createUser(new UserData("bob", "password", "e@gmail.com"));
         dataBase.clear();
-        assertNull(dataBase.getUserByName("bob"));
+        assertNull(dataBase.getUser("bob"));
     }
 
     @Test
@@ -25,7 +21,7 @@ class DataAccessTest {
         var dataBase = new MemoryDataAccess();
         var user = new UserData("bob", "password", "e@gmail.com");
         dataBase.createUser(user);
-        assertEquals(user, dataBase.getUserByName(user.username()));
+        assertEquals(user, dataBase.getUser(user.username()));
     }
 
     @Test
@@ -37,7 +33,7 @@ class DataAccessTest {
         var db = new MemoryDataAccess();
         var auth = new AuthData("bob", "123");
         db.addAuth(auth);
-        assertEquals(auth, db.getUserByAuth(auth.authToken()));
+        assertEquals(auth, db.getAuth(auth.authToken()));
     }
 
     @Test
@@ -45,6 +41,6 @@ class DataAccessTest {
         var db = new MemoryDataAccess();
         var auth = new AuthData("bob", "123");
         db.addAuth(auth);
-        assertEquals(auth.username(), db.getUserByAuth(auth.authToken()).username());
+        assertEquals(auth.username(), db.getAuth(auth.authToken()).username());
     }
 }

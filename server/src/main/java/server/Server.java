@@ -14,15 +14,15 @@ public class Server {
         // Register your endpoints and exception handlers here.
 
         javalinServer.delete("db", handlers::clearHandler);
-        // ctx -> register(ctx) ===== this::register
         javalinServer.post("user", handlers::registerHandler);
         javalinServer.post("session", handlers::loginHandler);
-        // TODO - Logout
         javalinServer.delete("session", handlers::logoutHandler);
+        // TODO - Create Game
+        javalinServer.post("game", handlers::createGameHandler);
 
         // TODO - List Games
 
-        // TODO - Create Game
+
 
         // TODO - Join Game
 

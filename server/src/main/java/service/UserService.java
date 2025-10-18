@@ -19,7 +19,7 @@ public class UserService {
 
     public AuthData register(UserData user) throws Exception {
         String username = user.username();
-        if (dataAccess.getUserByName(username) != null) {
+        if (dataAccess.getUser(username) != null) {
             throw new AlreadyTakenException();
         } else {
             dataAccess.createUser(user);
@@ -31,7 +31,7 @@ public class UserService {
 
     public AuthData login(UserData user) throws Exception {
         String username = user.username();
-        UserData userByName = dataAccess.getUserByName(username);
+        UserData userByName = dataAccess.getUser(username);
         if (userByName == null) {
             throw new DoesntExistException();
         }
@@ -45,7 +45,7 @@ public class UserService {
 
     public void logout(AuthData authData) throws Exception {
         String authToken = authData.authToken();
-        AuthData userByAuth = dataAccess.getUserByAuth(authToken);
+        AuthData userByAuth = dataAccess.getAuth(authToken);
         if (userByAuth == null) {
             throw new InvalidException();
         }

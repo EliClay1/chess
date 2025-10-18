@@ -8,7 +8,9 @@ import exceptions.InvalidException;
 import exceptions.MissingFieldException;
 import io.javalin.http.Context;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
+import service.GameService;
 import service.UserService;
 
 import java.util.Map;
@@ -17,6 +19,7 @@ public class Handlers {
 
     private final MemoryDataAccess dataAccess = new MemoryDataAccess();
     private final UserService userService = new UserService(dataAccess);
+    private final GameService gameService = new GameService(dataAccess);
     private final Gson serializer = new Gson();
 
 
@@ -79,20 +82,35 @@ public class Handlers {
         String requestHeader = ctx.header("authorization");
 //        AuthData request = serializer.fromJson(requestJson, AuthData.class);
         AuthData request = new AuthData(null, requestHeader);
-        // checks for input validation
-//        try {
-//            if (request.authToken() == null || request.authToken().isEmpty()) {throw new MissingFieldException();}
-//        } catch (Exception e) {
-//            var response = Map.of("message", "Error: bad request");
-//            ctx.status(400).result(serializer.toJson(response));
-//            return;
-//        }
 
         // call to the service and register
         try {
             userService.logout(request);
             ctx.result("{ }");
 
+        } catch (Exception e) {
+            if (e instanceof InvalidException) {
+                ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
+            } else {
+                ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
+            }
+        }
+    }
+
+    void createGameHandler(Context ctx) {
+        String requestHeader = ctx.header("authorization");
+        String requestJson = ctx.body();
+         GameData request = serializer.fromJson(requestJson, GameData.class);
+
+        try {
+            if (request.gameName() == null || request.gameName().isEmpty()) {throw new MissingFieldException();}
+        } catch (Exception e) {
+            var response = Map.of("message", "Error: bad request");
+            ctx.status(400).result(serializer.toJson(response));
+            return;
+        }
+        try {
+            gameService.createGame(request.gameName(), requestHeader);
         } catch (Exception e) {
             if (e instanceof InvalidException) {
                 ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");

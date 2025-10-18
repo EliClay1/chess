@@ -1,4 +1,3 @@
-
 import server.Server;
 import chess.*;
 
