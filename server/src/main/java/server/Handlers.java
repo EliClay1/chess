@@ -110,7 +110,8 @@ public class Handlers {
             return;
         }
         try {
-            gameService.createGame(request.gameName(), requestHeader);
+            GameData newGame = gameService.createGame(request.gameName(), requestHeader);
+            ctx.status(200).result(serializer.toJson(newGame.gameId()));
         } catch (Exception e) {
             if (e instanceof InvalidException) {
                 ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");

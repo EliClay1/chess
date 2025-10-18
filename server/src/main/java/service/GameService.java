@@ -13,7 +13,7 @@ public class GameService {
         this.dataAccess = dataAccess;
     }
 
-    public void createGame(String gameName, String authToken) throws Exception {
+    public GameData createGame(String gameName, String authToken) throws Exception {
         AuthData userByAuth = dataAccess.getAuth(authToken);
         // no auth token
         if (userByAuth == null) {
@@ -21,5 +21,6 @@ public class GameService {
         }
         GameData newGame = new GameData(dataAccess.createID(), null, null, gameName, new ChessGame());
         dataAccess.createGame(newGame);
+        return newGame;
     }
 }
