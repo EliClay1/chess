@@ -4,16 +4,15 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class MemoryDataAccess implements DataAccess{
 
     private final HashMap<String, UserData> usersByName = new HashMap<>();
     private final HashMap<String, AuthData> auth = new HashMap<>();
     private final HashMap<Integer, GameData> games = new HashMap<>();
-    private final List<Integer> usedIDs = new ArrayList<>();
+    private final TreeSet<Integer> usedIDs = new TreeSet<>();
+    private final PriorityQueue<Integer> reusableIDs = new PriorityQueue<>();
 
     @Override
     public void clear() {
@@ -57,8 +56,13 @@ public class MemoryDataAccess implements DataAccess{
 
     @Override
     public int createID() {
-        return 0;
+        int nextID;
+        if (!reusableIDs.isEmpty()) {
+            nextID = reusableIDs.remove();
+        } else {
+            nextID = (usedIDs.isEmpty() ? 1 : usedIDs.last() + 1);
+        }
+        usedIDs.add(nextID);
+        return nextID;
     }
-
-
 }
