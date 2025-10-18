@@ -111,7 +111,7 @@ public class Handlers {
         }
         try {
             GameData newGame = gameService.createGame(request.gameName(), requestHeader);
-            ctx.status(200).result(serializer.toJson(newGame.gameId()));
+            ctx.status(200).result(serializer.toJson(Map.of("gameID", newGame.gameId())));
         } catch (Exception e) {
             if (e instanceof InvalidException) {
                 ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
