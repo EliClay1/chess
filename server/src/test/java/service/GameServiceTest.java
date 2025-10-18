@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.MemoryDataAccess;
 import exceptions.InvalidException;
+import exceptions.UnauthorizedException;
 import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,7 @@ class GameServiceTest {
         GameData newGame = gameService.createGame(gameName, auth.authToken());
         assertNotNull(newGame);
         assertEquals(gameName, newGame.gameName());
-        assertInstanceOf(Integer.class, newGame.gameId());
+        assertInstanceOf(Integer.class, newGame.gameID());
     }
 
     @Test
@@ -30,6 +31,44 @@ class GameServiceTest {
         var db = new MemoryDataAccess();
         var gameService = new GameService(db);
         assertThrows(InvalidException.class, () -> gameService.createGame(gameName, auth.authToken()));
+    }
+
+    @Test
+    void joinGame() throws Exception {
+        AuthData auth = new AuthData("bob", "1234567890");
+        var db = new MemoryDataAccess();
+        db.addAuth(auth);
+        var gameService = new GameService(db);
+        GameData newGame = gameService.createGame("game1", auth.authToken());
+        gameService.joinGame(auth.authToken(), newGame.gameID(), "WHITE");
+        GameData updatedGame = db.getGame(newGame.gameID());
+        assertNotNull(updatedGame);
+        if (updatedGame.whiteUsername() == null) {
+            assertNotNull(updatedGame.blackUsername());
+        } else if (updatedGame.blackUsername() == null) {
+            assertNotNull(updatedGame.whiteUsername());
+        }
+        // TODO - not sure what else needs to be asserted here.
+    }
+
+    @Test
+    void noAuthDataJoinGame() throws Exception {
+        AuthData auth = new AuthData("bob", "1234567890");
+        AuthData joiningAuth = new AuthData("jerry", "0987654321");
+        var db = new MemoryDataAccess();
+        db.addAuth(auth);
+        var gameService = new GameService(db);
+        GameData newGame = gameService.createGame("game1", auth.authToken());
+        assertThrows(UnauthorizedException.class, () -> gameService.joinGame(joiningAuth.authToken(), newGame.gameID(), "WHITE"));
+    }
+
+    @Test
+    void invalidGameIDJoinGame() {
+        AuthData auth = new AuthData("bob", "1234567890");
+        AuthData joiningAuth = new AuthData("jerry", "0987654321");
+        var db = new MemoryDataAccess();
+        db.addAuth(auth);
+        db.addAuth(joiningAuth);
     }
 
 }
