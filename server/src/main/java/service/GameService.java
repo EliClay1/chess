@@ -8,6 +8,8 @@ import exceptions.UnauthorizedException;
 import model.AuthData;
 import model.GameData;
 
+import java.util.ArrayList;
+
 public class GameService {
     private final DataAccess dataAccess;
 
@@ -47,5 +49,19 @@ public class GameService {
             throw new AlreadyTakenException();
         }
         dataAccess.updateGame(updatedGame);
+    }
+
+    public ArrayList<GameData> listGames(String authToken) throws Exception {
+        AuthData userByAuth = dataAccess.getAuth(authToken);
+        // no auth token
+        if (userByAuth == null) {
+            throw new UnauthorizedException();
+        }
+        ArrayList<GameData> listOfGames = new ArrayList<>();
+
+        dataAccess.
+
+
+        return listOfGames;
     }
 }

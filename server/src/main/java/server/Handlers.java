@@ -23,7 +23,7 @@ public class Handlers {
     private final UserService userService = new UserService(dataAccess);
     private final GameService gameService = new GameService(dataAccess);
     private final Gson serializer = new Gson();
-    private final List<String> availablePieces = Arrays.asList(new String[]{"WHITE", "BLACK"});
+    private final List<String> availablePieces = Arrays.asList("WHITE", "BLACK");
 
 
     void registerHandler(Context ctx) {
@@ -158,6 +158,22 @@ public class Handlers {
             }
         }
 
+    }
+
+    void listGamesHandler(Context ctx) {
+        String requestHeader = ctx.header("authorization");
+        try {
+            ArrayList<GameData> gameList = gameService.listGames(requestHeader);
+
+            // { "games": [{"gameID": 1234, "whiteUsername":"", "blackUsername":"", "gameName:""} ]}
+
+        } catch (Exception e) {
+            if (e instanceof UnauthorizedException) {
+                ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
+            } else {
+                ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
+            }
+        }
     }
 
     void clearHandler(Context ctx) {
