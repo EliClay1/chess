@@ -11,7 +11,8 @@ public interface DataAccess {
     * createGame: Create a new game.
     * getGame: Retrieve a specified game with the given game ID.
     * listGames: Retrieve all games.
-    * updateGame: Updates a chess game. It should replace the chess game string corresponding to a given gameID. This is used when players join a game or when a move is made.
+    * updateGame: Updates a chess game. It should replace the chess game string corresponding to a given gameID.
+    * This is used when players join a game or when a move is made.
     */
 
     void clear();
@@ -21,7 +22,8 @@ public interface DataAccess {
     AuthData getAuth(String authToken);
     void deleteAuth(AuthData authData);
     void createGame(GameData gameData);
-    GameData getGame(Integer gameName);
+    GameData getGame(Integer gameID);
+    void updateGame(GameData gameData);
     int createID();
 
 }

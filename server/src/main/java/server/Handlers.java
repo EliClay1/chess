@@ -3,10 +3,7 @@ package server;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import dataaccess.MemoryDataAccess;
-import exceptions.AlreadyTakenException;
-import exceptions.DoesntExistException;
-import exceptions.InvalidException;
-import exceptions.MissingFieldException;
+import exceptions.*;
 import io.javalin.http.Context;
 import model.AuthData;
 import model.GameData;
@@ -117,7 +114,7 @@ public class Handlers {
         }
         try {
             GameData newGame = gameService.createGame(request.gameName(), requestHeader);
-            ctx.status(200).result(serializer.toJson(Map.of("gameID", newGame.gameId())));
+            ctx.status(200).result(serializer.toJson(Map.of("gameID", newGame.gameID())));
         } catch (Exception e) {
             if (e instanceof InvalidException) {
                 ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
@@ -135,7 +132,7 @@ public class Handlers {
         Map<String, String> request = serializer.fromJson(requestJson, type);
 
         String teamColor = request.get("playerColor");
-        String gameID = request.get("gameID");
+        int gameID = Integer.parseInt(request.get("gameID"));
 
         // Check if the piece is a valid color
         try {
@@ -149,8 +146,10 @@ public class Handlers {
         try {
             gameService.joinGame(requestHeader, gameID, teamColor);
         } catch (Exception e) {
-            if (e instanceof InvalidException) {
+            if (e instanceof UnauthorizedException) {
                 ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
+            } else if (e instanceof InvalidException) {
+                ctx.status(403).result("{ \"message\": \"Error: already taken\" }");
             } else {
                 ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
             }
