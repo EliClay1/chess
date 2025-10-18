@@ -19,7 +19,7 @@ public class GameService {
             throw new InvalidException();
         }
         String username = userByAuth.username();
-
+        GameData newGame = new GameData();
 
         return null;
     }

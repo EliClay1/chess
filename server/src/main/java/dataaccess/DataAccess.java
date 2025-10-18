@@ -22,5 +22,6 @@ public interface DataAccess {
     void deleteAuth(AuthData authData);
     void createGame(GameData gameData);
     GameData getGame(Integer gameName);
+    int createID();
 
 }
