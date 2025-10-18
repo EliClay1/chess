@@ -16,6 +16,8 @@ import service.UserService;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class Handlers {
@@ -24,6 +26,7 @@ public class Handlers {
     private final UserService userService = new UserService(dataAccess);
     private final GameService gameService = new GameService(dataAccess);
     private final Gson serializer = new Gson();
+    private final List<String> availablePieces = Arrays.asList(new String[]{"WHITE", "BLACK"});
 
 
     void registerHandler(Context ctx) {
@@ -131,6 +134,27 @@ public class Handlers {
         Type type = new TypeToken<Map<String, String>>() {}.getType();
         Map<String, String> request = serializer.fromJson(requestJson, type);
 
+        String teamColor = request.get("playerColor");
+        String gameID = request.get("gameID");
+
+        // Check if the piece is a valid color
+        try {
+            if (teamColor == null || teamColor.isEmpty() || !availablePieces.contains(teamColor)) {throw new MissingFieldException();}
+        } catch (Exception e) {
+            var response = Map.of("message", "Error: bad request");
+            ctx.status(400).result(serializer.toJson(response));
+            return;
+        }
+
+        try {
+            gameService.joinGame(requestHeader, gameID, teamColor);
+        } catch (Exception e) {
+            if (e instanceof InvalidException) {
+                ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
+            } else {
+                ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
+            }
+        }
 
     }
 

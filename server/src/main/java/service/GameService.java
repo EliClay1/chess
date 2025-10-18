@@ -23,4 +23,13 @@ public class GameService {
         dataAccess.createGame(newGame);
         return newGame;
     }
+
+    public void joinGame(String authToken, String gameID, String playerColor) throws InvalidException {
+        AuthData userByAuth = dataAccess.getAuth(authToken);
+        // no auth token
+        if (userByAuth == null) {
+            throw new InvalidException();
+        }
+
+    }
 }
