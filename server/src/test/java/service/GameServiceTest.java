@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.MemoryDataAccess;
+import exceptions.AlreadyTakenException;
 import exceptions.InvalidException;
 import exceptions.UnauthorizedException;
 import model.AuthData;
@@ -63,7 +64,7 @@ class GameServiceTest {
     }
 
     @Test
-    void invalidGameIDJoinGame() throws Exception {
+    void invalidGameIDJoinGame() {
         AuthData auth = new AuthData("bob", "1234567890");
         AuthData joiningAuth = new AuthData("jerry", "0987654321");
         var db = new MemoryDataAccess();
@@ -71,6 +72,32 @@ class GameServiceTest {
         db.addAuth(joiningAuth);
         var gameService = new GameService(db);
         assertThrows(InvalidException.class, () -> gameService.joinGame(joiningAuth.authToken(), 10, "WHITE"));
+    }
+
+    @Test
+    void whiteAlreadyTakenJoinGame() throws Exception {
+        AuthData auth = new AuthData("bob", "1234567890");
+        AuthData joiningAuth = new AuthData("jerry", "0987654321");
+        var db = new MemoryDataAccess();
+        db.addAuth(auth);
+        db.addAuth(joiningAuth);
+        var gameService = new GameService(db);
+        GameData newGame = gameService.createGame("game1", auth.authToken());
+        gameService.joinGame(auth.authToken(), newGame.gameID(), "WHITE");
+        assertThrows(AlreadyTakenException.class, () -> gameService.joinGame(joiningAuth.authToken(), newGame.gameID(), "WHITE"));
+    }
+
+    @Test
+    void blackAlreadyTakenJoinGame() throws Exception {
+        AuthData auth = new AuthData("bob", "1234567890");
+        AuthData joiningAuth = new AuthData("jerry", "0987654321");
+        var db = new MemoryDataAccess();
+        db.addAuth(auth);
+        db.addAuth(joiningAuth);
+        var gameService = new GameService(db);
+        GameData newGame = gameService.createGame("game1", auth.authToken());
+        gameService.joinGame(auth.authToken(), newGame.gameID(), "BLACK");
+        assertThrows(AlreadyTakenException.class, () -> gameService.joinGame(joiningAuth.authToken(), newGame.gameID(), "BLACK"));
     }
 
 }

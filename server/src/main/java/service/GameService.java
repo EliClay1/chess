@@ -41,7 +41,7 @@ public class GameService {
         // white path
         if (playerColor.equals("WHITE") && gameByID.whiteUsername() == null) {
             updatedGame = new GameData(gameID, username, gameByID.blackUsername(), gameByID.gameName(), gameByID.game());
-        } else if (playerColor.equals("BLACK") && gameByID.blackUsername() != null) {
+        } else if (playerColor.equals("BLACK") && gameByID.blackUsername() == null) {
             updatedGame = new GameData(gameID, gameByID.whiteUsername(), username, gameByID.gameName(), gameByID.game());
         } else {
             throw new AlreadyTakenException();
