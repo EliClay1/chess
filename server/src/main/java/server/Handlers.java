@@ -11,7 +11,6 @@ import model.UserData;
 import service.GameService;
 import service.UserService;
 
-import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -130,17 +129,6 @@ public class Handlers {
         // gets access to the request data without having to create a new record object to map the data to.
         Type type = new TypeToken<Map<String, String>>() {}.getType();
         Map<String, String> request = serializer.fromJson(requestJson, type);
-
-        /*
-        * String idStr = request.get("gameID");  // use the exact needed key name
-if (idStr != null && !idStr.isEmpty()) {
-    try {
-        gameID = Integer.parseInt(idStr);
-    } catch (NumberFormatException e) {
-        // handle invalid number format if necessary
-        // e.g. log an error, use default, or throw your own exception
-    }
-}*/
 
         int gameID = -1;
         String teamColor = request.get("playerColor");
