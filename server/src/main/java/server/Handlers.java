@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import dataaccess.MemoryDataAccess;
 import exceptions.AlreadyTakenException;
 import exceptions.DoesntExistException;
@@ -13,6 +14,8 @@ import model.UserData;
 import service.GameService;
 import service.UserService;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class Handlers {
@@ -121,25 +124,19 @@ public class Handlers {
         }
     }
 
+    void joinGameHandler(Context ctx) {
+        String requestHeader = ctx.header("authorization");
+        String requestJson = ctx.body();
+        // gets access to the request data without having to create a new record object to map the data to.
+        Type type = new TypeToken<Map<String, String>>() {}.getType();
+        Map<String, String> request = serializer.fromJson(requestJson, type);
+
+
+    }
+
     void clearHandler(Context ctx) {
         dataAccess.clear();
         ctx.status(200).result("{}");
 
     }
-
-
-
-
 }
-
-//    // code copied from spec
-//    void serializeGame() {
-//        var serializer = new Gson();
-//
-//        var game = new ChessGame();
-//
-//        var json = serializer.toJson(game);
-//
-//        game = serializer.fromJson(json, ChessGame.class);
-//    }
-//}

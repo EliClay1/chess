@@ -17,14 +17,11 @@ public class Server {
         javalinServer.post("user", handlers::registerHandler);
         javalinServer.post("session", handlers::loginHandler);
         javalinServer.delete("session", handlers::logoutHandler);
-        // TODO - Create Game
         javalinServer.post("game", handlers::createGameHandler);
+        // TODO - Join Game
+        javalinServer.put("game", handlers::joinGameHandler);
 
         // TODO - List Games
-
-
-
-        // TODO - Join Game
 
         // TODO - Clear Application
 
