@@ -3,7 +3,7 @@ package service;
 import dataaccess.DataAccess;
 import exceptions.AlreadyTakenException;
 import exceptions.DoesntExistException;
-import exceptions.InvalidException;
+import exceptions.UnauthorizedException;
 import model.AuthData;
 import model.UserData;
 
@@ -30,7 +30,7 @@ public record UserService(DataAccess dataAccess) {
             throw new DoesntExistException();
         }
         if (!userByName.password().equals(user.password())) {
-            throw new InvalidException();
+            throw new UnauthorizedException();
         }
         AuthData authData = new AuthData(username, generateAuthToken());
         dataAccess.addAuth(authData);
@@ -41,7 +41,7 @@ public record UserService(DataAccess dataAccess) {
         String authToken = authData.authToken();
         AuthData userByAuth = dataAccess.getAuth(authToken);
         if (userByAuth == null) {
-            throw new InvalidException();
+            throw new UnauthorizedException();
         }
         dataAccess.deleteAuth(userByAuth);
     }

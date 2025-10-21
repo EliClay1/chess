@@ -10,8 +10,6 @@ public class Server {
         Handlers handlers = new Handlers();
         javalinServer = Javalin.create(config -> config.staticFiles.add("web"));
 
-        // TODO - Change all auth errors to be UnauthorizedException.
-
         javalinServer.delete("db", handlers::clearHandler);
         javalinServer.post("user", handlers::registerHandler);
         javalinServer.post("session", handlers::loginHandler);
