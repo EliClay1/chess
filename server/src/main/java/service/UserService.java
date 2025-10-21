@@ -9,13 +9,7 @@ import model.UserData;
 
 import java.util.UUID;
 
-public class UserService {
-
-    private final DataAccess dataAccess;
-
-    public UserService(DataAccess dataAccess) {
-        this.dataAccess = dataAccess;
-    }
+public record UserService(DataAccess dataAccess) {
 
     public AuthData register(UserData user) throws Exception {
         String username = user.username();

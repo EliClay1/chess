@@ -12,18 +12,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GameService {
-    private final DataAccess dataAccess;
-
-    public GameService(DataAccess dataAccess) {
-        this.dataAccess = dataAccess;
-    }
+public record GameService(DataAccess dataAccess) {
 
     public GameData createGame(String gameName, String authToken) throws Exception {
         AuthData userByAuth = dataAccess.getAuth(authToken);
         // no auth token
         if (userByAuth == null) {
-            throw new InvalidException();
+            throw new UnauthorizedException();
         }
         GameData newGame = new GameData(dataAccess.createID(), null, null, gameName, new ChessGame());
         dataAccess.createGame(newGame);
