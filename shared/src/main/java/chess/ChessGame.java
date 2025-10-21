@@ -52,7 +52,6 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        // TODO - Figure out what the heck is going on here. Also, look into prior code design; match the principles.
         Collection<ChessMove> validMoves = new ArrayList<>();
 
         ChessPiece piece = getBoard().getPiece(startPosition);

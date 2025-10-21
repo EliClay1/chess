@@ -156,11 +156,11 @@ public class Handlers {
             ctx.result("{ }");
         } catch (Exception e) {
             switch (e) {
-                case UnauthorizedException unauthorizedException ->
+                case UnauthorizedException _ ->
                         ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
-                case InvalidException invalidException ->
+                case InvalidException _ ->
                         ctx.status(400).result("{ \"message\": \"Error: bad request\" }");
-                case AlreadyTakenException alreadyTakenException ->
+                case AlreadyTakenException _ ->
                         ctx.status(403).result("{ \"message\": \"Error: already taken\" }");
                 default -> ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
             }
