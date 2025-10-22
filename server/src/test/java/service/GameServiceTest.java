@@ -51,7 +51,6 @@ class GameServiceTest {
         } else if (updatedGame.blackUsername() == null) {
             assertNotNull(updatedGame.whiteUsername());
         }
-        // TODO - not sure what else needs to be asserted here.
     }
 
     @Test
@@ -118,7 +117,6 @@ class GameServiceTest {
         assertInstanceOf(ArrayList.class, listOfGames);
         assertNotNull(listOfGames.getFirst().get("gameID"));
         assertNotNull(listOfGames.getLast().get("gameID"));
-        // TODO - what other tests need to go here?
     }
 
     @Test

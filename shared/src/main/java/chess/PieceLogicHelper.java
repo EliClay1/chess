@@ -69,7 +69,8 @@ public class PieceLogicHelper {
     }
 
     boolean isNotWithinBounds(ChessBoard board, ChessPosition position) {
-        return (position.getRow() <= 0 || position.getRow() > board.gameBoard.length) || (position.getColumn() <= 0 || position.getColumn() > board.gameBoard.length);
+        return (position.getRow() <= 0 || position.getRow() > board.gameBoard.length) ||
+                (position.getColumn() <= 0 || position.getColumn() > board.gameBoard.length);
     }
 
     int getDirection(ChessGame.TeamColor teamColor) {
@@ -86,7 +87,8 @@ public class PieceLogicHelper {
         return position.getRow() == 7 && teamColor == ChessGame.TeamColor.BLACK;
     }
 
-    void directionalHelper(ChessBoard board, ChessPosition currentPosition, ChessPosition nPosition, int dRow, int dCol, ChessGame.TeamColor currentTeamColor, boolean recurse) {
+    void directionalHelper(ChessBoard board, ChessPosition currentPosition, ChessPosition nPosition,
+                           int dRow, int dCol, ChessGame.TeamColor currentTeamColor, boolean recurse) {
         int nextRow = nPosition.getRow() + dRow;
         int nextCol = nPosition.getColumn() + dCol;
         ChessPosition nextPosition = new ChessPosition(nextRow, nextCol);
