@@ -4,6 +4,7 @@ import dataaccess.MemoryDataAccess;
 import exceptions.AlreadyTakenException;
 import exceptions.DoesntExistException;
 import exceptions.InvalidException;
+import exceptions.UnauthorizedException;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
@@ -62,7 +63,7 @@ class UserServiceTest {
         var db = new MemoryDataAccess();
         var userService = new UserService(db);
         db.createUser(newUser);
-        assertThrows(InvalidException.class, () -> userService.login(returningUser));
+        assertThrows(UnauthorizedException.class, () -> userService.login(returningUser));
     }
 
     @Test
@@ -80,6 +81,6 @@ class UserServiceTest {
         var newAuth = new AuthData("Bob", "1234567890");
         var db = new MemoryDataAccess();
         var userService = new UserService(db);
-        assertThrows(InvalidException.class, () -> userService.logout(newAuth));
+        assertThrows(UnauthorizedException.class, () -> userService.logout(newAuth));
     }
 }

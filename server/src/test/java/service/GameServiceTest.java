@@ -33,7 +33,7 @@ class GameServiceTest {
         AuthData auth = new AuthData("bob", null);
         var db = new MemoryDataAccess();
         var gameService = new GameService(db);
-        assertThrows(InvalidException.class, () -> gameService.createGame(gameName, auth.authToken()));
+        assertThrows(UnauthorizedException.class, () -> gameService.createGame(gameName, auth.authToken()));
     }
 
     @Test
