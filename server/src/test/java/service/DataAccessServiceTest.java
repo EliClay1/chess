@@ -36,7 +36,7 @@ class DataAccessServiceTest {
     @Test
     void clearDataError() throws Exception {
         AuthData auth = new AuthData("test_admin", "1234567890");
-        var db = new FailingDataAccess();
+        var db = new MemoryDataAccess();
         db.addAuth(auth);
         var gameService = new GameService(db);
         var userService = new UserService(db);
@@ -48,7 +48,7 @@ class DataAccessServiceTest {
         for (String name : usernames) {
             userService.register(new UserData(name, "Password!", String.format("%s@gmail.com", name)));
         }
-        var dataService = new DataAccessService(db);
+        var dataService = new DataAccessService(new FailingDataAccess());
         assertThrows(Exception.class, dataService::clearAllData);
     }
 }
