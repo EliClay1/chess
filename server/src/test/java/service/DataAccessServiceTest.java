@@ -3,7 +3,6 @@ package service;
 import dataaccess.FailingDataAccess;
 import dataaccess.MemoryDataAccess;
 import model.AuthData;
-import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 
