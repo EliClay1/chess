@@ -7,7 +7,7 @@ import model.UserData;
 import java.util.ArrayList;
 
 public interface DataAccess {
-    void clear();
+    void clear() throws Exception;
     void createUser(UserData user);
     UserData getUser(String username);
     void addAuth(AuthData authData);
@@ -18,5 +18,6 @@ public interface DataAccess {
     ArrayList<GameData> listGames();
     void updateGame(GameData gameData);
     int createID();
+    boolean isEmpty();
 
 }

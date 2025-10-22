@@ -4,9 +4,12 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.PriorityQueue;
+import java.util.TreeSet;
 
-public class MemoryDataAccess implements DataAccess{
+public class FailingDataAccess implements DataAccess{
 
     private final HashMap<String, UserData> usersByName = new HashMap<>();
     private final HashMap<String, AuthData> auth = new HashMap<>();
@@ -15,12 +18,8 @@ public class MemoryDataAccess implements DataAccess{
     private final PriorityQueue<Integer> reusableIDs = new PriorityQueue<>();
 
     @Override
-    public void clear() {
-        usersByName.clear();
-        auth.clear();
-        games.clear();
-        usedIDs.clear();
-        reusableIDs.clear();
+    public void clear() throws Exception {
+        throw new Exception("database error");
     }
 
     @Override

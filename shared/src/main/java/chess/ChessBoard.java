@@ -10,10 +10,6 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessBoard {
-
-    /*TODO - Create a data structure that represents the chess board. (an 8x8 grid of some kind) A reminder
-    *  That the data structure of choice must be an object type of the ChessPiece class. */
-
     final ChessPiece[][] gameBoard = new ChessPiece[8][8];
 
     public ChessBoard() {

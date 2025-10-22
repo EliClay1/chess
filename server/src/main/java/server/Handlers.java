@@ -8,6 +8,7 @@ import io.javalin.http.Context;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import service.DataAccessService;
 import service.GameService;
 import service.UserService;
 
@@ -19,6 +20,7 @@ public class Handlers {
     private final MemoryDataAccess dataAccess = new MemoryDataAccess();
     private final UserService userService = new UserService(dataAccess);
     private final GameService gameService = new GameService(dataAccess);
+    private final DataAccessService dataAccessService = new DataAccessService(dataAccess);
     private final Gson serializer = new Gson();
     private final List<String> availablePieces = Arrays.asList("WHITE", "BLACK");
 
@@ -187,9 +189,12 @@ public class Handlers {
     }
 
     void clearHandler(Context ctx) {
-        dataAccess.clear();
-        ctx.status(200).result("{}");
-
+        try {
+            dataAccessService.clearAllData();
+            ctx.status(200).result("{}");
+        } catch (Exception e) {
+            ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
+        }
     }
 
 }
