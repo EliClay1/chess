@@ -155,14 +155,12 @@ public class Handlers {
             gameService.joinGame(requestHeader, gameID, teamColor);
             ctx.result("{ }");
         } catch (Exception e) {
-            switch (e) {
-                case UnauthorizedException _ ->
-                        ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
-                case InvalidException _ ->
-                        ctx.status(400).result("{ \"message\": \"Error: bad request\" }");
-                case AlreadyTakenException _ ->
-                        ctx.status(403).result("{ \"message\": \"Error: already taken\" }");
-                default -> ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
+            if (e instanceof UnauthorizedException) {
+                ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
+            } else if (e instanceof AlreadyTakenException) {
+                ctx.status(403).result("{ \"message\": \"Error: already taken\" }");
+            } else {
+                ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
             }
         }
 
