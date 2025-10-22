@@ -72,7 +72,7 @@ public class Handlers {
         } catch (Exception e) {
             if (e instanceof DoesntExistException) {
                 ctx.status(401).result("{ \"message\": \"Error: bad request\" }");
-            } else if (e instanceof InvalidException) {
+            } else if (e instanceof UnauthorizedException) {
                 ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
             } else {
                 ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
@@ -91,7 +91,7 @@ public class Handlers {
             ctx.result("{ }");
 
         } catch (Exception e) {
-            if (e instanceof InvalidException) {
+            if (e instanceof UnauthorizedException) {
                 ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
             } else {
                 ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
@@ -115,7 +115,7 @@ public class Handlers {
             GameData newGame = gameService.createGame(request.gameName(), requestHeader);
             ctx.status(200).result(serializer.toJson(Map.of("gameID", newGame.gameID())));
         } catch (Exception e) {
-            if (e instanceof InvalidException) {
+            if (e instanceof UnauthorizedException) {
                 ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
             } else {
                 ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
