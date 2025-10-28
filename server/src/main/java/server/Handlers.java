@@ -35,6 +35,7 @@ public class Handlers {
         } catch (Exception e) {
             var response = Map.of("message", String.format("Error: %s", e.getMessage()));
             ctx.status(500).result(serializer.toJson(response));
+            return;
         }
 
         // checks for input validation

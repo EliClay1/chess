@@ -74,11 +74,10 @@ public class MySQLDataAccess implements DataAccess{
 
     private void configureDatabase() throws Exception {
         try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("SELECT 1 + 1, SELECT 2 + 2")) {
+            try (var preparedStatement = conn.prepareStatement("SELECT 1 + 1")) {
                 var rs = preparedStatement.executeQuery();
                 rs.next();
                 System.out.print(rs.getInt(1));
-                System.out.print(rs.getInt(2));
             }
         }
     }
