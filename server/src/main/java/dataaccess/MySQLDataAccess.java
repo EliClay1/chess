@@ -1,12 +1,10 @@
 package dataaccess;
 
-import exceptions.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
 
 import java.util.ArrayList;
-import java.sql.*;
 
 
 public class MySQLDataAccess implements DataAccess{

@@ -2,7 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import dataaccess.MemoryDataAccess;
+import dataaccess.MySQLDataAccess;
 import exceptions.*;
 import io.javalin.http.Context;
 import model.AuthData;
@@ -17,7 +17,7 @@ import java.util.*;
 
 public class Handlers {
 
-    private final MemoryDataAccess dataAccess = new MemoryDataAccess();
+    private MySQLDataAccess dataAccess;
     private final UserService userService = new UserService(dataAccess);
     private final GameService gameService = new GameService(dataAccess);
     private final DataAccessService dataAccessService = new DataAccessService(dataAccess);
@@ -25,9 +25,18 @@ public class Handlers {
     private final List<String> availablePieces = Arrays.asList("WHITE", "BLACK");
 
 
+
     void registerHandler(Context ctx) {
         String requestJson = ctx.body();
         UserData request = serializer.fromJson(requestJson, UserData.class);
+
+        try {
+            dataAccess = new MySQLDataAccess();
+        } catch (Exception e) {
+            var response = Map.of("message", String.format("Error: %s", e.getMessage()));
+            ctx.status(500).result(serializer.toJson(response));
+        }
+
         // checks for input validation
         try {
             if (request.username() == null || request.username().isEmpty()) {throw new MissingFieldException();}
