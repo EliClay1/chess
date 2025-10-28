@@ -2,7 +2,6 @@ package dataaccess;
 
 import exceptions.ResponseException;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,6 +10,8 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
+
+// TODO - Refactor this later, understand what makes it tick.
 
 public class DatabaseManager {
     // password: securePassword

@@ -11,7 +11,7 @@ import java.sql.*;
 
 public class MySQLDataAccess implements DataAccess{
 
-    public MySQLDataAccess() throws ResponseException {
+    public MySQLDataAccess() throws Exception {
         configureDatabase();
     }
     @Override
@@ -74,6 +74,14 @@ public class MySQLDataAccess implements DataAccess{
         return false;
     }
 
-    private void configureDatabase() {
+    private void configureDatabase() throws Exception {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("SELECT 1 + 1, SELECT 2 + 2")) {
+                var rs = preparedStatement.executeQuery();
+                rs.next();
+                System.out.print(rs.getInt(1));
+                System.out.print(rs.getInt(2));
+            }
+        }
     }
 }
