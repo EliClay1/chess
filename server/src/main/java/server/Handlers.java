@@ -70,6 +70,7 @@ public class Handlers {
             ctx.result(serializer.toJson(response));
         } catch (Exception e) {
             if (e instanceof AlreadyTakenException) {
+                // TODO - look into the formatting of this.
                 ctx.status(403).result("{ \"message\": \"Error: already taken\" }");
             } else {
                 ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));

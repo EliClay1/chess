@@ -61,7 +61,7 @@ public class MySQLDataAccess implements DataAccess{
 
     @Override
     public void addAuth(AuthData authData) throws Exception {
-        String sqlCommand = "INSERT INTO userdata (username, password, email) VALUES (?, ?)";
+        String sqlCommand = "INSERT INTO authdata (username, authtoken) VALUES (?, ?)";
         sendDatabaseCommand(sqlCommand, authData.username(), authData.authToken());
     }
 
