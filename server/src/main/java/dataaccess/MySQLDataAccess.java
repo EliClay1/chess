@@ -6,10 +6,7 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 
 
@@ -41,7 +38,7 @@ public class MySQLDataAccess implements DataAccess{
     }
 
     @Override
-    public UserData getUser(String username) throws Exception {
+    public UserData getUser(String username) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             String sqlCommand = "SELECT * FROM userdata WHERE username=?";
             try (PreparedStatement prepState = conn.prepareStatement(sqlCommand)) {
@@ -56,17 +53,35 @@ public class MySQLDataAccess implements DataAccess{
 
                 }
             }
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
         }
         return null;
     }
 
     @Override
-    public void addAuth(AuthData authData) {
-
+    public void addAuth(AuthData authData) throws Exception {
+        String sqlCommand = "INSERT INTO userdata (username, password, email) VALUES (?, ?)";
+        sendDatabaseCommand(sqlCommand, authData.username(), authData.authToken());
     }
 
     @Override
-    public AuthData getAuth(String authToken) {
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String sqlCommand = "SELECT * FROM authdata WHERE authtoken=?";
+            try (PreparedStatement prepState = conn.prepareStatement(sqlCommand)) {
+                prepState.setString(1, authToken);
+                try (ResultSet resultSet = prepState.executeQuery()) {
+                    if (resultSet.next()) {
+                        var authToken1 = resultSet.getString("authToken");
+                        var user = resultSet.getString("username");
+                        return new AuthData(authToken1, user);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
         return null;
     }
 

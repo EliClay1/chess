@@ -88,7 +88,6 @@ class MySQLDataAccessTest {
 
     @Test
     void addAuth() {
-
     }
 
     @Test
