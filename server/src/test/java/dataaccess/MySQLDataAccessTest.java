@@ -27,13 +27,14 @@ class MySQLDataAccessTest {
     }
 
     @Test
-    void createUser() {
+    void createUser() throws Exception {
         try {
             var db = new MySQLDataAccess();
             db.createUser(newUser);
-
+            UserData returnedUser = db.getUser(newUser.username());
+            assertEquals(returnedUser.username(), newUser.username());
         } catch (Exception e) {
-            // empty for now. Not sure what to put here.
+            throw new Exception(e.getMessage());
         }
     }
 
