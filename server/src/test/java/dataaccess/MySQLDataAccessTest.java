@@ -61,7 +61,7 @@ class MySQLDataAccessTest {
         try {
             var db = new MySQLDataAccess();
             db.createUser(existingUser);
-            assertThrows(AlreadyTakenException.class, () -> db.createUser(newUser));
+            assertThrows(AlreadyTakenException.class, () -> userService.register(newUser));
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
