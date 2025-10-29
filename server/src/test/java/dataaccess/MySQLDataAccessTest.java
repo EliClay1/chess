@@ -108,7 +108,14 @@ class MySQLDataAccessTest {
     }
 
     @Test
-    void deleteAuth() {
+    void deleteAuth() throws Exception {
+        try {
+            db.addAuth(newAuth);
+            db.deleteAuth(newAuth);
+            assertNull(db.getAuth(newAuth.authToken()));
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
     }
 
     @Test
