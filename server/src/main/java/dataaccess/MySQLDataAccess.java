@@ -23,8 +23,9 @@ public class MySQLDataAccess implements DataAccess{
     }
 
     @Override
-    public void createUser(UserData user) {
-
+    public void createUser(UserData user) throws Exception {
+        String sqlCommand = "INSERT INTO userdata (id, name, type) VALUES (?, ?, ?)";
+        sendDatabaseCommand(sqlCommand, user.username(), user.password(), user.email());
     }
 
     @Override
@@ -130,9 +131,7 @@ public class MySQLDataAccess implements DataAccess{
 
                 // this loop will only run if there are additional arguments attached.
                 for (var arg : additionalArguments) {
-                    if (arg instanceof String) {
-                        prepState.execute();
-                    }
+                    if (arg instanceof String a) {prepState.setString(1, a);}
                 }
 
                 prepState.execute();

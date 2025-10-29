@@ -1,14 +1,22 @@
 package server;
 
 import io.javalin.*;
+import io.javalin.http.Context;
 
 public class Server {
 
     private final Javalin javalinServer;
 
     public Server() {
-        Handlers handlers = new Handlers();
         javalinServer = Javalin.create(config -> config.staticFiles.add("web"));
+
+        // TODO - see if there is a way to fix this violation of the geneva convention.
+        Handlers handlers = null;
+        try {
+            handlers = new Handlers();
+        } catch (Exception e) {
+            javalinServer.error(500, "Database failed to build.", this::failureHandler);
+        }
 
         javalinServer.delete("db", handlers::clearHandler);
         javalinServer.post("user", handlers::registerHandler);
@@ -17,6 +25,11 @@ public class Server {
         javalinServer.post("game", handlers::createGameHandler);
         javalinServer.put("game", handlers::joinGameHandler);
         javalinServer.get("game", handlers::listGamesHandler);
+    }
+
+    // TODO - this is breaking coupling / probably like 5 other design principles. Find a way to fix it.
+    private void failureHandler(Context ctx) {
+        ctx.status(500);
     }
 
     public int run(int desiredPort) {

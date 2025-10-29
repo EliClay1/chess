@@ -18,13 +18,27 @@ import java.util.*;
 public class Handlers {
 
     private MySQLDataAccess dataAccess;
-    private final UserService userService = new UserService(dataAccess);
-    private final GameService gameService = new GameService(dataAccess);
-    private final DataAccessService dataAccessService = new DataAccessService(dataAccess);
+    private UserService userService;
+    private DataAccessService dataAccessService;
+    private GameService gameService;
     private final Gson serializer = new Gson();
     private final List<String> availablePieces = Arrays.asList("WHITE", "BLACK");
 
+    public Handlers() throws DataAccessException {
+        registerDataSystems();
+    }
 
+    // TODO - See if there is a better way to do this.
+    void registerDataSystems() throws DataAccessException {
+        try {
+            dataAccess = new MySQLDataAccess();
+        } catch (Exception e) {
+            throw new DataAccessException();
+        }
+        userService = new UserService(dataAccess);
+        gameService = new GameService(dataAccess);
+        dataAccessService= new DataAccessService(dataAccess);
+    }
 
     void registerHandler(Context ctx) {
         String requestJson = ctx.body();
