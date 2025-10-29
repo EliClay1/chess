@@ -1,17 +1,22 @@
 package dataaccess;
 
+import exceptions.DataAccessException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 
 public class MySQLDataAccess implements DataAccess{
 
     public MySQLDataAccess() throws Exception {
-        configureDatabase();
+        initializeDatabase();
     }
+
     @Override
     public void clear() throws Exception {
 
@@ -72,13 +77,64 @@ public class MySQLDataAccess implements DataAccess{
         return false;
     }
 
-    private void configureDatabase() throws Exception {
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("SELECT 1 + 1")) {
-                var rs = preparedStatement.executeQuery();
-                rs.next();
-                System.out.print(rs.getInt(1));
+    private final String[] createTables = {
+            """
+            CREATE TABLE IF NOT EXISTS userdata (
+                id INT,
+                username VARCHAR(100),
+                password VARCHAR(255),
+                email VARCHAR(255)
+                );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS authdata (
+                id INT,
+                username VARCHAR(100),
+                authToken VARCHAR(255)
+                );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS gamedata (
+                gameID INT PRIMARY KEY AUTO_INCREMENT,
+                gameName VARCHAR(255),
+                whiteUsername VARCHAR(255),
+                blackUsername VARCHAR(255),
+                game LONGTEXT
+                );
+            """
+    };
+
+    private void initializeDatabase() throws DataAccessException {
+        try {
+            DatabaseManager.createDatabase();
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Failed to create database, %s", e));
+        }
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            for (String createCommand : createTables) {
+                PreparedStatement preparedStatement = conn.prepareStatement(createCommand);
+                preparedStatement.execute();
             }
+
+        } catch (Exception e) {
+            // TODO - actually give explanation to the error here.
+            throw new DataAccessException(String.format("Failed to create tables, %s", e));
+        }
+    }
+
+    private void sendDatabaseCommand(String sqlCommand, Object... additionalArguments) throws Exception {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            // not entirely sure what return generated keys is doing here.
+            try (PreparedStatement prepState = conn.prepareStatement(sqlCommand, Statement.RETURN_GENERATED_KEYS)) {
+
+            } catch (Exception e) {
+                throw new DataAccessException(String.format("Failed to send sql command to database, %s", e));
+            }
+
+
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Failed to connect to database, %s", e));
         }
     }
 }
