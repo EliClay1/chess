@@ -68,11 +68,27 @@ class MySQLDataAccessTest {
     }
 
     @Test
-    void getUser() {
+    void getUser() throws Exception {
+        try {
+            userService.register(newUser);
+            assertNotNull(db.getUser(newUser.username()));
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    @Test
+    void userDoesntExist() throws Exception {
+        try {
+            assertNull(db.getUser(newUser.username()));
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
     }
 
     @Test
     void addAuth() {
+
     }
 
     @Test
