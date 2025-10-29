@@ -8,6 +8,7 @@ import model.UserData;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 
@@ -33,12 +34,26 @@ public class MySQLDataAccess implements DataAccess{
 
     @Override
     public void createUser(UserData user) throws Exception {
+        // the question marks are used to prevent SQL injection.
         String sqlCommand = "INSERT INTO userdata (username, password, email) VALUES (?, ?, ?)";
+        // just because thed sendDatabaseCommand returns an int, doesn't mean I have to assingn it to.
         sendDatabaseCommand(sqlCommand, user.username(), user.password(), user.email());
     }
 
     @Override
-    public UserData getUser(String username) {
+    public UserData getUser(String username) throws Exception {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String sqlCommand = "SELECT * FROM userdata WHERE username=?";
+            try (PreparedStatement prepState = conn.prepareStatement(sqlCommand)) {
+                prepState.setString(1, username);
+                prepState.executeUpdate();
+                try (ResultSet resultSet = prepState.getResultSet()) {
+                    System.out.println(resultSet.getString(2));
+                    System.out.println(resultSet.getString(3));
+                    System.out.println(resultSet.getString(4));
+                }
+            }
+        }
         return null;
     }
 
@@ -90,6 +105,7 @@ public class MySQLDataAccess implements DataAccess{
     private final String[] createTables = {
             """
             CREATE TABLE IF NOT EXISTS userdata (
+                id INT PRIMARY KEY AUTO_INCREMENT,
                 username VARCHAR(100),
                 password VARCHAR(255),
                 email VARCHAR(255)
@@ -97,6 +113,7 @@ public class MySQLDataAccess implements DataAccess{
             """,
             """
             CREATE TABLE IF NOT EXISTS authdata (
+                id INT PRIMARY KEY AUTO_INCREMENT,
                 username VARCHAR(100),
                 authToken VARCHAR(255)
                 );
@@ -116,7 +133,7 @@ public class MySQLDataAccess implements DataAccess{
         try {
             DatabaseManager.createDatabase();
         } catch (Exception e) {
-            throw new DataAccessException(String.format("Failed to create database, %s", e));
+            throw new DataAccessException(String.format("Failed to create database, %s", e.getMessage()));
         }
 
         try (Connection conn = DatabaseManager.getConnection()) {
@@ -126,11 +143,12 @@ public class MySQLDataAccess implements DataAccess{
             }
 
         } catch (Exception e) {
-            throw new DataAccessException(String.format("Failed to create tables, %s", e));
+            throw new DataAccessException(String.format("Failed to create tables, %s", e.getMessage()));
         }
     }
 
-    private void sendDatabaseCommand(String sqlCommand, Object... additionalArguments) throws Exception {
+    // TODO - figure how to get this to return data, like searching the database.
+    private int sendDatabaseCommand(String sqlCommand, Object... additionalArguments) throws Exception {
         try (Connection conn = DatabaseManager.getConnection()) {
 
             try {
@@ -149,14 +167,21 @@ public class MySQLDataAccess implements DataAccess{
                     }
                 }
 
-                prepState.execute();
+                prepState.executeUpdate();
+
+                // This code will return the auto-generated ID number attached to the database (if there is one).
+                // This isn't entirely neccessary, but it could be useful later down the line.
+                ResultSet resultSet = prepState.getGeneratedKeys();
+                var ID = 0;
+                if (resultSet.next()) {
+                    ID = resultSet.getInt(1);
+                }
+                return ID;
             } catch (Exception e) {
-                throw new DataAccessException(String.format("Failed to send sql command to database, %s", e));
+                throw new DataAccessException(String.format("Failed to send sql command to database, %s", e.getMessage()));
             }
-
-
         } catch (Exception e) {
-            throw new DataAccessException(String.format("Failed to connect to database, %s", e));
+            throw new DataAccessException(String.format("Failed to connect to database, %s", e.getMessage()));
         }
     }
 }
