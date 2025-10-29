@@ -46,11 +46,14 @@ public class MySQLDataAccess implements DataAccess{
             String sqlCommand = "SELECT * FROM userdata WHERE username=?";
             try (PreparedStatement prepState = conn.prepareStatement(sqlCommand)) {
                 prepState.setString(1, username);
-                prepState.executeUpdate();
-                try (ResultSet resultSet = prepState.getResultSet()) {
-                    System.out.println(resultSet.getString(2));
-                    System.out.println(resultSet.getString(3));
-                    System.out.println(resultSet.getString(4));
+                try (ResultSet resultSet = prepState.executeQuery()) {
+                    if (resultSet.next()) {
+                        var user = resultSet.getString("username");
+                        var password = resultSet.getString("password");
+                        var email = resultSet.getString("email");
+                        return new UserData(user, password, email);
+                    }
+
                 }
             }
         }
@@ -148,6 +151,8 @@ public class MySQLDataAccess implements DataAccess{
     }
 
     // TODO - figure how to get this to return data, like searching the database.
+
+    // TODO - We don't even have to have a catch statement, the handling in other functions will cover it as long as an exception is thrown.
     private int sendDatabaseCommand(String sqlCommand, Object... additionalArguments) throws Exception {
         try (Connection conn = DatabaseManager.getConnection()) {
 
