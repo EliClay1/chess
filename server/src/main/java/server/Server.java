@@ -17,7 +17,8 @@ public class Server {
         } catch (Exception e) {
             javalinServer.error(500, "Database failed to build.", this::failureHandler);
         }
-
+        // ensures that the handlers variable will never = null, prevents additional warnings.
+        assert handlers != null;
         javalinServer.delete("db", handlers::clearHandler);
         javalinServer.post("user", handlers::registerHandler);
         javalinServer.post("session", handlers::loginHandler);

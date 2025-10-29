@@ -140,10 +140,13 @@ public class MySQLDataAccess implements DataAccess{
                 for (int i = 0; i < additionalArguments.length; i++) {
                     var arg = additionalArguments[i];
                     // the + 1 is to fix out of range errors.
-                    // TODO - change this to an if-else statement so it doesn't go over EVERY if statement. Should speed up the code.
-                    if (arg instanceof String a) {prepState.setString(i + 1, a);}
-                    if (arg instanceof ChessGame a) {prepState.setObject(i + 1, a);}
-                    if (arg instanceof Integer a) {prepState.setInt(i + 1, a);}
+                    if (arg instanceof String a) {
+                        prepState.setString(i + 1, a);
+                    } else if (arg instanceof Integer a) {
+                        prepState.setInt(i + 1, a);
+                    } else if (arg instanceof ChessGame a) {
+                        prepState.setObject(i + 1, a);
+                    }
                 }
 
                 prepState.execute();
