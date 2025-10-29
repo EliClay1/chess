@@ -75,7 +75,7 @@ public class MySQLDataAccess implements DataAccess{
                     if (resultSet.next()) {
                         var authToken1 = resultSet.getString("authToken");
                         var user = resultSet.getString("username");
-                        return new AuthData(authToken1, user);
+                        return new AuthData(user, authToken1);
                     }
                 }
             }
@@ -86,8 +86,9 @@ public class MySQLDataAccess implements DataAccess{
     }
 
     @Override
-    public void deleteAuth(AuthData authData) {
-
+    public void deleteAuth(AuthData authData) throws Exception {
+        String sqlCommand = "DELETE FROM authdata WHERE username=?";
+        sendDatabaseCommand(sqlCommand, authData.username());
     }
 
     @Override

@@ -42,7 +42,7 @@ class MySQLDataAccessTest {
 
     @AfterAll
     public static void deInit() throws Exception {
-        db.clear();
+//        db.clear();
     }
 
     @Test
@@ -87,7 +87,14 @@ class MySQLDataAccessTest {
     }
 
     @Test
-    void addAuth() {
+    void addAuth() throws Exception {
+        try {
+            db.addAuth(newAuth);
+            AuthData returnedAuth = db.getAuth(newAuth.authToken());
+            assertEquals(newAuth.authToken(), returnedAuth.authToken());
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
     }
 
     @Test
