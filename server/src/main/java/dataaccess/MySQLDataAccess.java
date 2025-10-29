@@ -128,6 +128,14 @@ public class MySQLDataAccess implements DataAccess{
             // not entirely sure what return generated keys is doing here.
             try (PreparedStatement prepState = conn.prepareStatement(sqlCommand, Statement.RETURN_GENERATED_KEYS)) {
 
+                // this loop will only run if there are additional arguments attached.
+                for (var arg : additionalArguments) {
+                    if (arg instanceof String) {
+                        prepState.execute();
+                    }
+                }
+
+                prepState.execute();
             } catch (Exception e) {
                 throw new DataAccessException(String.format("Failed to send sql command to database, %s", e));
             }
