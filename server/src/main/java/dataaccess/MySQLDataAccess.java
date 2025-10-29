@@ -127,11 +127,17 @@ public class MySQLDataAccess implements DataAccess{
     private void sendDatabaseCommand(String sqlCommand, Object... additionalArguments) throws Exception {
         try (Connection conn = DatabaseManager.getConnection()) {
             // not entirely sure what return generated keys is doing here.
-            try (PreparedStatement prepState = conn.prepareStatement(sqlCommand, Statement.RETURN_GENERATED_KEYS)) {
+            try {
 
                 // this loop will only run if there are additional arguments attached.
-                for (var arg : additionalArguments) {
-                    if (arg instanceof String a) {prepState.setString(1, a);}
+//                for (var arg : additionalArguments) {
+//                    if (arg instanceof String a) {prepState.setString(1, a);}
+//                }
+                PreparedStatement prepState = conn.prepareStatement(sqlCommand, Statement.RETURN_GENERATED_KEYS);
+
+                for (int i = 0; i < additionalArguments.length; i++) {
+                    var arg = additionalArguments[i];
+                    if (arg instanceof String a) {prepState.setString(i, a);}
                 }
 
                 prepState.execute();
