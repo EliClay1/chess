@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import exceptions.DataAccessException;
 import model.AuthData;
 import model.GameData;
@@ -19,12 +20,20 @@ public class MySQLDataAccess implements DataAccess{
 
     @Override
     public void clear() throws Exception {
+        String[] clearCommands = {
+                "TRUNCATE TABLE authdata",
+                "TRUNCATE TABLE userdata",
+                "TRUNCATE TABLE gamedata"
+        };
 
+        for (String command : clearCommands) {
+            sendDatabaseCommand(command);
+        }
     }
 
     @Override
     public void createUser(UserData user) throws Exception {
-        String sqlCommand = "INSERT INTO userdata (id, name, type) VALUES (?, ?, ?)";
+        String sqlCommand = "INSERT INTO userdata (username, password, email) VALUES (?, ?, ?)";
         sendDatabaseCommand(sqlCommand, user.username(), user.password(), user.email());
     }
 
@@ -81,7 +90,6 @@ public class MySQLDataAccess implements DataAccess{
     private final String[] createTables = {
             """
             CREATE TABLE IF NOT EXISTS userdata (
-                id INT,
                 username VARCHAR(100),
                 password VARCHAR(255),
                 email VARCHAR(255)
@@ -89,7 +97,6 @@ public class MySQLDataAccess implements DataAccess{
             """,
             """
             CREATE TABLE IF NOT EXISTS authdata (
-                id INT,
                 username VARCHAR(100),
                 authToken VARCHAR(255)
                 );
@@ -119,25 +126,24 @@ public class MySQLDataAccess implements DataAccess{
             }
 
         } catch (Exception e) {
-            // TODO - actually give explanation to the error here.
             throw new DataAccessException(String.format("Failed to create tables, %s", e));
         }
     }
 
     private void sendDatabaseCommand(String sqlCommand, Object... additionalArguments) throws Exception {
         try (Connection conn = DatabaseManager.getConnection()) {
-            // not entirely sure what return generated keys is doing here.
-            try {
 
-                // this loop will only run if there are additional arguments attached.
-//                for (var arg : additionalArguments) {
-//                    if (arg instanceof String a) {prepState.setString(1, a);}
-//                }
+            try {
+                // not entirely sure what return generated keys is doing here.
                 PreparedStatement prepState = conn.prepareStatement(sqlCommand, Statement.RETURN_GENERATED_KEYS);
 
                 for (int i = 0; i < additionalArguments.length; i++) {
                     var arg = additionalArguments[i];
-                    if (arg instanceof String a) {prepState.setString(i, a);}
+                    // the + 1 is to fix out of range errors.
+                    // TODO - change this to an if-else statement so it doesn't go over EVERY if statement. Should speed up the code.
+                    if (arg instanceof String a) {prepState.setString(i + 1, a);}
+                    if (arg instanceof ChessGame a) {prepState.setObject(i + 1, a);}
+                    if (arg instanceof Integer a) {prepState.setInt(i + 1, a);}
                 }
 
                 prepState.execute();
