@@ -6,6 +6,7 @@ import exceptions.DoesntExistException;
 import exceptions.UnauthorizedException;
 import model.AuthData;
 import model.UserData;
+import org.eclipse.jetty.server.Authentication;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.UUID;
@@ -17,7 +18,8 @@ public record UserService(DataAccess dataAccess) {
         if (dataAccess.getUser(username) != null) {
             throw new AlreadyTakenException();
         }
-        dataAccess.createUser(user);
+        String hashedPassword = generateHashedPassword(user.password());
+        dataAccess.createUser(new UserData(username, hashedPassword, user.email()));
 
         AuthData authData = new AuthData(username, generateAuthToken());
         dataAccess.addAuth(authData);
@@ -30,7 +32,8 @@ public record UserService(DataAccess dataAccess) {
         if (userByName == null) {
             throw new DoesntExistException();
         }
-        if (!userByName.password().equals(user.password())) {
+        String hashedPassword = generateHashedPassword(user.password());
+        if (!userByName.password().equals(hashedPassword)) {
             throw new UnauthorizedException();
         }
         AuthData authData = new AuthData(username, generateAuthToken());
