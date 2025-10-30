@@ -12,6 +12,8 @@ import service.DataAccessService;
 import service.GameService;
 import service.UserService;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class MySQLDataAccessTest {
@@ -130,8 +132,17 @@ class MySQLDataAccessTest {
     }
 
     @Test
-    void listGames() {
-
+    void listGames() throws Exception {
+        db.addAuth(newAuth);
+        // loop to create 10 games
+        for (int i = 0; i < 10; i++) {
+            gameService.createGame(String.format("game%d", i), newAuth.authToken());
+        }
+        var listOfGames = gameService.listGames(newAuth.authToken());
+        assertNotNull(listOfGames);
+        assertInstanceOf(ArrayList.class, listOfGames);
+        assertNotNull(listOfGames.getFirst().get("gameID"));
+        assertNotNull(listOfGames.getLast().get("gameID"));
     }
 
     @Test
@@ -148,16 +159,9 @@ class MySQLDataAccessTest {
 
     @Test
     void clear() throws Exception {
-        try {
-            var db = new MySQLDataAccess();
-            db.createUser(newUser);
-            db.addAuth(newAuth);
-            db.createGame(newGame);
-
-
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
-
+        var db = new MySQLDataAccess();
+        db.createUser(newUser);
+        db.addAuth(newAuth);
+        db.createGame(newGame);
     }
 }
