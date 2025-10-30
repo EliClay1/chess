@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import exceptions.AlreadyTakenException;
 import exceptions.DataAccessException;
 import exceptions.DoesntExistException;
-import exceptions.UnauthorizedException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -113,7 +112,7 @@ public class MySQLDataAccess implements DataAccess{
     @Override
     public GameData getGame(Integer gameID) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            String sqlCommand = "SELECT * FROM gamedata WHERE id=?";
+            String sqlCommand = "SELECT * FROM gamedata WHERE gameID=?";
             try (PreparedStatement prepState = conn.prepareStatement(sqlCommand)) {
                 prepState.setInt(1, gameID);
                 try (ResultSet resultSet = prepState.executeQuery()) {
@@ -121,7 +120,7 @@ public class MySQLDataAccess implements DataAccess{
                         var gameName = resultSet.getString("gameName");
                         var whiteName = resultSet.getString("whiteUsername");
                         var blackName = resultSet.getString("blackUsername");
-                        var game = resultSet.getLong("game");
+                        var game = resultSet.getString("game");
                         // TODO - move game serialization
                         return new GameData(gameID, whiteName, blackName, gameName, serializeToGameObject(game));
                     }
@@ -134,8 +133,26 @@ public class MySQLDataAccess implements DataAccess{
     }
 
     @Override
-    public ArrayList<GameData> listGames() {
-        return null;
+    public ArrayList<GameData> listGames() throws DataAccessException {
+        ArrayList<Integer> usedIDs = new ArrayList<>();
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String sqlCommand = "SELECT gameID FROM gamedata";
+            try (PreparedStatement prepState = conn.prepareStatement(sqlCommand)) {
+                try (ResultSet resultSet = prepState.executeQuery()) {
+                    while (resultSet.next()) {
+                        usedIDs.add(resultSet.getInt("gameID"));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
+
+        ArrayList<GameData> listOfGames = new ArrayList<>();
+        for (int id : usedIDs) {
+            listOfGames.add(getGame(id));
+        }
+        return listOfGames;
     }
 
     @Override
@@ -175,7 +192,7 @@ public class MySQLDataAccess implements DataAccess{
                 gameName VARCHAR(255),
                 whiteUsername VARCHAR(255),
                 blackUsername VARCHAR(255),
-                game LONGTEXT
+                game JSON
                 );
             """
     };
@@ -244,8 +261,8 @@ public class MySQLDataAccess implements DataAccess{
         return serializer.toJson(chessGame);
     }
 
-    private ChessGame serializeToGameObject(Long chessGame) {
+    private ChessGame serializeToGameObject(String chessGame) {
         // TODO - is this a violation of any principles?
-        return serializer.fromJson(String.valueOf(chessGame), ChessGame.class);
+        return serializer.fromJson(chessGame, ChessGame.class);
     }
 }

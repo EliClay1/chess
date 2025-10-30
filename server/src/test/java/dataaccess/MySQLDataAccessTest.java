@@ -23,7 +23,6 @@ class MySQLDataAccessTest {
     private static GameData newGame;
     private static UserService userService;
     private static GameService gameService;
-    private static DataAccessService dataAccessService;
 
 
     @BeforeEach
@@ -31,7 +30,6 @@ class MySQLDataAccessTest {
         db = new MySQLDataAccess();
         userService = new UserService(db);
         gameService = new GameService(db);
-        dataAccessService = new DataAccessService(db);
 
         newUser = new UserData("Bob", "s3cur3Passw0rd", "bob@gmail.com");
         existingUser = new UserData("Bob", "123456790", "bob.king@gmail.com");
@@ -46,6 +44,7 @@ class MySQLDataAccessTest {
 
     @Test
     void createUser() throws Exception {
+        db.clear();
         userService.register(newUser);
         UserData returnedUser = db.getUser(newUser.username());
         assertEquals(returnedUser.username(), newUser.username());
@@ -107,27 +106,44 @@ class MySQLDataAccessTest {
 
     @Test
     void createGame() throws Exception {
-        userService.register(newUser);
-        AuthData response = userService.login(newUser);
-        gameService.createGame("Wowzah", response.authToken());
-
+        int gameID = db.createGame(new GameData(0, null, null, "wowzah", new ChessGame()));
+        assertInstanceOf(GameData.class, db.getGame(gameID));
     }
 
     @Test
-    void createGameNegative() {
-
+    void createGameNegative() throws Exception {
+        int gameID = db.createGame(new GameData(0, null, null, "wowzah", null));
+        assertNull(db.getGame(gameID).game());
     }
 
     @Test
-    void getGame() {
+    void getGame() throws Exception {
+        int gameID = db.createGame(new GameData(0, null, null, "wowzah", new ChessGame()));
+        GameData returnedGame = db.getGame(gameID);
+        assertInstanceOf(GameData.class, returnedGame);
+    }
+
+    @Test
+    void getGameNegative() throws Exception {
+        db.createGame(new GameData(0, null, null, "wowzah", new ChessGame()));
+        assertNull(db.getGame(0));
     }
 
     @Test
     void listGames() {
+
+    }
+
+    @Test
+    void listGamesNegative() {
     }
 
     @Test
     void updateGame() {
+    }
+
+    @Test
+    void updateGameNegative() {
     }
 
     @Test

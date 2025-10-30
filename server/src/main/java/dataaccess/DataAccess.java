@@ -16,7 +16,7 @@ public interface DataAccess {
     void deleteAuth(AuthData authData) throws Exception;
     int createGame(GameData gameData) throws Exception;
     GameData getGame(Integer gameID) throws DataAccessException;
-    ArrayList<GameData> listGames();
+    ArrayList<GameData> listGames() throws DataAccessException;
     void updateGame(GameData gameData);
     int createID();
     boolean isEmpty();
