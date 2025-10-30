@@ -156,8 +156,15 @@ public class MySQLDataAccess implements DataAccess{
     }
 
     @Override
-    public void updateGame(GameData gameData) {
-
+    public void updateGame(GameData gameData) throws Exception {
+        int gameID = gameData.gameID();
+        // removes the game
+        String deleteCommand = "DELETE FROM gamedata WHERE gameID=?";
+        sendDatabaseCommand(deleteCommand, gameID);
+        // adds the new game with updated game data
+        String serializedGame = serializeFromGameObject(gameData.game());
+        String updateCommand = "INSERT INTO gamedata (gameName, whiteUsername, blackUsername, game) VALUES (?, ?, ?, ?)";
+        sendDatabaseCommand(updateCommand, gameData.gameName(), gameData.whiteUsername(), gameData.blackUsername(), serializedGame);
     }
 
     private final String[] createTables = {
