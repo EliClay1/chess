@@ -6,6 +6,7 @@ import exceptions.DoesntExistException;
 import exceptions.UnauthorizedException;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.UUID;
 
@@ -15,9 +16,9 @@ public record UserService(DataAccess dataAccess) {
         String username = user.username();
         if (dataAccess.getUser(username) != null) {
             throw new AlreadyTakenException();
-        } else {
-            dataAccess.createUser(user);
         }
+        dataAccess.createUser(user);
+
         AuthData authData = new AuthData(username, generateAuthToken());
         dataAccess.addAuth(authData);
         return authData;
@@ -48,5 +49,9 @@ public record UserService(DataAccess dataAccess) {
 
     private String generateAuthToken() {
         return UUID.randomUUID().toString();
+    }
+
+    private String generateHashedPassword(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 }

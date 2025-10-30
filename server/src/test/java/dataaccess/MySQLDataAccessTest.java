@@ -150,12 +150,15 @@ class MySQLDataAccessTest {
     }
 
     @Test
-    void updateGame() {
-
+    void updateGame() throws Exception {
+        GameData updatedGame = new GameData(newGame.gameID(), "Bob", null, newGame.gameName(), newGame.game());
+        db.updateGame(updatedGame);
+        assertEquals(updatedGame, db.getGame(updatedGame.gameID()));
     }
 
     @Test
     void updateGameNegative() {
+        assertThrows(Exception.class, () -> db.updateGame(null));
     }
 
     @Test
