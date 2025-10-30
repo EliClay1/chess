@@ -146,11 +146,14 @@ class MySQLDataAccessTest {
     }
 
     @Test
-    void listGamesNegative() {
+    void listGamesNegative() throws Exception {
+        var listOfGames = db.listGames();
+        assertTrue(listOfGames == null || listOfGames.isEmpty());
     }
 
     @Test
     void updateGame() {
+
     }
 
     @Test
