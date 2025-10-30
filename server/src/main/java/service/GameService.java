@@ -20,9 +20,11 @@ public record GameService(DataAccess dataAccess) {
         if (userByAuth == null) {
             throw new UnauthorizedException();
         }
-        GameData newGame = new GameData(dataAccess.createID(), null, null, gameName, new ChessGame());
-        dataAccess.createGame(newGame);
-        return newGame;
+        int gameID;
+        GameData newGame = new GameData(0, null, null, gameName, new ChessGame());
+        gameID = dataAccess.createGame(newGame);
+        // TODO - find a way to refactor this.
+        return new GameData(gameID, null, null, gameName, new ChessGame());
     }
 
     public void joinGame(String authToken, int gameID, String playerColor) throws Exception {

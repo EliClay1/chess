@@ -53,6 +53,7 @@ public class Handlers {
         }
 
         // checks for input validation
+        // TODO - Password Hashing, still due for phase 4.
         try {
             if (request.username() == null || request.username().isEmpty()) {throw new MissingFieldException();}
             if (request.email() == null || request.email().isEmpty()) {throw new MissingFieldException();}

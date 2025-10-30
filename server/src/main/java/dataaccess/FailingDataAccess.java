@@ -38,8 +38,8 @@ public class FailingDataAccess implements DataAccess{
     }
 
     @Override
-    public void createGame(GameData gameData) {
-
+    public int createGame(GameData gameData) {
+        return 0;
     }
 
     @Override

@@ -101,11 +101,13 @@ public class MySQLDataAccess implements DataAccess{
     }
 
     @Override
-    public int createGame(GameData gameData) {
-
-
-
-        return 0;
+    public int createGame(GameData gameData) throws Exception {
+        String serializedGame = serializeFromGameObject(gameData.game());
+        int gameID;
+        String sqlCommand = "INSERT INTO gamedata (gameName, whiteUsername, blackUsername, game) VALUES (?, ?, ?, ?)";
+        gameID = sendDatabaseCommand(sqlCommand, gameData.gameName(),
+                gameData.whiteUsername(), gameData.blackUsername(), serializedGame);
+        return gameID;
     }
 
     @Override
@@ -215,6 +217,8 @@ public class MySQLDataAccess implements DataAccess{
                         prepState.setInt(i + 1, a);
                     } else if (arg instanceof ChessGame a) {
                         prepState.setObject(i + 1, a);
+                    } else if (arg == null) {
+                        prepState.setObject(i + 1, null);
                     }
                 }
 
