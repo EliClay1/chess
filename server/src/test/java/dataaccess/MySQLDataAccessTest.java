@@ -2,6 +2,8 @@ package dataaccess;
 
 import chess.ChessGame;
 import exceptions.AlreadyTakenException;
+import exceptions.DataAccessException;
+import exceptions.DoesntExistException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -44,89 +46,76 @@ class MySQLDataAccessTest {
 
     @Test
     void createUser() throws Exception {
-        try {
-            userService.register(newUser);
-            UserData returnedUser = db.getUser(newUser.username());
-            assertEquals(returnedUser.username(), newUser.username());
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
+        userService.register(newUser);
+        UserData returnedUser = db.getUser(newUser.username());
+        assertEquals(returnedUser.username(), newUser.username());
     }
 
     @Test
     void createUserNegative() throws Exception {
-        try {
-            var db = new MySQLDataAccess();
-            db.createUser(existingUser);
-            assertThrows(AlreadyTakenException.class, () -> userService.register(newUser));
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
+        var db = new MySQLDataAccess();
+        db.createUser(existingUser);
+        assertThrows(AlreadyTakenException.class, () -> userService.register(newUser));
     }
 
     @Test
     void getUser() throws Exception {
-        try {
-            userService.register(newUser);
-            assertNotNull(db.getUser(newUser.username()));
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
+        userService.register(newUser);
+        assertNotNull(db.getUser(newUser.username()));
     }
 
     @Test
     void getUserNegative() throws Exception {
-        try {
-            assertNull(db.getUser(newUser.username()));
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
+        assertNull(db.getUser(newUser.username()));
     }
 
     @Test
     void addAuth() throws Exception {
-        try {
-            db.addAuth(newAuth);
-            AuthData returnedAuth = db.getAuth(newAuth.authToken());
-            assertEquals(newAuth.authToken(), returnedAuth.authToken());
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
+        db.addAuth(newAuth);
+        AuthData returnedAuth = db.getAuth(newAuth.authToken());
+        assertEquals(newAuth.authToken(), returnedAuth.authToken());
     }
 
     @Test
         void addAuthNegative() throws Exception {
-        try {
-            db.addAuth(newAuth);
-            assertThrows(AlreadyTakenException.class, () -> db.addAuth(newAuth));
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
+        db.addAuth(newAuth);
+        assertThrows(AlreadyTakenException.class, () -> db.addAuth(newAuth));
     }
 
     @Test
     void getAuth() throws Exception {
-        try {
-            db.addAuth(newAuth);
-            assertNotNull(db.getAuth(newAuth.authToken()));
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
+        db.addAuth(newAuth);
+        assertNotNull(db.getAuth(newAuth.authToken()));
+    }
+
+    @Test
+    void getAuthNegative() throws Exception {
+        assertNull(db.getAuth("0"));
     }
 
     @Test
     void deleteAuth() throws Exception {
-        try {
-            db.addAuth(newAuth);
-            db.deleteAuth(newAuth);
-            assertNull(db.getAuth(newAuth.authToken()));
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
+        db.addAuth(newAuth);
+        db.deleteAuth(newAuth);
+        assertNull(db.getAuth(newAuth.authToken()));
     }
 
     @Test
-    void createGame() {
+    void deleteAuthNegative() {
+        assertThrows(DoesntExistException.class, () -> db.deleteAuth(new AuthData("Kerry", "0")));
+    }
+
+    @Test
+    void createGame() throws Exception {
+        userService.register(newUser);
+        AuthData response = userService.login(newUser);
+        gameService.createGame("Wowzah", response.authToken());
+
+    }
+
+    @Test
+    void createGameNegative() {
+
     }
 
     @Test

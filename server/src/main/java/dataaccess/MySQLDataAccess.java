@@ -1,8 +1,10 @@
 package dataaccess;
 
 import chess.ChessGame;
+import com.google.gson.Gson;
 import exceptions.AlreadyTakenException;
 import exceptions.DataAccessException;
+import exceptions.DoesntExistException;
 import exceptions.UnauthorizedException;
 import model.AuthData;
 import model.GameData;
@@ -13,6 +15,8 @@ import java.util.ArrayList;
 
 
 public class MySQLDataAccess implements DataAccess{
+
+    private final Gson serializer = new Gson();
 
     public MySQLDataAccess() throws Exception {
         initializeDatabase();
@@ -63,11 +67,7 @@ public class MySQLDataAccess implements DataAccess{
 
     @Override
     public void addAuth(AuthData authData) throws Exception {
-        AuthData authCheck = getAuth(authData.authToken());
-
-        if (authCheck != null) {
-            throw new AlreadyTakenException();
-        }
+        if (getAuth(authData.authToken()) != null) {throw new AlreadyTakenException();}
 
         String sqlCommand = "INSERT INTO authdata (username, authtoken) VALUES (?, ?)";
         sendDatabaseCommand(sqlCommand, authData.username(), authData.authToken());
@@ -95,17 +95,39 @@ public class MySQLDataAccess implements DataAccess{
 
     @Override
     public void deleteAuth(AuthData authData) throws Exception {
+        if (getAuth(authData.authToken()) == null) {throw new DoesntExistException();}
         String sqlCommand = "DELETE FROM authdata WHERE username=?";
         sendDatabaseCommand(sqlCommand, authData.username());
     }
 
     @Override
-    public void createGame(GameData gameData) {
+    public int createGame(GameData gameData) {
 
+
+
+        return 0;
     }
 
     @Override
-    public GameData getGame(Integer gameID) {
+    public GameData getGame(Integer gameID) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String sqlCommand = "SELECT * FROM gamedata WHERE id=?";
+            try (PreparedStatement prepState = conn.prepareStatement(sqlCommand)) {
+                prepState.setInt(1, gameID);
+                try (ResultSet resultSet = prepState.executeQuery()) {
+                    if (resultSet.next()) {
+                        var gameName = resultSet.getString("gameName");
+                        var whiteName = resultSet.getString("whiteUsername");
+                        var blackName = resultSet.getString("blackUsername");
+                        var game = resultSet.getLong("game");
+                        // TODO - move game serialization
+                        return new GameData(gameID, whiteName, blackName, gameName, serializeToGameObject(game));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
         return null;
     }
 
@@ -212,5 +234,14 @@ public class MySQLDataAccess implements DataAccess{
         } catch (Exception e) {
             throw new DataAccessException(String.format("Failed to connect to database, %s", e.getMessage()));
         }
+    }
+
+    private String serializeFromGameObject(ChessGame chessGame) {
+        return serializer.toJson(chessGame);
+    }
+
+    private ChessGame serializeToGameObject(Long chessGame) {
+        // TODO - is this a violation of any principles?
+        return serializer.fromJson(String.valueOf(chessGame), ChessGame.class);
     }
 }
