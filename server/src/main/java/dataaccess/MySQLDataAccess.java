@@ -1,7 +1,9 @@
 package dataaccess;
 
 import chess.ChessGame;
+import exceptions.AlreadyTakenException;
 import exceptions.DataAccessException;
+import exceptions.UnauthorizedException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -61,6 +63,12 @@ public class MySQLDataAccess implements DataAccess{
 
     @Override
     public void addAuth(AuthData authData) throws Exception {
+        AuthData authCheck = getAuth(authData.authToken());
+
+        if (authCheck != null) {
+            throw new AlreadyTakenException();
+        }
+
         String sqlCommand = "INSERT INTO authdata (username, authtoken) VALUES (?, ?)";
         sendDatabaseCommand(sqlCommand, authData.username(), authData.authToken());
     }

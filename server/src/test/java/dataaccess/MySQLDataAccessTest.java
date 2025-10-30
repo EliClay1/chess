@@ -5,10 +5,7 @@ import exceptions.AlreadyTakenException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import service.DataAccessService;
 import service.GameService;
 import service.UserService;
@@ -27,8 +24,8 @@ class MySQLDataAccessTest {
     private static DataAccessService dataAccessService;
 
 
-    @BeforeAll
-    public static void init() throws Exception {
+    @BeforeEach
+    public void init() throws Exception {
         db = new MySQLDataAccess();
         userService = new UserService(db);
         gameService = new GameService(db);
@@ -40,8 +37,8 @@ class MySQLDataAccessTest {
         newGame = new GameData(1, null, null, "game1", new ChessGame());
     }
 
-    @AfterAll
-    public static void deInit() throws Exception {
+    @AfterEach
+    public void deInit() throws Exception {
         db.clear();
     }
 
@@ -57,7 +54,7 @@ class MySQLDataAccessTest {
     }
 
     @Test
-    void userAlreadyExists() throws Exception {
+    void createUserNegative() throws Exception {
         try {
             var db = new MySQLDataAccess();
             db.createUser(existingUser);
@@ -78,7 +75,7 @@ class MySQLDataAccessTest {
     }
 
     @Test
-    void userDoesntExist() throws Exception {
+    void getUserNegative() throws Exception {
         try {
             assertNull(db.getUser(newUser.username()));
         } catch (Exception e) {
@@ -92,6 +89,16 @@ class MySQLDataAccessTest {
             db.addAuth(newAuth);
             AuthData returnedAuth = db.getAuth(newAuth.authToken());
             assertEquals(newAuth.authToken(), returnedAuth.authToken());
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    @Test
+        void addAuthNegative() throws Exception {
+        try {
+            db.addAuth(newAuth);
+            assertThrows(AlreadyTakenException.class, () -> db.addAuth(newAuth));
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
@@ -135,15 +142,7 @@ class MySQLDataAccessTest {
     }
 
     @Test
-    void createID() {
-    }
-
-    @Test
-    void isEmpty() {
-    }
-
-    @Test
-    void clear() {
+    void clear() throws Exception {
         try {
             var db = new MySQLDataAccess();
             db.createUser(newUser);
@@ -152,7 +151,7 @@ class MySQLDataAccessTest {
 
 
         } catch (Exception e) {
-            // empty for now. Not sure what to put here.
+            throw new Exception(e.getMessage());
         }
 
     }
