@@ -75,7 +75,6 @@ public class MemoryDataAccess implements DataAccess{
         games.put(gameID, gameData);
     }
 
-    @Override
     public int createID() {
         int nextID;
         if (!reusableIDs.isEmpty()) {
@@ -87,7 +86,6 @@ public class MemoryDataAccess implements DataAccess{
         return nextID;
     }
 
-    @Override
     public boolean isEmpty() {
         return usedIDs.isEmpty() && auth.isEmpty() && games.isEmpty() && usersByName.isEmpty() && reusableIDs.isEmpty();
     }

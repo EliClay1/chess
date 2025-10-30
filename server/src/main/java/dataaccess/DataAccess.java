@@ -18,7 +18,5 @@ public interface DataAccess {
     GameData getGame(Integer gameID) throws DataAccessException;
     ArrayList<GameData> listGames() throws DataAccessException;
     void updateGame(GameData gameData);
-    int createID();
-    boolean isEmpty();
 
 }

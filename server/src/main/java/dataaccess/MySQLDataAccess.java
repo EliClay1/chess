@@ -160,16 +160,6 @@ public class MySQLDataAccess implements DataAccess{
 
     }
 
-    @Override
-    public int createID() {
-        return 0;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
     private final String[] createTables = {
             """
             CREATE TABLE IF NOT EXISTS userdata (

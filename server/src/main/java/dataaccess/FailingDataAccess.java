@@ -56,14 +56,4 @@ public class FailingDataAccess implements DataAccess{
     public void updateGame(GameData gameData) {
 
     }
-
-    @Override
-    public int createID() {
-        return 0;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
 }
