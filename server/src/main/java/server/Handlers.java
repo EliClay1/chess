@@ -53,15 +53,13 @@ public class Handlers {
         }
 
         // checks for input validation
-        // TODO - Password Hashing, still due for phase 4.
         try {
             if (request.username() == null || request.username().isEmpty()) {throw new MissingFieldException();}
             if (request.email() == null || request.email().isEmpty()) {throw new MissingFieldException();}
             if (request.password() == null || request.password().isEmpty()) {throw new MissingFieldException();}
         } catch (Exception e) {
-            var response = Map.of("message", "Error: bad request");
-            ctx.status(400);
-            ctx.result(serializer.toJson(response));
+            var response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
+            ctx.status(400).result(serializer.toJson(response));
             return;
         }
 
@@ -70,11 +68,13 @@ public class Handlers {
             AuthData response = userService.register(request);
             ctx.result(serializer.toJson(response));
         } catch (Exception e) {
+            var response = Map.of();
             if (e instanceof AlreadyTakenException) {
-                // TODO - look into the formatting of this.
-                ctx.status(403).result("{ \"message\": \"Error: already taken\" }");
+                response = Map.of("message", String.format("Error: already taken, %s", e.getMessage()));
+                ctx.status(403).result(serializer.toJson(response));
             } else {
-                ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
+                response = Map.of("message", String.format("Error: %s", e.getMessage()));
+                ctx.status(500).result(serializer.toJson(response));
             }
         }
     }
@@ -87,7 +87,7 @@ public class Handlers {
             if (request.username() == null || request.username().isEmpty()) {throw new MissingFieldException();}
             if (request.password() == null || request.password().isEmpty()) {throw new MissingFieldException();}
         } catch (Exception e) {
-            var response = Map.of("message", "Error: bad request");
+            var response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
             ctx.status(400).result(serializer.toJson(response));
             return;
         }
@@ -100,9 +100,11 @@ public class Handlers {
         } catch (Exception e) {
             var response = Map.of();
             if (e instanceof DoesntExistException) {
-                ctx.status(401).result("{ \"message\": \"Error: bad request\" }");
+                response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
+                ctx.status(400).result(serializer.toJson(response));
             } else if (e instanceof UnauthorizedException) {
-                ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
+                response = Map.of("message", String.format("Error: unauthorized, %s", e.getMessage()));
+                ctx.status(401).result(serializer.toJson(response));
             } else {
                 response = Map.of("message", String.format("Error: %s", e.getMessage()));
                 ctx.status(500).result(serializer.toJson(response));
@@ -118,17 +120,21 @@ public class Handlers {
         // call to the service and register
         try {
             userService.logout(request);
-            ctx.result("{ }");
+            ctx.result("{}");
 
         } catch (Exception e) {
+            var response = Map.of();
             if (e instanceof UnauthorizedException) {
-                ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
+                response = Map.of("message", String.format("Error: unauthorized, %s", e.getMessage()));
+                ctx.status(401).result(serializer.toJson(response));
             } else {
-                ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
+                response = Map.of("message", String.format("Error: %s", e.getMessage()));
+                ctx.status(500).result(serializer.toJson(response));
             }
         }
     }
 
+    // TODO - fix duplicate code.
     void createGameHandler(Context ctx) {
         String requestHeader = ctx.header("authorization");
         String requestJson = ctx.body();
@@ -137,7 +143,7 @@ public class Handlers {
         try {
             if (request.gameName() == null || request.gameName().isEmpty()) {throw new MissingFieldException();}
         } catch (Exception e) {
-            var response = Map.of("message", "Error: bad request");
+            var response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
             ctx.status(400).result(serializer.toJson(response));
             return;
         }
@@ -145,10 +151,13 @@ public class Handlers {
             GameData newGame = gameService.createGame(request.gameName(), requestHeader);
             ctx.status(200).result(serializer.toJson(Map.of("gameID", newGame.gameID())));
         } catch (Exception e) {
+            var response = Map.of();
             if (e instanceof UnauthorizedException) {
-                ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
+                response = Map.of("message", String.format("Error: unauthorized, %s", e.getMessage()));
+                ctx.status(401).result(serializer.toJson(response));
             } else {
-                ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
+                response = Map.of("message", String.format("Error: %s", e.getMessage()));
+                ctx.status(500).result(serializer.toJson(response));
             }
         }
     }
@@ -176,14 +185,14 @@ public class Handlers {
         try {
             if (teamColor == null || teamColor.isEmpty() || !availablePieces.contains(teamColor)) {throw new MissingFieldException();}
         } catch (Exception e) {
-            var response = Map.of("message", "Error: bad request");
+            var response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
             ctx.status(400).result(serializer.toJson(response));
             return;
         }
 
         try {
             gameService.joinGame(requestHeader, gameID, teamColor);
-            ctx.result("{ }");
+            ctx.result("{}");
         } catch (Exception e) {
             var response = Map.of();
             if (!(e instanceof UnauthorizedException)) {
