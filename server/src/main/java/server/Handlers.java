@@ -98,12 +98,14 @@ public class Handlers {
             ctx.result(serializer.toJson(response));
 
         } catch (Exception e) {
+            var response = Map.of();
             if (e instanceof DoesntExistException) {
                 ctx.status(401).result("{ \"message\": \"Error: bad request\" }");
             } else if (e instanceof UnauthorizedException) {
                 ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
             } else {
-                ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
+                response = Map.of("message", String.format("Error: %s", e.getMessage()));
+                ctx.status(500).result(serializer.toJson(response));
             }
         }
     }
@@ -183,16 +185,21 @@ public class Handlers {
             gameService.joinGame(requestHeader, gameID, teamColor);
             ctx.result("{ }");
         } catch (Exception e) {
+            var response = Map.of();
             if (!(e instanceof UnauthorizedException)) {
                 if (e instanceof InvalidException) {
-                    ctx.status(400).result("{ \"message\": \"Error: bad request\" }");
+                    response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
+                    ctx.status(400).result(serializer.toJson(response));
                 } else if (e instanceof AlreadyTakenException) {
-                    ctx.status(403).result("{ \"message\": \"Error: already taken\" }");
+                    response = Map.of("message", String.format("Error: already taken, %s", e.getMessage()));
+                    ctx.status(403).result(serializer.toJson(response));
                 } else {
-                    ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
+                    response = Map.of("message", String.format("Error: %s", e.getMessage()));
+                    ctx.status(500).result(serializer.toJson(response));
                 }
             } else {
-                ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
+                response = Map.of("message", String.format("Error: unauthorized, %s", e.getMessage()));
+                ctx.status(401).result(serializer.toJson(response));
             }
         }
 
@@ -206,10 +213,13 @@ public class Handlers {
             resultMap.put("games", gameList);
             ctx.status(200).result(serializer.toJson(resultMap));
         } catch (Exception e) {
+            var response = Map.of();
             if (e instanceof UnauthorizedException) {
-                ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
+                response = Map.of("message", String.format("Error: unauthorized, %s", e.getMessage()));
+                ctx.status(401).result(serializer.toJson(response));
             } else {
-                ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
+                response = Map.of("message", String.format("Error: %s", e.getMessage()));
+                ctx.status(500).result(serializer.toJson(response));
             }
         }
     }
@@ -219,7 +229,8 @@ public class Handlers {
             dataAccessService.clearAllData();
             ctx.status(200).result("{}");
         } catch (Exception e) {
-            ctx.status(500).result(String.format("{{ \"message\": \"Error: %s\" }}", e));
+            var response = Map.of("message", String.format("Error: %s", e.getMessage()));
+            ctx.status(500).result(serializer.toJson(response));
         }
     }
 

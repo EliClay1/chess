@@ -32,8 +32,10 @@ public record UserService(DataAccess dataAccess) {
         if (userByName == null) {
             throw new DoesntExistException();
         }
-        String hashedPassword = generateHashedPassword(user.password());
-        if (!userByName.password().equals(hashedPassword)) {
+
+        boolean passwordsMatch = BCrypt.checkpw(user.password(), userByName.password());
+
+        if (!passwordsMatch) {
             throw new UnauthorizedException();
         }
         AuthData authData = new AuthData(username, generateAuthToken());
