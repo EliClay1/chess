@@ -6,7 +6,6 @@ import exceptions.DoesntExistException;
 import exceptions.UnauthorizedException;
 import model.AuthData;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.UUID;

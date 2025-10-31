@@ -13,6 +13,7 @@ import java.sql.*;
 import java.util.ArrayList;
 
 
+@SuppressWarnings("IfCanBeSwitch")
 public class MySQLDataAccess implements DataAccess{
 
     private final Gson serializer = new Gson();
