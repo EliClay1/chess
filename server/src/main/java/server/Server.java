@@ -10,7 +10,6 @@ public class Server {
     public Server() {
         javalinServer = Javalin.create(config -> config.staticFiles.add("web"));
 
-        // TODO - see if there is a way to fix this violation of the geneva convention.
         try {
             // Handlers must be created with the Handlers.create...() function because of saftey precautions. i.e, you
             // cannot create the handler any other way.
@@ -23,14 +22,9 @@ public class Server {
             javalinServer.put("game", handlers::joinGameHandler);
             javalinServer.get("game", handlers::listGamesHandler);
         } catch (Exception e) {
-            javalinServer.error(500, "Database failed to build.", this::failureHandler);
+            FaultBarrierHandlers faultBarrier = new FaultBarrierHandlers();
+            javalinServer.error(500, "Database failed to build.", faultBarrier::failureHandler);
         }
-        // ensures that the handlers variable will never = null, prevents additional warnings.
-    }
-
-    // TODO - this is breaking coupling / probably like 5 other design principles. Find a way to fix it.
-    private void failureHandler(Context ctx) {
-        ctx.status(500);
     }
 
     public int run(int desiredPort) {

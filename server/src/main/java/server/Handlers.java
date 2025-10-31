@@ -2,14 +2,12 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import dataaccess.DataAccess;
 import dataaccess.MySQLDataAccess;
 import exceptions.*;
 import io.javalin.http.Context;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 import service.DataAccessService;
 import service.GameService;
 import service.UserService;
@@ -26,7 +24,8 @@ public class Handlers {
     private final Gson serializer = new Gson();
     private final List<String> availablePieces = Arrays.asList("WHITE", "BLACK");
 
-    private Handlers(MySQLDataAccess dataAccess) throws DataAccessException {
+    // This is private so that the database can be safely initialized.
+    private Handlers(MySQLDataAccess dataAccess) {
         this.db = dataAccess;
         this.userService = new UserService(db);
         this.gameService = new GameService(db);
@@ -74,14 +73,7 @@ public class Handlers {
             AuthData response = userService.register(request);
             ctx.result(serializer.toJson(response));
         } catch (Exception e) {
-            var response = Map.of();
-            if (e instanceof AlreadyTakenException) {
-                response = Map.of("message", String.format("Error: already taken, %s", e.getMessage()));
-                ctx.status(403).result(serializer.toJson(response));
-            } else {
-                response = Map.of("message", String.format("Error: %s", e.getMessage()));
-                ctx.status(500).result(serializer.toJson(response));
-            }
+            errorReturnHandling(ctx, e);
         }
     }
 
@@ -104,17 +96,7 @@ public class Handlers {
             ctx.result(serializer.toJson(response));
 
         } catch (Exception e) {
-            var response = Map.of();
-            if (e instanceof DoesntExistException) {
-                response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
-                ctx.status(400).result(serializer.toJson(response));
-            } else if (e instanceof UnauthorizedException) {
-                response = Map.of("message", String.format("Error: unauthorized, %s", e.getMessage()));
-                ctx.status(401).result(serializer.toJson(response));
-            } else {
-                response = Map.of("message", String.format("Error: %s", e.getMessage()));
-                ctx.status(500).result(serializer.toJson(response));
-            }
+            errorReturnHandling(ctx, e);
         }
     }
 
@@ -129,18 +111,10 @@ public class Handlers {
             ctx.result("{}");
 
         } catch (Exception e) {
-            var response = Map.of();
-            if (e instanceof UnauthorizedException) {
-                response = Map.of("message", String.format("Error: unauthorized, %s", e.getMessage()));
-                ctx.status(401).result(serializer.toJson(response));
-            } else {
-                response = Map.of("message", String.format("Error: %s", e.getMessage()));
-                ctx.status(500).result(serializer.toJson(response));
-            }
+            errorReturnHandling(ctx, e);
         }
     }
 
-    // TODO - fix duplicate code.
     void createGameHandler(Context ctx) {
         String requestHeader = ctx.header("authorization");
         String requestJson = ctx.body();
@@ -157,14 +131,7 @@ public class Handlers {
             GameData newGame = gameService.createGame(request.gameName(), requestHeader);
             ctx.status(200).result(serializer.toJson(Map.of("gameID", newGame.gameID())));
         } catch (Exception e) {
-            var response = Map.of();
-            if (e instanceof UnauthorizedException) {
-                response = Map.of("message", String.format("Error: unauthorized, %s", e.getMessage()));
-                ctx.status(401).result(serializer.toJson(response));
-            } else {
-                response = Map.of("message", String.format("Error: %s", e.getMessage()));
-                ctx.status(500).result(serializer.toJson(response));
-            }
+            errorReturnHandling(ctx, e);
         }
     }
 
@@ -200,22 +167,7 @@ public class Handlers {
             gameService.joinGame(requestHeader, gameID, teamColor);
             ctx.result("{}");
         } catch (Exception e) {
-            var response = Map.of();
-            if (!(e instanceof UnauthorizedException)) {
-                if (e instanceof InvalidException) {
-                    response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
-                    ctx.status(400).result(serializer.toJson(response));
-                } else if (e instanceof AlreadyTakenException) {
-                    response = Map.of("message", String.format("Error: already taken, %s", e.getMessage()));
-                    ctx.status(403).result(serializer.toJson(response));
-                } else {
-                    response = Map.of("message", String.format("Error: %s", e.getMessage()));
-                    ctx.status(500).result(serializer.toJson(response));
-                }
-            } else {
-                response = Map.of("message", String.format("Error: unauthorized, %s", e.getMessage()));
-                ctx.status(401).result(serializer.toJson(response));
-            }
+            errorReturnHandling(ctx, e);
         }
 
     }
@@ -228,14 +180,7 @@ public class Handlers {
             resultMap.put("games", gameList);
             ctx.status(200).result(serializer.toJson(resultMap));
         } catch (Exception e) {
-            var response = Map.of();
-            if (e instanceof UnauthorizedException) {
-                response = Map.of("message", String.format("Error: unauthorized, %s", e.getMessage()));
-                ctx.status(401).result(serializer.toJson(response));
-            } else {
-                response = Map.of("message", String.format("Error: %s", e.getMessage()));
-                ctx.status(500).result(serializer.toJson(response));
-            }
+            errorReturnHandling(ctx, e);
         }
     }
 
@@ -249,4 +194,21 @@ public class Handlers {
         }
     }
 
+    private void errorReturnHandling(Context ctx, Exception e) {
+        var response = Map.of();
+        //noinspection IfCanBeSwitch
+        if (e instanceof DoesntExistException) {
+            response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
+            ctx.status(400).result(serializer.toJson(response));
+        } else if (e instanceof UnauthorizedException) {
+            response = Map.of("message", String.format("Error: unauthorized, %s", e.getMessage()));
+            ctx.status(401).result(serializer.toJson(response));
+        } else if (e instanceof InvalidException) {
+            response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
+            ctx.status(400).result(serializer.toJson(response));
+        } else {
+            response = Map.of("message", String.format("Error: %s", e.getMessage()));
+            ctx.status(500).result(serializer.toJson(response));
+        }
+    }
 }
