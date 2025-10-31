@@ -211,9 +211,7 @@ public class MySQLDataAccess implements DataAccess{
         }
     }
 
-    // TODO - figure how to get this to return data, like searching the database.
-
-    // TODO - We don't even have to have a catch statement, the handling in other functions will cover it as long as an exception is thrown.
+    // We don't even have to have a catch statement, the handling in other functions will cover it as long as an exception is thrown.
     private int sendDatabaseCommand(String sqlCommand, Object... additionalArguments) throws Exception {
         try (Connection conn = DatabaseManager.getConnection()) {
 
@@ -258,7 +256,6 @@ public class MySQLDataAccess implements DataAccess{
     }
 
     private ChessGame serializeToGameObject(String chessGame) {
-        // TODO - is this a violation of any principles?
         return serializer.fromJson(chessGame, ChessGame.class);
     }
 }
