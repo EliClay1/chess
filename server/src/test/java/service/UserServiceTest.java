@@ -3,7 +3,6 @@ package service;
 import dataaccess.MemoryDataAccess;
 import exceptions.AlreadyTakenException;
 import exceptions.DoesntExistException;
-import exceptions.InvalidException;
 import exceptions.UnauthorizedException;
 import model.AuthData;
 import model.UserData;
@@ -11,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+// WRITTEN TO USE THE MEMORY DATABASE - BREAKS NOW.
 class UserServiceTest {
 
     @Test

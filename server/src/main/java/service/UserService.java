@@ -33,7 +33,13 @@ public record UserService(DataAccess dataAccess) {
             throw new DoesntExistException();
         }
 
-        boolean passwordsMatch = BCrypt.checkpw(user.password(), userByName.password());
+        boolean passwordsMatch;
+        try {
+            passwordsMatch = BCrypt.checkpw(user.password(), userByName.password());
+        } catch (Exception e) {
+            throw new UnauthorizedException();
+        }
+
 
         if (!passwordsMatch) {
             throw new UnauthorizedException();

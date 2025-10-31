@@ -17,7 +17,7 @@ import java.util.*;
 
 public class Handlers {
 
-    private MySQLDataAccess dataAccess;
+    private MySQLDataAccess db;
     private UserService userService;
     private DataAccessService dataAccessService;
     private GameService gameService;
@@ -31,13 +31,25 @@ public class Handlers {
     // TODO - See if there is a better way to do this.
     void registerDataSystems() throws DataAccessException {
         try {
-            dataAccess = new MySQLDataAccess();
+            db = new MySQLDataAccess();
         } catch (Exception e) {
             throw new DataAccessException();
         }
-        userService = new UserService(dataAccess);
-        gameService = new GameService(dataAccess);
-        dataAccessService= new DataAccessService(dataAccess);
+        userService = new UserService(db);
+        gameService = new GameService(db);
+        dataAccessService= new DataAccessService(db);
+    }
+
+    public static Handlers createHandlersWithDatabase() throws DataAccessException {
+        MySQLDataAccess dataAccess = attemptDatabaseCreation();
+    }
+
+    private static MySQLDataAccess attemptDatabaseCreation() throws DataAccessException {
+        try {
+            return new MySQLDataAccess();
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Database initalization error: %s", e.getMessage()));
+        }
     }
 
     void registerHandler(Context ctx) {
@@ -45,7 +57,7 @@ public class Handlers {
         UserData request = serializer.fromJson(requestJson, UserData.class);
 
         try {
-            dataAccess = new MySQLDataAccess();
+            db = new MySQLDataAccess();
         } catch (Exception e) {
             var response = Map.of("message", String.format("Error: %s", e.getMessage()));
             ctx.status(500).result(serializer.toJson(response));
