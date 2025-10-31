@@ -2,12 +2,14 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import dataaccess.DataAccess;
 import dataaccess.MySQLDataAccess;
 import exceptions.*;
 import io.javalin.http.Context;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import org.eclipse.jetty.server.Authentication;
 import service.DataAccessService;
 import service.GameService;
 import service.UserService;
@@ -18,30 +20,22 @@ import java.util.*;
 public class Handlers {
 
     private MySQLDataAccess db;
-    private UserService userService;
-    private DataAccessService dataAccessService;
-    private GameService gameService;
+    private final UserService userService;
+    private final DataAccessService dataAccessService;
+    private final GameService gameService;
     private final Gson serializer = new Gson();
     private final List<String> availablePieces = Arrays.asList("WHITE", "BLACK");
 
-    public Handlers() throws DataAccessException {
-        registerDataSystems();
-    }
-
-    // TODO - See if there is a better way to do this.
-    void registerDataSystems() throws DataAccessException {
-        try {
-            db = new MySQLDataAccess();
-        } catch (Exception e) {
-            throw new DataAccessException();
-        }
-        userService = new UserService(db);
-        gameService = new GameService(db);
-        dataAccessService= new DataAccessService(db);
+    private Handlers(MySQLDataAccess dataAccess) throws DataAccessException {
+        this.db = dataAccess;
+        this.userService = new UserService(db);
+        this.gameService = new GameService(db);
+        this.dataAccessService= new DataAccessService(db);
     }
 
     public static Handlers createHandlersWithDatabase() throws DataAccessException {
         MySQLDataAccess dataAccess = attemptDatabaseCreation();
+        return new Handlers(dataAccess);
     }
 
     private static MySQLDataAccess attemptDatabaseCreation() throws DataAccessException {
