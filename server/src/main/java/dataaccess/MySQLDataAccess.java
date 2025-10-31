@@ -67,7 +67,13 @@ public class MySQLDataAccess implements DataAccess{
 
     @Override
     public void addAuth(AuthData authData) throws Exception {
-        if (getAuth(authData.authToken()) != null) {throw new AlreadyTakenException();}
+        AuthData retrievedAuth = getAuth(authData.authToken());
+
+        if (getAuth(authData.authToken()) != null) {
+            // originally through alreadytakenexception. This just needs to update the authdata.
+            String sqlCommand = "UPDATE authdata SET authToken=? WHERE username=?";
+            sendDatabaseCommand(sqlCommand, authData.authToken(), authData.username());
+        }
 
         String sqlCommand = "INSERT INTO authdata (username, authtoken) VALUES (?, ?)";
         sendDatabaseCommand(sqlCommand, authData.username(), authData.authToken());

@@ -49,6 +49,8 @@ public class Handlers {
         String requestJson = ctx.body();
         UserData request = serializer.fromJson(requestJson, UserData.class);
 
+
+        // TODO - Remove this line of code.
         try {
             db = new MySQLDataAccess();
         } catch (Exception e) {
@@ -199,10 +201,13 @@ public class Handlers {
         //noinspection IfCanBeSwitch
         if (e instanceof DoesntExistException) {
             response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
-            ctx.status(400).result(serializer.toJson(response));
+            ctx.status(401).result(serializer.toJson(response));
         } else if (e instanceof UnauthorizedException) {
             response = Map.of("message", String.format("Error: unauthorized, %s", e.getMessage()));
             ctx.status(401).result(serializer.toJson(response));
+        } else if (e instanceof AlreadyTakenException) {
+            response = Map.of("message", String.format("Error: already taken, %s", e.getMessage()));
+            ctx.status(403).result(serializer.toJson(response));
         } else if (e instanceof InvalidException) {
             response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
             ctx.status(400).result(serializer.toJson(response));
