@@ -259,11 +259,11 @@ public class MySQLDataAccess implements DataAccess{
                 // This code will return the auto-generated ID number attached to the database (if there is one).
                 // This isn't entirely neccessary, but it could be useful later down the line.
                 ResultSet resultSet = prepState.getGeneratedKeys();
-                var ID = 0;
+                var id = 0;
                 if (resultSet.next()) {
-                    ID = resultSet.getInt(1);
+                    id = resultSet.getInt(1);
                 }
-                return ID;
+                return id;
             } catch (Exception e) {
                 throw new DataAccessException(String.format("Failed to send sql command to database, %s", e.getMessage()));
             }

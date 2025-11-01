@@ -75,17 +75,6 @@ public class MemoryDataAccess implements DataAccess{
         games.put(gameID, gameData);
     }
 
-    public int createID() {
-        int nextID;
-        if (!reusableIDs.isEmpty()) {
-            nextID = reusableIDs.remove();
-        } else {
-            nextID = (usedIDs.isEmpty() ? 1 : usedIDs.last() + 1);
-        }
-        usedIDs.add(nextID);
-        return nextID;
-    }
-
     public boolean isEmpty() {
         return usedIDs.isEmpty() && auth.isEmpty() && games.isEmpty() && usersByName.isEmpty() && reusableIDs.isEmpty();
     }

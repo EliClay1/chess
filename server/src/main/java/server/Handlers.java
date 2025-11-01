@@ -64,10 +64,8 @@ public class Handlers {
             if (request.username() == null || request.username().isEmpty()) {throw new MissingFieldException();}
             if (request.email() == null || request.email().isEmpty()) {throw new MissingFieldException();}
             if (request.password() == null || request.password().isEmpty()) {throw new MissingFieldException();}
-        } catch (Exception e) {
-            var response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
-            ctx.status(400).result(serializer.toJson(response));
-            return;
+        } catch (MissingFieldException e) {
+            errorReturnHandling(ctx, e);
         }
 
         // call to the service and register
@@ -86,10 +84,8 @@ public class Handlers {
         try {
             if (request.username() == null || request.username().isEmpty()) {throw new MissingFieldException();}
             if (request.password() == null || request.password().isEmpty()) {throw new MissingFieldException();}
-        } catch (Exception e) {
-            var response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
-            ctx.status(400).result(serializer.toJson(response));
-            return;
+        } catch (MissingFieldException e) {
+            errorReturnHandling(ctx, e);
         }
 
         // call to the service and register
@@ -124,10 +120,8 @@ public class Handlers {
 
         try {
             if (request.gameName() == null || request.gameName().isEmpty()) {throw new MissingFieldException();}
-        } catch (Exception e) {
-            var response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
-            ctx.status(400).result(serializer.toJson(response));
-            return;
+        } catch (MissingFieldException e) {
+            errorReturnHandling(ctx, e);
         }
         try {
             GameData newGame = gameService.createGame(request.gameName(), requestHeader);
@@ -159,10 +153,8 @@ public class Handlers {
         // Check if the piece is a valid color
         try {
             if (teamColor == null || teamColor.isEmpty() || !availablePieces.contains(teamColor)) {throw new MissingFieldException();}
-        } catch (Exception e) {
-            var response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
-            ctx.status(400).result(serializer.toJson(response));
-            return;
+        } catch (MissingFieldException e) {
+            errorReturnHandling(ctx, e);
         }
 
         try {
@@ -202,15 +194,23 @@ public class Handlers {
         if (e instanceof DoesntExistException) {
             response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
             ctx.status(401).result(serializer.toJson(response));
+
         } else if (e instanceof UnauthorizedException) {
             response = Map.of("message", String.format("Error: unauthorized, %s", e.getMessage()));
             ctx.status(401).result(serializer.toJson(response));
+
+        } else if (e instanceof MissingFieldException) {
+            response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
+            ctx.status(400).result(serializer.toJson(response));
+
         } else if (e instanceof AlreadyTakenException) {
             response = Map.of("message", String.format("Error: already taken, %s", e.getMessage()));
             ctx.status(403).result(serializer.toJson(response));
+
         } else if (e instanceof InvalidException) {
             response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
             ctx.status(400).result(serializer.toJson(response));
+
         } else {
             response = Map.of("message", String.format("Error: %s", e.getMessage()));
             ctx.status(500).result(serializer.toJson(response));

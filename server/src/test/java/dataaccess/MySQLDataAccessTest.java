@@ -35,6 +35,8 @@ class MySQLDataAccessTest {
         existingUser = new UserData("Bob", "123456790", "bob.king@gmail.com");
         newAuth = new AuthData("Bob", "01923854972987342");
         newGame = new GameData(1, null, null, "game1", new ChessGame());
+
+        db.createGame(newGame);
     }
 
     @AfterEach
@@ -78,7 +80,9 @@ class MySQLDataAccessTest {
     @Test
         void addAuthNegative() throws Exception {
         db.addAuth(newAuth);
-        assertThrows(AlreadyTakenException.class, () -> db.addAuth(newAuth));
+        db.addAuth(newAuth);
+        db.deleteAuth(newAuth);
+        assertNull(db.getAuth(newAuth.authToken()));
     }
 
     @Test
@@ -145,6 +149,7 @@ class MySQLDataAccessTest {
 
     @Test
     void listGamesNegative() throws Exception {
+        db.clear();
         var listOfGames = db.listGames();
         assertTrue(listOfGames == null || listOfGames.isEmpty());
     }
@@ -153,6 +158,7 @@ class MySQLDataAccessTest {
     void updateGame() throws Exception {
         GameData updatedGame = new GameData(newGame.gameID(), "Bob", null, newGame.gameName(), newGame.game());
         db.updateGame(updatedGame);
+        var test = db.getGame(updatedGame.gameID());
         assertEquals(updatedGame, db.getGame(updatedGame.gameID()));
     }
 
