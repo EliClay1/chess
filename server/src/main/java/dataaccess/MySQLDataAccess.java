@@ -67,24 +67,39 @@ public class MySQLDataAccess implements DataAccess{
 
     @Override
     public void addAuth(AuthData authData) throws Exception {
-        AuthData retrievedAuth = getAuth(authData.authToken());
+        AuthData retrievedAuth = getAuth(authData.authToken(), authData.username());
 
-        if (getAuth(authData.authToken()) != null) {
+        if (retrievedAuth != null) {
             // originally through alreadytakenexception. This just needs to update the authdata.
-            String sqlCommand = "UPDATE authdata SET authToken=? WHERE username=?";
-            sendDatabaseCommand(sqlCommand, authData.authToken(), authData.username());
+//            String sqlCommand = "UPDATE authdata SET authToken=? WHERE username=?";
+            String sqlCommand = "INSERT INTO authdata (username, authToken) VALUES (?, ?)";
+            sendDatabaseCommand(sqlCommand, authData.username(), authData.authToken());
+            return;
         }
 
-        String sqlCommand = "INSERT INTO authdata (username, authtoken) VALUES (?, ?)";
+        String sqlCommand = "INSERT INTO authdata (username, authToken) VALUES (?, ?)";
         sendDatabaseCommand(sqlCommand, authData.username(), authData.authToken());
     }
 
+    // TODO - Temporary fix, need to look into this.
     @Override
-    public AuthData getAuth(String authToken) throws DataAccessException {
+    public AuthData getAuth(String authToken, Object... params) throws DataAccessException {
+        boolean usingUsername = false;
+        String username = "";
+        String sqlCommand = "SELECT * FROM authdata WHERE authtoken=?";
+        for (var parameter : params) {
+            if (parameter instanceof String user) {
+                username = user;
+                usingUsername = true;
+                sqlCommand = "SELECT * FROM authdata WHERE username=?";
+            }
+        }
         try (Connection conn = DatabaseManager.getConnection()) {
-            String sqlCommand = "SELECT * FROM authdata WHERE authtoken=?";
             try (PreparedStatement prepState = conn.prepareStatement(sqlCommand)) {
-                prepState.setString(1, authToken);
+
+                var setString = (usingUsername) ? username : authToken;
+                prepState.setString(1, setString);
+
                 try (ResultSet resultSet = prepState.executeQuery()) {
                     if (resultSet.next()) {
                         var authToken1 = resultSet.getString("authToken");

@@ -32,6 +32,7 @@ public record UserService(DataAccess dataAccess) {
             throw new DoesntExistException();
         }
 
+        // TODO - find a way to refactor this.
         boolean passwordsMatch;
         try {
             passwordsMatch = BCrypt.checkpw(user.password(), userByName.password());

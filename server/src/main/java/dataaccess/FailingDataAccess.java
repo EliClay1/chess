@@ -28,7 +28,7 @@ public class FailingDataAccess implements DataAccess{
     }
 
     @Override
-    public AuthData getAuth(String authToken) {
+    public AuthData getAuth(String authToken, Object... args) {
         return null;
     }
 
