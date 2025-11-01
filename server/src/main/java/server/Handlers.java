@@ -66,6 +66,7 @@ public class Handlers {
             if (request.password() == null || request.password().isEmpty()) {throw new MissingFieldException();}
         } catch (MissingFieldException e) {
             errorReturnHandling(ctx, e);
+            return;
         }
 
         // call to the service and register
@@ -86,6 +87,7 @@ public class Handlers {
             if (request.password() == null || request.password().isEmpty()) {throw new MissingFieldException();}
         } catch (MissingFieldException e) {
             errorReturnHandling(ctx, e);
+            return;
         }
 
         // call to the service and register
@@ -122,6 +124,7 @@ public class Handlers {
             if (request.gameName() == null || request.gameName().isEmpty()) {throw new MissingFieldException();}
         } catch (MissingFieldException e) {
             errorReturnHandling(ctx, e);
+            return;
         }
         try {
             GameData newGame = gameService.createGame(request.gameName(), requestHeader);
@@ -155,6 +158,7 @@ public class Handlers {
             if (teamColor == null || teamColor.isEmpty() || !availablePieces.contains(teamColor)) {throw new MissingFieldException();}
         } catch (MissingFieldException e) {
             errorReturnHandling(ctx, e);
+            return;
         }
 
         try {
