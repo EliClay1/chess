@@ -117,8 +117,8 @@ public class MySQLDataAccess implements DataAccess{
     @Override
     public void deleteAuth(AuthData authData) throws Exception {
         if (getAuth(authData.authToken()) == null) {throw new DoesntExistException();}
-        String sqlCommand = "DELETE FROM authdata WHERE username=?";
-        sendDatabaseCommand(sqlCommand, authData.username());
+        String sqlCommand = "DELETE FROM authdata WHERE authtoken=?";
+        sendDatabaseCommand(sqlCommand, authData.authToken());
     }
 
     @Override
