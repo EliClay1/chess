@@ -32,6 +32,29 @@ public class HttpClient {
         }
     }
 
+    // TODO - duplicate code.
+    public void loginUser(String host, int port, String path, String username,
+                             String password) throws Exception {
+
+        HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(
+                String.format("{\"username\": \"%s\", \"password\": \"%s\"}", username, password));
+        String url = String.format(Locale.getDefault(), "http://%s:%d%s", host, port, path);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI(url))
+                .timeout(Duration.ofMillis(5000))
+                .POST(body)
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() >= 200 && response.statusCode() < 300) {
+            System.out.printf("%sSuccessfully logged in!\n%s", EscapeSequences.SET_TEXT_COLOR_MAGENTA, EscapeSequences.RESET_TEXT_COLOR);
+//            System.out.print(response.body());
+        } else {
+            System.out.println("Error: recieved status code: " + response.statusCode());
+        }
+    }
+
 // TEMPLATE CODE
 //    public void get(String host, int port, String path) throws Exception {
 //        String url = String.format(Locale.getDefault(), "http://%s:%d%s", host, port, path);

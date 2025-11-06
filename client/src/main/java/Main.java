@@ -23,19 +23,26 @@ public class Main {
             String line = scanner.nextLine();
             var listOfInputData = Arrays.stream(line.split(" ")).toList();
             String command = listOfInputData.getFirst();
-            // TODO - Help command will change depending on if the user is logged in. Remember to place this in the helper function.
             if (command.equalsIgnoreCase("help") || command.equalsIgnoreCase("h")) {
                 printHelpInformation(false);
             } else if (command.equalsIgnoreCase("register") || command.equalsIgnoreCase("r")) {
                 String username = listOfInputData.get(1);
                 String password = listOfInputData.get(2);
                 String email = listOfInputData.getLast();
+                // TODO - Implement error handling for registering and logging in.
                 httpClient.registerUser("localhost", 8080, "/user", username, password, email);
+                // if correct registration information provided.
                 loggedIn = true;
                 break;
                 // run argument check helper function
             } else if (command.equalsIgnoreCase("login") || command.equalsIgnoreCase("l")) {
-                System.out.print("Logging in User:\n");
+                String username = listOfInputData.get(1);
+                String password = listOfInputData.get(2);
+                httpClient.loginUser("localhost", 8080, "/session", username, password);
+
+                // if successful login.
+                loggedIn = true;
+                break;
                 // run argument check helper function
             } else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("q")) {
                 System.out.print("Exiting Chess...");
@@ -45,6 +52,7 @@ public class Main {
             }
         }
 
+        // TODO - Fix duplicate code here.
         while (loggedIn) {
             System.out.printf("%sChessMaster4000 >>> %s", SET_TEXT_COLOR_LIGHT_GREY + SET_TEXT_ITALIC, RESET_TEXT_COLOR + RESET_TEXT_ITALIC);
             Scanner scanner = new Scanner(System.in);
@@ -66,13 +74,12 @@ public class Main {
             System.out.print("Print this message: \"p\", \"print\"\n");
             return;
         }
-        System.out.print("Options:\n");
+        System.out.printf("%sOptions:\n", SET_TEXT_COLOR_BLUE);
         System.out.print("List current games: \"l\", \"list\"\n");
         System.out.print("Create a new game: \"c\", \"create\" <GAME NAME>\n");
         System.out.print("Join an existing game: \"j\", \"join\" <GAME ID> <COLOR>\n");
         System.out.print("Watch a game: \"w\", \"watch\" <GAME ID>\n");
         System.out.print("Logout: \"logout\"\n");
         System.out.print("Print this message: \"p\", \"print\"\n");
-
     }
 }
