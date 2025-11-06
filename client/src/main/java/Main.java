@@ -16,6 +16,7 @@ public class Main {
         var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
         System.out.println("Welcome to Chess! Feel free to sign in, or type 'h' for help.");
         boolean isActive = true;
+        boolean loggedIn = false;
         while (isActive) {
             System.out.printf("%sChessMaster4000 >>> %s", SET_TEXT_COLOR_LIGHT_GREY + SET_TEXT_ITALIC, RESET_TEXT_COLOR + RESET_TEXT_ITALIC);
             Scanner scanner = new Scanner(System.in);
@@ -26,8 +27,12 @@ public class Main {
             if (command.equalsIgnoreCase("help") || command.equalsIgnoreCase("h")) {
                 printHelpInformation(false);
             } else if (command.equalsIgnoreCase("register") || command.equalsIgnoreCase("r")) {
-                System.out.print("Registering User:\n");
-                httpClient.get("localhost", 8080, "/register");
+                String username = listOfInputData.get(1);
+                String password = listOfInputData.get(2);
+                String email = listOfInputData.getLast();
+                httpClient.registerUser("localhost", 8080, "/user", username, password, email);
+                loggedIn = true;
+                break;
                 // run argument check helper function
             } else if (command.equalsIgnoreCase("login") || command.equalsIgnoreCase("l")) {
                 System.out.print("Logging in User:\n");
@@ -37,6 +42,17 @@ public class Main {
                 isActive = false;
             } else {
                 System.out.print("I'm sorry, but I don't know that command. Please try again, or type 'h' for a list of commands.\n");
+            }
+        }
+
+        while (loggedIn) {
+            System.out.printf("%sChessMaster4000 >>> %s", SET_TEXT_COLOR_LIGHT_GREY + SET_TEXT_ITALIC, RESET_TEXT_COLOR + RESET_TEXT_ITALIC);
+            Scanner scanner = new Scanner(System.in);
+            String line = scanner.nextLine();
+            var listOfInputData = Arrays.stream(line.split(" ")).toList();
+            String command = listOfInputData.getFirst();
+            if (command.equalsIgnoreCase("help") || command.equalsIgnoreCase("h")) {
+                printHelpInformation(true);
             }
         }
     }
