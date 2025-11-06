@@ -21,7 +21,7 @@ public class Main {
         boolean isActive = true;
         boolean loggedIn = false;
         while (isActive) {
-            printHelpInformation(false);
+//            printHelpInformation(false);
             System.out.printf("%sChessMaster4000 >>> %s", SET_TEXT_COLOR_LIGHT_GREY + SET_TEXT_ITALIC, RESET_TEXT_COLOR + RESET_TEXT_ITALIC);
             Scanner scanner = new Scanner(System.in);
             String line = scanner.nextLine();
@@ -31,6 +31,10 @@ public class Main {
                 printHelpInformation(false);
             } else if (command.equalsIgnoreCase("register") || command.equalsIgnoreCase("r")) {
                 try {
+                    if (listOfInputData.size() > 4) {
+                        throw new IllegalArgumentException();
+                    }
+
                     String username = listOfInputData.get(1);
                     String password = listOfInputData.get(2);
                     String email = listOfInputData.get(3);
@@ -39,8 +43,9 @@ public class Main {
                     loggedIn = true;
                 } catch(Exception e) {
                     if (e instanceof ArrayIndexOutOfBoundsException) {
-                        System.out.printf("%sThat user already exists! Try again.\n%s",
-                                "\u001b[38;5;1m", RESET_TEXT_COLOR);
+                        simplePrint(1, "Not enough arguments. Try again.");
+                    } else if (e instanceof IllegalArgumentException) {
+                        simplePrint(1, "Too many arguments. Try again");
                     }
                 }
 
@@ -96,7 +101,7 @@ public class Main {
         System.out.print("Print this message: \"h\", \"help\"\n");
     }
 
-    private static void simplePrint(String colorID, String message) {
-        System.out.printf("%s%s%s", colorID, message, RESET_TEXT_COLOR);
+    private static void simplePrint(int colorID, String message) {
+        System.out.printf("\u001b[38;5;%dm%s%s\n", colorID, message, RESET_TEXT_COLOR);
     }
 }

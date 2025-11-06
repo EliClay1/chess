@@ -12,6 +12,8 @@ public class HttpClient {
     public void registerUser(String host, int port, String path, String username,
                              String password, String email) throws Exception {
 
+        // TODO - putting a # causes the password input and email inputs to break. Check to ensure those characters aren't in the email.
+
         HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(
                 String.format("{\"username\": \"%s\", \"password\": \"%s\", \"email\": \"%s\"}", username, password, email));
         String url = String.format(Locale.getDefault(), "http://%s:%d%s", host, port, path);
@@ -30,6 +32,12 @@ public class HttpClient {
                     SET_TEXT_COLOR_MAGENTA, RESET_TEXT_COLOR);
         } else if (status == 403) {
             System.out.printf("%sThat user already exists! Try again.\n%s",
+                    "\u001b[38;5;1m", RESET_TEXT_COLOR);
+        } else if (status == 406) {
+            System.out.printf("%sBad inputs! Try again.\n%s",
+                    "\u001b[38;5;1m", RESET_TEXT_COLOR);
+        } else if (status == 500) {
+            System.out.printf("%sAn error occurred. Please try again.\n%s",
                     "\u001b[38;5;1m", RESET_TEXT_COLOR);
         }
         else {

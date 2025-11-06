@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import dataaccess.MySQLDataAccess;
 import exceptions.*;
@@ -47,33 +48,28 @@ public class Handlers {
 
     void registerHandler(Context ctx) {
         String requestJson = ctx.body();
-        UserData request = serializer.fromJson(requestJson, UserData.class);
+        // TODO - error raised when "" is inputted as pasword. Might need to run some error handling here.
 
-
-        // TODO - Remove this line of code.
         try {
-            db = new MySQLDataAccess();
-        } catch (Exception e) {
-            var response = Map.of("message", String.format("Error: %s", e.getMessage()));
-            ctx.status(500).result(serializer.toJson(response));
-            return;
-        }
+            UserData request = serializer.fromJson(requestJson, UserData.class);
+            // checks for input validation
+            try {
+                if (request.username() == null || request.username().isEmpty()) {throw new MissingFieldException();}
+                if (request.email() == null || request.email().isEmpty()) {throw new MissingFieldException();}
+                if (request.password() == null || request.password().isEmpty()) {throw new MissingFieldException();}
+            } catch (MissingFieldException e) {
+                errorReturnHandling(ctx, e);
+                return;
+            }
 
-        // checks for input validation
-        try {
-            if (request.username() == null || request.username().isEmpty()) {throw new MissingFieldException();}
-            if (request.email() == null || request.email().isEmpty()) {throw new MissingFieldException();}
-            if (request.password() == null || request.password().isEmpty()) {throw new MissingFieldException();}
-        } catch (MissingFieldException e) {
-            errorReturnHandling(ctx, e);
-            return;
-        }
-
-        // call to the service and register
-        try {
-            AuthData response = userService.register(request);
-            ctx.result(serializer.toJson(response));
-        } catch (Exception e) {
+            // call to the service and register
+            try {
+                AuthData response = userService.register(request);
+                ctx.result(serializer.toJson(response));
+            } catch (Exception e) {
+                errorReturnHandling(ctx, e);
+            }
+        } catch (JsonSyntaxException e) {
             errorReturnHandling(ctx, e);
         }
     }
@@ -215,7 +211,12 @@ public class Handlers {
             response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
             ctx.status(400).result(serializer.toJson(response));
 
-        } else {
+        } else if (e instanceof JsonSyntaxException) {
+            response = Map.of("message", String.format("Error: bad arguments, %s", e.getMessage()));
+            ctx.status(406).result(serializer.toJson(response));
+        }
+
+        else {
             response = Map.of("message", String.format("Error: %s", e.getMessage()));
             ctx.status(500).result(serializer.toJson(response));
         }
