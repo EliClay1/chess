@@ -33,7 +33,6 @@ public class Main {
                 httpClient.registerUser("localhost", 8080, "/user", username, password, email);
                 // if correct registration information provided.
                 loggedIn = true;
-                break;
                 // run argument check helper function
             } else if (command.equalsIgnoreCase("login") || command.equalsIgnoreCase("l")) {
                 String username = listOfInputData.get(1);
@@ -42,7 +41,6 @@ public class Main {
 
                 // if successful login.
                 loggedIn = true;
-                break;
                 // run argument check helper function
             } else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("q")) {
                 System.out.print("Exiting Chess...");
@@ -50,19 +48,23 @@ public class Main {
             } else {
                 System.out.print("I'm sorry, but I don't know that command. Please try again, or type 'h' for a list of commands.\n");
             }
+
+            // TODO - This is absolutely designed wrong, go back and fix it.
+            while (loggedIn) {
+                System.out.printf("%sChessMaster4000 >>> %s", SET_TEXT_COLOR_LIGHT_GREY + SET_TEXT_ITALIC, RESET_TEXT_COLOR + RESET_TEXT_ITALIC);
+                Scanner loggedInScanner = new Scanner(System.in);
+                String loggedInLine = loggedInScanner.nextLine();
+                var loggedInListOfInputData = Arrays.stream(loggedInLine.split(" ")).toList();
+                String loggedInCommand = loggedInListOfInputData.getFirst();
+                if (loggedInCommand.equalsIgnoreCase("help") || command.equalsIgnoreCase("h")) {
+                    printHelpInformation(true);
+                } else if (loggedInCommand.equalsIgnoreCase("logout")) {
+                    loggedIn = false;
+                }
+            }
         }
 
         // TODO - Fix duplicate code here.
-        while (loggedIn) {
-            System.out.printf("%sChessMaster4000 >>> %s", SET_TEXT_COLOR_LIGHT_GREY + SET_TEXT_ITALIC, RESET_TEXT_COLOR + RESET_TEXT_ITALIC);
-            Scanner scanner = new Scanner(System.in);
-            String line = scanner.nextLine();
-            var listOfInputData = Arrays.stream(line.split(" ")).toList();
-            String command = listOfInputData.getFirst();
-            if (command.equalsIgnoreCase("help") || command.equalsIgnoreCase("h")) {
-                printHelpInformation(true);
-            }
-        }
     }
 
     private static void printHelpInformation(boolean loggedIn) {
