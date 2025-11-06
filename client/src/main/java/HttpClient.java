@@ -1,4 +1,4 @@
-import ui.EscapeSequences;
+import static ui.EscapeSequences.*;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -23,11 +23,16 @@ public class HttpClient {
 
         // What in the heckerdundooskis is going on here.
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        int status = response.statusCode();
 
-        if (response.statusCode() >= 200 && response.statusCode() < 300) {
-            System.out.printf("%sSuccessfully registed!\n%s", EscapeSequences.SET_TEXT_COLOR_MAGENTA, EscapeSequences.RESET_TEXT_COLOR);
-//            System.out.print(response.body());
-        } else {
+        if (status >= 200 && status < 300) {
+            System.out.printf("%sSuccessfully registed!\n%s",
+                    SET_TEXT_COLOR_MAGENTA, RESET_TEXT_COLOR);
+        } else if (status == 403) {
+            System.out.printf("%sThat user already exists! Try again.\n%s",
+                    "\u001b[38;5;1m", RESET_TEXT_COLOR);
+        }
+        else {
             System.out.println("Error: recieved status code: " + response.statusCode());
         }
     }
@@ -48,7 +53,8 @@ public class HttpClient {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() >= 200 && response.statusCode() < 300) {
-            System.out.printf("%sSuccessfully logged in!\n%s", EscapeSequences.SET_TEXT_COLOR_MAGENTA, EscapeSequences.RESET_TEXT_COLOR);
+            System.out.printf("%sSuccessfully logged in!\n%s",
+                    SET_TEXT_COLOR_MAGENTA, RESET_TEXT_COLOR);
 //            System.out.print(response.body());
         } else {
             System.out.println("Error: recieved status code: " + response.statusCode());

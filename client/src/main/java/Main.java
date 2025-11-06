@@ -11,13 +11,17 @@ public class Main {
         httpClient = new HttpClient();
     }
 
+    /* TODO - Error handling, specifically every single kind of bad input, not the right amount of arguments
+    * Wrong type of arguments, and rejected arguments (ie already created with that account name)
+    * */
 
     public static void main(String[] args) throws Exception {
-        var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+//        var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
         System.out.println("Welcome to Chess! Feel free to sign in, or type 'h' for help.");
         boolean isActive = true;
         boolean loggedIn = false;
         while (isActive) {
+            printHelpInformation(false);
             System.out.printf("%sChessMaster4000 >>> %s", SET_TEXT_COLOR_LIGHT_GREY + SET_TEXT_ITALIC, RESET_TEXT_COLOR + RESET_TEXT_ITALIC);
             Scanner scanner = new Scanner(System.in);
             String line = scanner.nextLine();
@@ -26,14 +30,21 @@ public class Main {
             if (command.equalsIgnoreCase("help") || command.equalsIgnoreCase("h")) {
                 printHelpInformation(false);
             } else if (command.equalsIgnoreCase("register") || command.equalsIgnoreCase("r")) {
-                String username = listOfInputData.get(1);
-                String password = listOfInputData.get(2);
-                String email = listOfInputData.getLast();
+                try {
+                    String username = listOfInputData.get(1);
+                    String password = listOfInputData.get(2);
+                    String email = listOfInputData.get(3);
+                    httpClient.registerUser("localhost", 8080, "/user", username, password, email);
+                    // if correct registration information provided.
+                    loggedIn = true;
+                } catch(Exception e) {
+                    if (e instanceof ArrayIndexOutOfBoundsException) {
+                        System.out.printf("%sThat user already exists! Try again.\n%s",
+                                "\u001b[38;5;1m", RESET_TEXT_COLOR);
+                    }
+                }
+
                 // TODO - Implement error handling for registering and logging in.
-                httpClient.registerUser("localhost", 8080, "/user", username, password, email);
-                // if correct registration information provided.
-                loggedIn = true;
-                // run argument check helper function
             } else if (command.equalsIgnoreCase("login") || command.equalsIgnoreCase("l")) {
                 String username = listOfInputData.get(1);
                 String password = listOfInputData.get(2);
@@ -46,11 +57,13 @@ public class Main {
                 System.out.print("Exiting Chess...");
                 isActive = false;
             } else {
-                System.out.print("I'm sorry, but I don't know that command. Please try again, or type 'h' for a list of commands.\n");
+                System.out.print("I'm sorry, but I don't know that command.\n");
             }
 
             // TODO - This is absolutely designed wrong, go back and fix it.
             while (loggedIn) {
+                // TODO - Fix duplicate code here.
+//                printHelpInformation(true);
                 System.out.printf("%sChessMaster4000 >>> %s", SET_TEXT_COLOR_LIGHT_GREY + SET_TEXT_ITALIC, RESET_TEXT_COLOR + RESET_TEXT_ITALIC);
                 Scanner loggedInScanner = new Scanner(System.in);
                 String loggedInLine = loggedInScanner.nextLine();
@@ -63,8 +76,6 @@ public class Main {
                 }
             }
         }
-
-        // TODO - Fix duplicate code here.
     }
 
     private static void printHelpInformation(boolean loggedIn) {
@@ -73,7 +84,7 @@ public class Main {
             System.out.print("Login as an existing user: \"l\", \"login\" <USERNAME> <PASSWORD>\n");
             System.out.print("Register as a new user: \"r\", \"register\" <USERNAME> <PASSWORD> <EMAIL>\n");
             System.out.print("Exit the program: \"q\", \"quit\"\n");
-            System.out.print("Print this message: \"p\", \"print\"\n");
+            System.out.print("Print this message: \"h\", \"help\"\n");
             return;
         }
         System.out.printf("%sOptions:\n", SET_TEXT_COLOR_BLUE);
@@ -82,6 +93,10 @@ public class Main {
         System.out.print("Join an existing game: \"j\", \"join\" <GAME ID> <COLOR>\n");
         System.out.print("Watch a game: \"w\", \"watch\" <GAME ID>\n");
         System.out.print("Logout: \"logout\"\n");
-        System.out.print("Print this message: \"p\", \"print\"\n");
+        System.out.print("Print this message: \"h\", \"help\"\n");
+    }
+
+    private static void simplePrint(String colorID, String message) {
+        System.out.printf("%s%s%s", colorID, message, RESET_TEXT_COLOR);
     }
 }
