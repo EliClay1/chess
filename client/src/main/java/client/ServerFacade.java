@@ -219,13 +219,43 @@ public class ServerFacade {
         }
     }
 
-    public void printBoard() {
+    public void printBoard(String color) {
+
+
+
         // white square always in left corner
-        String[] layer1 = {EMPTY, "a", "b", "c", "d", "e", "f", "g", "h", EMPTY, "\n"};
+        String[] layer1 = {"   ", " a ", " b ", " c ", " d ", " e ", " f ", " g ", " h ", "   "};
+        String[] leftNumbers = {" 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 ", "   "};
+        String[] rightNumbers = {"   ", " 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 "};
 
         for (var part : layer1) {
-            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_DARK_GREEN, SET_BG_COLOR_BLACK, part, RESET_TEXT_COLOR, RESET_BG_COLOR);
+            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_DARK_GREEN, SET_TEXT_COLOR_WHITE, part, RESET_TEXT_COLOR, RESET_BG_COLOR);
         }
+        for (int x = 0; x < 8; x++) {
+            System.out.print("\n");
+            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_DARK_GREEN, SET_TEXT_COLOR_WHITE, leftNumbers[x], RESET_TEXT_COLOR, RESET_BG_COLOR);
+            for (int y = 0; y < 8; y++) {
+                // print black pieces
+
+                if ((x + y) % 2 == 0 && (x > 0 && x < 3)) {
+                    System.out.printf("%s   %s", SET_BG_COLOR_WHITE, RESET_BG_COLOR);
+                } else {
+                    System.out.printf("%s   %s", SET_BG_COLOR_BLACK, RESET_BG_COLOR);
+                }
+            }
+            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_DARK_GREEN, SET_TEXT_COLOR_WHITE, rightNumbers[x], RESET_TEXT_COLOR, RESET_BG_COLOR);
+        }
+        System.out.print("\n");
+        for (var part : layer1) {
+            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_DARK_GREEN, SET_TEXT_COLOR_WHITE, part, RESET_TEXT_COLOR, RESET_BG_COLOR);
+        }
+        System.out.print("\n");
+
+//        for (var part : layer1) {
+//            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_DARK_GREEN, SET_BG_COLOR_BLACK, part, RESET_TEXT_COLOR, RESET_BG_COLOR);
+//        }
+//        System.out.print("\n");
+//        System.out.printf("%s%s%s\n",SET_BG_COLOR_BLACK, WHITE_KING, RESET_BG_COLOR);
 
     }
 

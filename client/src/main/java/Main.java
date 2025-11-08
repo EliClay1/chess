@@ -82,8 +82,8 @@ public class Main {
             } else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("q")) {
                 simplePrint(19, "Exiting Chess...");
                 isActive = false;
-            } else if (command.equalsIgnoreCase("board")) {
-                httpClient.printBoard();
+            } else if (command.equalsIgnoreCase("b")) {
+                httpClient.printBoard("white");
 //                simplePrint(19, "Exiting Chess...");
 //                isActive = false;
             } else {
