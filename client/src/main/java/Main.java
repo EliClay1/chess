@@ -1,4 +1,3 @@
-import chess.*;
 import exceptions.InvalidException;
 
 import static ui.EscapeSequences.*;
@@ -7,10 +6,10 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
-    private static HttpClient httpClient = new HttpClient();
+    private static ChessHttpClient httpClient = new ChessHttpClient();
 
     public Main() {
-        httpClient = new HttpClient();
+        httpClient = new ChessHttpClient();
     }
 
     /* TODO - Error handling, specifically every single kind of bad input, not the right amount of arguments
@@ -80,7 +79,7 @@ public class Main {
                 String loggedInLine = loggedInScanner.nextLine();
                 var loggedInListOfInputData = Arrays.stream(loggedInLine.split(" ")).toList();
                 String loggedInCommand = loggedInListOfInputData.getFirst();
-                if (loggedInCommand.equalsIgnoreCase("help") || command.equalsIgnoreCase("h")) {
+                if (loggedInCommand.equalsIgnoreCase("help") || loggedInCommand.equalsIgnoreCase("h")) {
                     printHelpInformation(true);
                 } else if (loggedInCommand.equalsIgnoreCase("logout")) {
                     loggedIn = false;

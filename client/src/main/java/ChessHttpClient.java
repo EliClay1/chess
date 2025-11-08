@@ -8,7 +8,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Locale;
 
-public class HttpClient {
+public class ChessHttpClient {
     private static final java.net.http.HttpClient httpClient = java.net.http.HttpClient.newHttpClient();
 
     public void registerUser(String host, int port, String path, String username,
@@ -18,6 +18,7 @@ public class HttpClient {
         if (invalidCharacters(password) || invalidCharacters(email) || invalidCharacters(username)) {
             throw new InvalidException();
         }
+        // TODO - This makes it impossible to send a bad password, but the double handling checks never hurt anyone.
 
         HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(
                 String.format("{\"username\": \"%s\", \"password\": \"%s\", \"email\": \"%s\"}", username, password, email));
