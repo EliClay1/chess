@@ -1,5 +1,7 @@
 package client;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import exceptions.InvalidException;
 
 import static ui.EscapeSequences.*;
@@ -20,7 +22,7 @@ import java.util.regex.Pattern;
 /*TODO
 *  Register ---
 *  Login ---
-*  Logout
+*  Logout ---
 *  Create
 *  Observe
 *  List
@@ -109,7 +111,7 @@ public class ServerFacade {
             System.out.println("Error: recieved status code: " + status);
         }
 
-        return authTokenExtractor(response.body());
+        return jsonParser(response.body());
     }
 
     public void logoutUser(String host, int port, String path, String authToken) throws Exception {
@@ -118,6 +120,26 @@ public class ServerFacade {
                 .uri(new URI(url))
                 .timeout(Duration.ofMillis(5000))
                 .DELETE()
+                .header("Authorization", authToken)
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        status = response.statusCode();
+        if (status >= 200 && status < 300) {
+            System.out.printf("%sLogged Out.\n%s",
+                    SET_TEXT_COLOR_MAGENTA, RESET_TEXT_COLOR);
+        } else {
+            System.out.printf("%sError: received status code: %s\n%s",
+                    "\u001b[38;5;1m", status, RESET_TEXT_COLOR);
+        }
+    }
+
+    public void listGames(String host, int port, String path, String authToken) throws Exception {
+        String url = String.format(Locale.getDefault(), "http://%s:%d%s", host, port, path);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI(url))
+                .timeout(Duration.ofMillis(5000))
+                .GET()
                 .header("Authorization", authToken)
                 .build();
 
@@ -157,18 +179,11 @@ public class ServerFacade {
         return false;
     }
 
-    private Map<String, String> authTokenExtractor(String json) {
+    private Map<String, String> jsonParser(String json, String... args) {
         Map<String, String> extractedValues = new HashMap<>();
-        Pattern usernamePattern = Pattern.compile("\"username\"\\s*:\\s*\"([^\"]+)\"");
-        Pattern tokenPattern = Pattern.compile("\"authToken\"\\s*:\\s*\"([^\"]+)\"");
-        Matcher usernameMatcher = usernamePattern.matcher(json);
-        Matcher tokenMatcher = tokenPattern.matcher(json);
-
-        if (usernameMatcher.find()) {
-            extractedValues.put("username", usernameMatcher.group(1));
-        }
-        if (tokenMatcher.find()) {
-            extractedValues.put("authToken", tokenMatcher.group(1));
+        JsonObject object = JsonParser.parseString(json).getAsJsonObject();
+        for (var argument : args) {
+            extractedValues.put(argument, object.get(argument).getAsString());
         }
         return extractedValues;
     }
