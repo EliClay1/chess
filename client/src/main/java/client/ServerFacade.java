@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 *  Register ---
 *  Login ---
 *  Logout ---
-*  Create
+*  Create ---
 *  Observe
 *  List ---
 *  Join
@@ -137,6 +137,7 @@ public class ServerFacade {
     }
 
     public void listGames(String host, int port, String path, String authToken) throws Exception {
+        // TODO - Maybe say if no games are created, and suggest making one?
         String url = String.format(Locale.getDefault(), "http://%s:%d%s", host, port, path);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(url))
@@ -185,6 +186,47 @@ public class ServerFacade {
             System.out.printf("%sError: received status code: %s\n%s",
                     "\u001b[38;5;1m", status, RESET_TEXT_COLOR);
         }
+    }
+
+    public void joinGame(String host, int port, String path, String authToken, String gameID, String playerColor) throws Exception {
+        if (invalidCharacters(playerColor)) {
+            throw new InvalidException();
+        }
+
+        // TODO - Convert GameID to int, if it fails, no bueno, throw invalid exception.
+
+        String url = String.format(Locale.getDefault(), "http://%s:%d%s", host, port, path);
+        HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(
+                String.format("{\"playerColor\": \"%s\"}, \"gameID\": \"%s\"", playerColor, gameID));
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI(url))
+                .timeout(Duration.ofMillis(5000))
+                .PUT(body)
+                .header("Authorization", authToken)
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        status = response.statusCode();
+        jsonParser(response.body(), "gameID", "gameName", "whiteUsername", "blackUsername");
+
+        if (status >= 200 && status < 300) {
+            // TODO - Generate board print code. Don't worry about calculation of moves.
+//            System.out.printf("%sSuccessfully created game: %s\n%s", SET_TEXT_COLOR_BLUE, gameName, RESET_TEXT_COLOR);
+        } else {
+            System.out.printf("%sError: received status code: %s\n%s",
+                    "\u001b[38;5;1m", status, RESET_TEXT_COLOR);
+        }
+    }
+
+    public void printBoard() {
+        // white square always in left corner
+        String[] layer1 = {EMPTY, "a", "b", "c", "d", "e", "f", "g", "h", EMPTY, "\n"};
+
+        for (var part : layer1) {
+            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_DARK_GREEN, SET_BG_COLOR_BLACK, part, RESET_TEXT_COLOR, RESET_BG_COLOR);
+        }
+
     }
 
 

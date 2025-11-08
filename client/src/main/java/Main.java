@@ -82,6 +82,10 @@ public class Main {
             } else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("q")) {
                 simplePrint(19, "Exiting Chess...");
                 isActive = false;
+            } else if (command.equalsIgnoreCase("board")) {
+                httpClient.printBoard();
+//                simplePrint(19, "Exiting Chess...");
+//                isActive = false;
             } else {
                 System.out.print("I'm sorry, but I don't know that command.\n");
             }
@@ -102,6 +106,14 @@ public class Main {
                     loggedIn = false;
                 } else if (loggedInCommand.equalsIgnoreCase("list") || loggedInCommand.equalsIgnoreCase("l")) {
                     httpClient.listGames("localhost", 8080, "/game", authToken);
+                } else if (loggedInCommand.equalsIgnoreCase("create") || loggedInCommand.equalsIgnoreCase("c")) {
+                    // TODO - add error handling for excessive arguments, makes sure it's on all of them.
+                    String gameName = loggedInListOfInputData.get(1);
+                    httpClient.createGame("localhost", 8080, "/game", authToken, gameName);
+                } else if (loggedInCommand.equalsIgnoreCase("join") || loggedInCommand.equalsIgnoreCase("j")) {
+                    // TODO - add error handling for excessive arguments, makes sure it's on all of them.
+                    String gameName = loggedInListOfInputData.get(1);
+                    httpClient.createGame("localhost", 8080, "/game", authToken, gameName);
                 }
             }
         }
