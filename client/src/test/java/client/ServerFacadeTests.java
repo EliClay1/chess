@@ -116,10 +116,40 @@ public class ServerFacadeTests {
     public void listInvalidAuth() throws Exception {
         serverFacade.registerUser("localhost", actualPort,
                 "/user", "bob", "password", "bob@gmail.com");
-        var authMap = serverFacade.loginUser("localhost", actualPort,
+        serverFacade.loginUser("localhost", actualPort,
                 "/session", "bob", "password");
         serverFacade.listGames("localhost", actualPort, "/game", "0");
         assertEquals(401, serverFacade.status);
+    }
+
+    @Test
+    public void createGamePass() throws Exception {
+        serverFacade.registerUser("localhost", actualPort,
+                "/user", "bob", "password", "bob@gmail.com");
+        var authMap = serverFacade.loginUser("localhost", actualPort,
+                "/session", "bob", "password");
+        serverFacade.createGame("localhost", actualPort, "/game", authMap.get("authToken"), "Bobs_Game");
+        assertEquals(200, serverFacade.status);
+    }
+
+    @Test
+    public void createGameInvalidAuth() throws Exception {
+        serverFacade.registerUser("localhost", actualPort,
+                "/user", "bob", "password", "bob@gmail.com");
+        var authMap = serverFacade.loginUser("localhost", actualPort,
+                "/session", "bob", "password");
+        serverFacade.createGame("localhost", actualPort, "/game", "0", "Bobs_Game");
+        assertEquals(401, serverFacade.status);
+    }
+
+    @Test
+    public void createGameInvalidGameName() throws Exception {
+        serverFacade.registerUser("localhost", actualPort,
+                "/user", "bob", "password", "bob@gmail.com");
+        var authMap = serverFacade.loginUser("localhost", actualPort,
+                "/session", "bob", "password");
+        assertThrows(InvalidException.class, () -> serverFacade.createGame("localhost", actualPort, "/game",
+                authMap.get("authToken"), "#Bobs_Game"));
     }
 
 }

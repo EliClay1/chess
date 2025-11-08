@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 *  Logout ---
 *  Create
 *  Observe
-*  List
+*  List ---
 *  Join
 * */
 
@@ -152,20 +152,40 @@ public class ServerFacade {
             for (Map<String, String> gameData : parsedResponse) {
                 System.out.printf("%s%s. Game Name: %s, White: %s, Black: %s\n%s", SET_TEXT_COLOR_BLUE, gameData.get("gameID"),
                         gameData.get("gameName"), gameData.get("whiteUsername"), gameData.get("blackUsername"), RESET_TEXT_COLOR);
-
             }
         } else {
             System.out.printf("%sError: received status code: %s\n%s",
                     "\u001b[38;5;1m", status, RESET_TEXT_COLOR);
         }
-
-
     }
 
+    public void createGame(String host, int port, String path, String authToken, String gameName) throws Exception {
+        if (invalidCharacters(gameName)) {
+            throw new InvalidException();
+        }
 
+        String url = String.format(Locale.getDefault(), "http://%s:%d%s", host, port, path);
+        HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(
+                String.format("{\"gameName\": \"%s\"}", gameName));
 
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI(url))
+                .timeout(Duration.ofMillis(5000))
+                .POST(body)
+                .header("Authorization", authToken)
+                .build();
 
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        status = response.statusCode();
+        jsonParser(response.body(), "gameID", "gameName", "whiteUsername", "blackUsername");
 
+        if (status >= 200 && status < 300) {
+            System.out.printf("%sSuccessfully created game: %s\n%s", SET_TEXT_COLOR_BLUE, gameName, RESET_TEXT_COLOR);
+        } else {
+            System.out.printf("%sError: received status code: %s\n%s",
+                    "\u001b[38;5;1m", status, RESET_TEXT_COLOR);
+        }
+    }
 
 
 
@@ -186,15 +206,6 @@ public class ServerFacade {
         }
         return false;
     }
-
-//    private Map<String, String> jsonParser(String json, String... args) {
-//        Map<String, String> extractedValues = new HashMap<>();
-//        JsonObject object = JsonParser.parseString(json).getAsJsonObject();
-//        for (var argument : args) {
-//            extractedValues.put(argument, object.get(argument).getAsString());
-//        }
-//        return extractedValues;
-//    }
 
     private List<Map<String, String>> jsonParser(String json, String... args) {
         List<Map<String, String>> resultList = new ArrayList<>();
@@ -222,23 +233,4 @@ public class ServerFacade {
         }
         return resultList;
     }
-
-// TEMPLATE CODE
-//    public void get(String host, int port, String path) throws Exception {
-//        String url = String.format(Locale.getDefault(), "http://%s:%d%s", host, port, path);
-//        HttpRequest request = HttpRequest.newBuilder()
-//                .uri(new URI(url))
-//                .timeout(java.time.Duration.ofMillis(5000))
-//                .GET()
-//                .build();
-//
-//        // What in the heckerdundooskis is going on here.
-//        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-//
-//        if (response.statusCode() >= 200 && response.statusCode() < 300) {
-//            System.out.print(response.body());
-//        } else {
-//            System.out.println("Error: recieved status code: " + response.statusCode());
-//        }
-//    }
 }
