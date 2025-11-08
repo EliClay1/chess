@@ -1,8 +1,12 @@
 package client;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import exceptions.InvalidException;
+
+import javax.lang.model.type.ExecutableType;
 
 import static ui.EscapeSequences.*;
 
@@ -10,9 +14,7 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -111,7 +113,7 @@ public class ServerFacade {
             System.out.println("Error: recieved status code: " + status);
         }
 
-        return jsonParser(response.body());
+        return jsonParser(response.body(), "username", "authToken").getFirst();
     }
 
     public void logoutUser(String host, int port, String path, String authToken) throws Exception {
@@ -145,13 +147,19 @@ public class ServerFacade {
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         status = response.statusCode();
+        var parsedResponse = jsonParser(response.body(), "gameID", "gameName", "whiteUsername", "blackUsername");
         if (status >= 200 && status < 300) {
-            System.out.printf("%sLogged Out.\n%s",
-                    SET_TEXT_COLOR_MAGENTA, RESET_TEXT_COLOR);
+            for (Map<String, String> gameData : parsedResponse) {
+                System.out.printf("%s%s. Game Name: %s, White: %s, Black: %s\n%s", SET_TEXT_COLOR_BLUE, gameData.get("gameID"),
+                        gameData.get("gameName"), gameData.get("whiteUsername"), gameData.get("blackUsername"), RESET_TEXT_COLOR);
+
+            }
         } else {
             System.out.printf("%sError: received status code: %s\n%s",
                     "\u001b[38;5;1m", status, RESET_TEXT_COLOR);
         }
+
+
     }
 
 
@@ -179,13 +187,40 @@ public class ServerFacade {
         return false;
     }
 
-    private Map<String, String> jsonParser(String json, String... args) {
-        Map<String, String> extractedValues = new HashMap<>();
-        JsonObject object = JsonParser.parseString(json).getAsJsonObject();
-        for (var argument : args) {
-            extractedValues.put(argument, object.get(argument).getAsString());
+//    private Map<String, String> jsonParser(String json, String... args) {
+//        Map<String, String> extractedValues = new HashMap<>();
+//        JsonObject object = JsonParser.parseString(json).getAsJsonObject();
+//        for (var argument : args) {
+//            extractedValues.put(argument, object.get(argument).getAsString());
+//        }
+//        return extractedValues;
+//    }
+
+    private List<Map<String, String>> jsonParser(String json, String... args) {
+        List<Map<String, String>> resultList = new ArrayList<>();
+        JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
+        if (jsonObject.has("games") && jsonObject.get("games").isJsonArray()) {
+            JsonArray gamesArray = jsonObject.getAsJsonArray("games");
+            for (JsonElement element : gamesArray) {
+                JsonObject gameObject = element.getAsJsonObject();
+                Map<String, String> extractedValues = new HashMap<>();
+                for (String argument : args) {
+                    if (gameObject.has(argument)) {
+                        extractedValues.put(argument, gameObject.get(argument).getAsString());
+                    }
+                }
+                resultList.add(extractedValues);
+            }
+        } else {
+            Map<String, String> extractedValues = new HashMap<>();
+            for (var argument : args) {
+                if (jsonObject.has(argument)) {
+                    extractedValues.put(argument, jsonObject.get(argument).getAsString());
+                }
+            }
+            resultList.add(extractedValues);
         }
-        return extractedValues;
+        return resultList;
     }
 
 // TEMPLATE CODE

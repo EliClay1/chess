@@ -98,9 +98,10 @@ public class Main {
                 if (loggedInCommand.equalsIgnoreCase("help") || loggedInCommand.equalsIgnoreCase("h")) {
                     printHelpInformation(true);
                 } else if (loggedInCommand.equalsIgnoreCase("logout")) {
+                    httpClient.logoutUser("localhost", 8080, "/session", authToken);
                     loggedIn = false;
                 } else if (loggedInCommand.equalsIgnoreCase("list") || loggedInCommand.equalsIgnoreCase("l")) {
-                    httpClient.logoutUser("localhost", 8080, "/session", authToken);
+                    httpClient.listGames("localhost", 8080, "/game", authToken);
                 }
             }
         }

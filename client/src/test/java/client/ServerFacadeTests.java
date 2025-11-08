@@ -102,4 +102,24 @@ public class ServerFacadeTests {
         assertEquals(401, serverFacade.status);
     }
 
+    @Test
+    public void listPass() throws Exception {
+        serverFacade.registerUser("localhost", actualPort,
+                "/user", "bob", "password", "bob@gmail.com");
+        var authMap = serverFacade.loginUser("localhost", actualPort,
+                "/session", "bob", "password");
+        serverFacade.listGames("localhost", actualPort, "/game", authMap.get("authToken"));
+        assertEquals(200, serverFacade.status);
+    }
+
+    @Test
+    public void listInvalidAuth() throws Exception {
+        serverFacade.registerUser("localhost", actualPort,
+                "/user", "bob", "password", "bob@gmail.com");
+        var authMap = serverFacade.loginUser("localhost", actualPort,
+                "/session", "bob", "password");
+        serverFacade.listGames("localhost", actualPort, "/game", "0");
+        assertEquals(401, serverFacade.status);
+    }
+
 }
