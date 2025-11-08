@@ -1,3 +1,5 @@
+package client;
+
 import exceptions.InvalidException;
 
 import static ui.EscapeSequences.*;
@@ -8,8 +10,11 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Locale;
 
-public class ChessHttpClient {
+// TODO - implement port into initialization.
+public class ServerFacade {
     private static final java.net.http.HttpClient httpClient = java.net.http.HttpClient.newHttpClient();
+
+    public int status;
 
     public void registerUser(String host, int port, String path, String username,
                              String password, String email) throws Exception {
@@ -31,7 +36,7 @@ public class ChessHttpClient {
 
         // What in the heckerdundooskis is going on here.
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        int status = response.statusCode();
+        status = response.statusCode();
 
         if (status >= 200 && status < 300) {
             System.out.printf("%sSuccessfully registed!\n%s",
@@ -55,6 +60,10 @@ public class ChessHttpClient {
     public void loginUser(String host, int port, String path, String username,
                              String password) throws Exception {
 
+        if (invalidCharacters(password) || invalidCharacters(username)) {
+            throw new InvalidException();
+        }
+
         HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(
                 String.format("{\"username\": \"%s\", \"password\": \"%s\"}", username, password));
         String url = String.format(Locale.getDefault(), "http://%s:%d%s", host, port, path);
@@ -65,12 +74,22 @@ public class ChessHttpClient {
                 .build();
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        status = response.statusCode();
 
-        if (response.statusCode() >= 200 && response.statusCode() < 300) {
-            System.out.printf("%sSuccessfully logged in!\n%s",
+        if (status >= 200 && status < 300) {
+            System.out.printf("%sYou are now logged in!\n%s",
                     SET_TEXT_COLOR_MAGENTA, RESET_TEXT_COLOR);
-//            System.out.print(response.body());
-        } else {
+        } else if (status == 401) {
+            System.out.printf("%sIncorrect Password! Try again.\n%s",
+                    "\u001b[38;5;1m", RESET_TEXT_COLOR);
+        } else if (status == 406) {
+            System.out.printf("%sBad inputs! Try again.\n%s",
+                    "\u001b[38;5;1m", RESET_TEXT_COLOR);
+        } else if (status == 500) {
+            System.out.printf("%sAn error occurred. Please try again.\n%s",
+                    "\u001b[38;5;1m", RESET_TEXT_COLOR);
+        }
+        else {
             System.out.println("Error: recieved status code: " + response.statusCode());
         }
     }

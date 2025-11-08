@@ -1,3 +1,4 @@
+import client.ServerFacade;
 import exceptions.InvalidException;
 
 import static ui.EscapeSequences.*;
@@ -6,10 +7,10 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
-    private static ChessHttpClient httpClient = new ChessHttpClient();
+    private static ServerFacade httpClient = new ServerFacade();
 
     public Main() {
-        httpClient = new ChessHttpClient();
+        httpClient = new ServerFacade();
     }
 
     /* TODO - Error handling, specifically every single kind of bad input, not the right amount of arguments
