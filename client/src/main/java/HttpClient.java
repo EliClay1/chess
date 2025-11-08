@@ -1,3 +1,5 @@
+import exceptions.InvalidException;
+
 import static ui.EscapeSequences.*;
 
 import java.net.URI;
@@ -13,6 +15,9 @@ public class HttpClient {
                              String password, String email) throws Exception {
 
         // TODO - putting a # causes the password input and email inputs to break. Check to ensure those characters aren't in the email.
+        if (invalidCharacters(password) || invalidCharacters(email) || invalidCharacters(username)) {
+            throw new InvalidException();
+        }
 
         HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(
                 String.format("{\"username\": \"%s\", \"password\": \"%s\", \"email\": \"%s\"}", username, password, email));
@@ -67,6 +72,17 @@ public class HttpClient {
         } else {
             System.out.println("Error: recieved status code: " + response.statusCode());
         }
+    }
+
+    public boolean invalidCharacters(String string) {
+        String[] invalidCharacters = {"\"", " ", "#", "%", "&", "<", ">", "{", "}", "|", "\\", "~", "`", "'", "/", "="};
+        for (var character : invalidCharacters) {
+            if (string.contains(character)) {
+                return true;
+            }
+        }
+        return false;
+
     }
 
 // TEMPLATE CODE

@@ -1,4 +1,6 @@
 import chess.*;
+import exceptions.InvalidException;
+
 import static ui.EscapeSequences.*;
 
 import java.util.Arrays;
@@ -35,6 +37,8 @@ public class Main {
                         throw new IllegalArgumentException();
                     }
 
+                    // TODO Check for what kind of letters are in the password BEFORE sending it to the server. Send null if empty.
+
                     String username = listOfInputData.get(1);
                     String password = listOfInputData.get(2);
                     String email = listOfInputData.get(3);
@@ -46,6 +50,8 @@ public class Main {
                         simplePrint(1, "Not enough arguments. Try again.");
                     } else if (e instanceof IllegalArgumentException) {
                         simplePrint(1, "Too many arguments. Try again");
+                    } else if (e instanceof InvalidException) {
+                        simplePrint(1, "Invalid characters. Try again.");
                     }
                 }
 
