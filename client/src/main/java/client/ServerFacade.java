@@ -216,79 +216,56 @@ public class ServerFacade {
     }
 
     public void printBoard(String color) {
+        String[] letters = {"   ", " \u2009a ", " \u2007b ", " \u2004c ", " \u2007d ", " \u2004e ", " \u2007f ", " \u2004g ", " \u2007h ", "   \u200A"};
+        String[] numbers = {" 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 "};
 
+        // TODO - Piece index needs to be generate THROUGH the game data.
+        String[] whitePieceIndex = {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK};
+        String[] blackPieceIndex = {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK};
 
-
-        String[] layer1 = {"   ", " a ", "  b ", "  c ", " d ", "  e ", " f ", " g ", " h ", "   "};
-        String[] leftNumbers = {" 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 ", "   "};
-        String[] rightNumbers = {"   ", " 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 "};
-        String[] whitePieceIndex = {" R ", " N ", " B ", " Q ", " K ", " B ", " N ", " R "};
-        String[] blackPieceIndex = {" r ", " n ", " b ", " q ", " k ", " b ", " n ", " r "};
-
-        String[] whitePieceIndexTest = {};
-        String[] blackPieceIndexTest = {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK};
-
-        for (var part : layer1) {
-            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_DARK_GREEN, SET_TEXT_COLOR_WHITE, part, RESET_TEXT_COLOR, RESET_BG_COLOR);
+        for (var letter : letters) {
+            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE, letter, RESET_TEXT_COLOR, RESET_BG_COLOR);
         }
         for (int x = 0; x < 8; x++) {
             System.out.print("\n");
-            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_DARK_GREEN, SET_TEXT_COLOR_WHITE, leftNumbers[x], RESET_TEXT_COLOR, RESET_BG_COLOR);
+            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE, numbers[x], RESET_TEXT_COLOR, RESET_BG_COLOR);
             for (int y = 0; y < 8; y++) {
-                if (x == 0 && (x + y) % 2 == 0) {
-                    System.out.printf("%s%s%s%s%s", SET_BG_COLOR_WHITE, SET_TEXT_COLOR_BLUE, blackPieceIndexTest[y], HAIRSPACE, RESET_BG_COLOR);
-                } else if (x == 0) {
-                    System.out.printf("%s%s%s%s", SET_BG_COLOR_BLACK, SET_TEXT_COLOR_BLUE, blackPieceIndexTest[y], RESET_BG_COLOR);
-                } else if (x == 1 && (x + y) % 2 == 0) {
-                    System.out.printf("%s%s%s%s", SET_BG_COLOR_WHITE, BLACK_PAWN, HAIRSPACE, RESET_BG_COLOR);
-                } else if (x == 1 && (x + y) % 2 != 0) {
-                    System.out.printf("%s%s%s", SET_BG_COLOR_BLACK, BLACK_PAWN, RESET_BG_COLOR);
+
+                boolean dark = ((x + y) & 1) == 1;
+                String bg = dark ? SET_BOARD_BLACK : SET_BOARD_WHITE;
+                String piece = null;
+                String pieceColor = null;
+
+                if (x == 0) {
+                    piece = blackPieceIndex[y];
+                    pieceColor = SET_PIECE_COLOR_BLACK;
+                } else if (x == 1) {
+                    piece = BLACK_PAWN;
+                    pieceColor = SET_PIECE_COLOR_BLACK;
+                } else if (x == 6) {
+                    piece = WHITE_PAWN;
+                    pieceColor = SET_PIECE_COLOR_WHITE;
+                } else if (x == 7) {
+                    piece = whitePieceIndex[y];
+                    pieceColor = SET_PIECE_COLOR_WHITE;
+                }
+
+                if (piece != null) {
+                    String cell = dark ? piece : piece + HAIRSPACE;
+                    System.out.printf("%s%s%s%s", bg, pieceColor, cell, RESET_BG_COLOR);
                 } else if ((x + y) % 2 == 0) {
-                    System.out.printf("%s%s%s", SET_BG_COLOR_WHITE, EMPTY, RESET_BG_COLOR);
+                    System.out.printf("%s%s%s", SET_BOARD_WHITE, EMPTY, RESET_BG_COLOR);
                 } else {
-                    System.out.printf("%s%s%s", SET_BG_COLOR_BLACK, EMPTY, RESET_BG_COLOR);
+                    System.out.printf("%s%s%s", SET_BOARD_BLACK, EMPTY, RESET_BG_COLOR);
                 }
             }
-            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_DARK_GREEN, SET_TEXT_COLOR_WHITE, rightNumbers[x], RESET_TEXT_COLOR, RESET_BG_COLOR);
+            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE, numbers[x], RESET_TEXT_COLOR, RESET_BG_COLOR);
         }
         System.out.print("\n");
-        for (var part : layer1) {
-            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_DARK_GREEN, SET_TEXT_COLOR_WHITE, part, RESET_TEXT_COLOR, RESET_BG_COLOR);
+        for (var letter : letters) {
+            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE, letter, RESET_TEXT_COLOR, RESET_BG_COLOR);
         }
         System.out.print("\n");
-
-
-
-//        for (var part : layer1) {
-//            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_DARK_GREEN, SET_TEXT_COLOR_WHITE, part, RESET_TEXT_COLOR, RESET_BG_COLOR);
-//        }
-//        for (int x = 0; x < 8; x++) {
-//            System.out.print("\n");
-//            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_DARK_GREEN, SET_TEXT_COLOR_WHITE, leftNumbers[x], RESET_TEXT_COLOR, RESET_BG_COLOR);
-//            for (int y = 0; y < 8; y++) {
-//
-//                if (x == 0 && (x + y) % 2 == 0) {
-//                    System.out.printf("%s%s%s%s", SET_BG_COLOR_WHITE, SET_TEXT_COLOR_BLACK, blackPieceIndex[y], RESET_BG_COLOR);
-//                } else if (x == 0 && (x + y) % 2 != 0) {
-//                    System.out.printf("%s%s%s%s", SET_BG_COLOR_BLACK, SET_TEXT_COLOR_BLACK, blackPieceIndex[y], RESET_BG_COLOR);
-//                } else if (x == 1 && (x + y) % 2 == 0) {
-//                    System.out.printf("%s%s%s", SET_BG_COLOR_WHITE, " p ", RESET_BG_COLOR);
-//                } else if (x == 1 && (x + y) % 2 != 0) {
-//                    System.out.printf("%s%s%s", SET_BG_COLOR_BLACK, " p ", RESET_BG_COLOR);
-//                } else if ((x + y) % 2 == 0) {
-//                    System.out.printf("%s%s%s", SET_BG_COLOR_WHITE, "   ", RESET_BG_COLOR);
-//                } else {
-//                    System.out.printf("%s%s%s", SET_BG_COLOR_BLACK, "   ", RESET_BG_COLOR);
-//                }
-//            }
-//            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_DARK_GREEN, SET_TEXT_COLOR_WHITE, rightNumbers[x], RESET_TEXT_COLOR, RESET_BG_COLOR);
-//        }
-//        System.out.print("\n");
-//        for (var part : layer1) {
-//            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_DARK_GREEN, SET_TEXT_COLOR_WHITE, part, RESET_TEXT_COLOR, RESET_BG_COLOR);
-//        }
-//        System.out.print("\n");
-
     }
 
 

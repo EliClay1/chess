@@ -46,12 +46,16 @@ public class EscapeSequences {
     public static final String SET_BG_COLOR_MAGENTA = SET_BG_COLOR + "5m";
     public static final String SET_BG_COLOR_WHITE = SET_BG_COLOR + "15m";
     public static final String RESET_BG_COLOR = UNICODE_ESCAPE + "[49m";
-    public static final String SET_BG_COLOR_SAND = SET_BG_COLOR + "187m";
-    public static final String SET_BG_COLOR_CHARCOAL = SET_BG_COLOR + "235m";
+//    public static final String SET_BOARD_WHITE = SET_BG_COLOR + "111m";
+//    public static final String SET_BOARD_BLACK = SET_BG_COLOR + "25m";
     public static final String SET_BG_COLOR_BORDER = SET_BG_COLOR + "66m";
 
+    // organge / wood board
+    public static final String SET_BOARD_WHITE = SET_BG_COLOR + "172m";
+    public static final String SET_BOARD_BLACK = SET_BG_COLOR + "130m";
+
     public static final String SET_PIECE_COLOR_WHITE = SET_TEXT_COLOR + "15m";
-    public static final String SET_PIECE_COLOR_BLACK = SET_TEXT_COLOR + "48m";
+    public static final String SET_PIECE_COLOR_BLACK = SET_TEXT_COLOR + "m";
 
     public static final String WHITE_KING = " ♔ ";
     public static final String WHITE_QUEEN = " ♕ ";
