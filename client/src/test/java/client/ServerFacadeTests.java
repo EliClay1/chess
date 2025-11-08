@@ -82,4 +82,15 @@ public class ServerFacadeTests {
                 "/session", "#bob", "password1"));
     }
 
+    @Test
+    public void logoutPass() throws Exception {
+        serverFacade.registerUser("localhost", actualPort,
+                "/user", "bob", "password", "bob@gmail.com");
+        serverFacade.loginUser("localhost", actualPort,
+                "/session", "bob", "password");
+//        serverFacade.loginUser("localhost", actualPort,
+//                "/session", "bob", "password");
+        assertEquals(200, serverFacade.status);
+    }
+
 }

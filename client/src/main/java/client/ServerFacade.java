@@ -5,12 +5,25 @@ import exceptions.InvalidException;
 import static ui.EscapeSequences.*;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Locale;
 
 // TODO - implement port into initialization.
+
+
+/*TODO
+*  Register ---
+*  Login ---
+*  Logout
+*  Create
+*  Observe
+*  List
+*  Join
+* */
+
 public class ServerFacade {
     private static final java.net.http.HttpClient httpClient = java.net.http.HttpClient.newHttpClient();
 
@@ -52,7 +65,7 @@ public class ServerFacade {
                     "\u001b[38;5;1m", RESET_TEXT_COLOR);
         }
         else {
-            System.out.println("Error: recieved status code: " + response.statusCode());
+            System.out.println("Error: recieved status code: " + status);
         }
     }
 
@@ -90,9 +103,42 @@ public class ServerFacade {
                     "\u001b[38;5;1m", RESET_TEXT_COLOR);
         }
         else {
-            System.out.println("Error: recieved status code: " + response.statusCode());
+            System.out.println("Error: recieved status code: " + status);
         }
     }
+
+    public void logoutUser(String host, int port, String path) throws Exception {
+        String url = String.format(Locale.getDefault(), "http://%s:%d%s", host, port, path);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI(url))
+                .timeout(Duration.ofMillis(5000))
+                .DELETE()
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        status = response.statusCode();
+        if (status >= 200 && status < 300) {
+            System.out.printf("%sLogged Out.\n%s",
+                    SET_TEXT_COLOR_MAGENTA, RESET_TEXT_COLOR);
+        } else {
+            System.out.printf("%sError: received status code: %s\n%s",
+                    "\u001b[38;5;1m", status, RESET_TEXT_COLOR);
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public boolean invalidCharacters(String string) {
         String[] invalidCharacters = {"\"", " ", "#", "%", "&", "<", ">", "{", "}", "|", "\\", "~", "`", "'", "/", "="};

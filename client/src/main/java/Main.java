@@ -36,9 +36,6 @@ public class Main {
                     if (listOfInputData.size() > 4) {
                         throw new IllegalArgumentException();
                     }
-
-                    // TODO Check for what kind of letters are in the password BEFORE sending it to the server. Send null if empty.
-
                     String username = listOfInputData.get(1);
                     String password = listOfInputData.get(2);
                     String email = listOfInputData.get(3);
@@ -54,18 +51,29 @@ public class Main {
                         simplePrint(1, "Invalid characters. Try again.");
                     }
                 }
-
-                // TODO - Implement error handling for registering and logging in.
             } else if (command.equalsIgnoreCase("login") || command.equalsIgnoreCase("l")) {
-                String username = listOfInputData.get(1);
-                String password = listOfInputData.get(2);
-                httpClient.loginUser("localhost", 8080, "/session", username, password);
 
-                // if successful login.
-                loggedIn = true;
-                // run argument check helper function
+                try {
+                    if (listOfInputData.size() > 4) {
+                        throw new IllegalArgumentException();
+                    }
+                    String username = listOfInputData.get(1);
+                    String password = listOfInputData.get(2);
+                    httpClient.loginUser("localhost", 8080, "/session", username, password);
+                    // if correct registration information provided.
+                    loggedIn = true;
+                } catch(Exception e) {
+                    if (e instanceof ArrayIndexOutOfBoundsException) {
+                        simplePrint(1, "Not enough arguments. Try again.");
+                    } else if (e instanceof IllegalArgumentException) {
+                        simplePrint(1, "Too many arguments. Try again");
+                    } else if (e instanceof InvalidException) {
+                        simplePrint(1, "Invalid characters. Try again.");
+                    }
+                }
+
             } else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("q")) {
-                System.out.print("Exiting Chess...");
+                simplePrint(19, "Exiting Chess...");
                 isActive = false;
             } else {
                 System.out.print("I'm sorry, but I don't know that command.\n");
@@ -84,6 +92,8 @@ public class Main {
                     printHelpInformation(true);
                 } else if (loggedInCommand.equalsIgnoreCase("logout")) {
                     loggedIn = false;
+                } else if (loggedInCommand.equalsIgnoreCase("list") || loggedInCommand.equalsIgnoreCase("l")) {
+                    httpClient.logoutUser("localhost", 8080, "/session");
                 }
             }
         }
