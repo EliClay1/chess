@@ -86,9 +86,9 @@ public class ServerFacadeTests {
     public void logoutPass() throws Exception {
         serverFacade.registerUser("localhost", actualPort,
                 "/user", "bob", "password", "bob@gmail.com");
-        serverFacade.loginUser("localhost", actualPort,
+        var authMap = serverFacade.loginUser("localhost", actualPort,
                 "/session", "bob", "password");
-        serverFacade.logoutUser("localhost", actualPort, "/session");
+        serverFacade.logoutUser("localhost", actualPort, "/session", authMap.get("authToken"));
         assertEquals(200, serverFacade.status);
     }
 

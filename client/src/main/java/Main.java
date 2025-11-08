@@ -9,7 +9,8 @@ import java.util.Scanner;
 
 public class Main {
     private static ServerFacade httpClient = new ServerFacade();
-    private String authToken;
+    private static String authToken;
+    private static String user;
 
     public Main() {
         httpClient = new ServerFacade();
@@ -63,7 +64,8 @@ public class Main {
                     String password = listOfInputData.get(2);
                     Map<String, String> body = httpClient.loginUser("localhost", 8080, "/session", username, password);
 
-                    System.out.print(body);
+                    authToken = body.get("authToken");
+                    user = body.get("username");
 
                     // if correct registration information provided.
                     loggedIn = true;
@@ -98,7 +100,7 @@ public class Main {
                 } else if (loggedInCommand.equalsIgnoreCase("logout")) {
                     loggedIn = false;
                 } else if (loggedInCommand.equalsIgnoreCase("list") || loggedInCommand.equalsIgnoreCase("l")) {
-                    httpClient.logoutUser("localhost", 8080, "/session");
+                    httpClient.logoutUser("localhost", 8080, "/session", authToken);
                 }
             }
         }

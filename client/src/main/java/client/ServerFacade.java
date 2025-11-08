@@ -112,12 +112,13 @@ public class ServerFacade {
         return authTokenExtractor(response.body());
     }
 
-    public void logoutUser(String host, int port, String path) throws Exception {
+    public void logoutUser(String host, int port, String path, String authToken) throws Exception {
         String url = String.format(Locale.getDefault(), "http://%s:%d%s", host, port, path);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(url))
                 .timeout(Duration.ofMillis(5000))
                 .DELETE()
+                .header("Authorization", authToken)
                 .build();
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -160,10 +161,15 @@ public class ServerFacade {
         Map<String, String> extractedValues = new HashMap<>();
         Pattern usernamePattern = Pattern.compile("\"username\"\\s*:\\s*\"([^\"]+)\"");
         Pattern tokenPattern = Pattern.compile("\"authToken\"\\s*:\\s*\"([^\"]+)\"");
-        var username = usernamePattern.matcher(json).group(1);
-        var authToken = tokenPattern.matcher(json).group(1);
-        extractedValues.put("username", username);
-        extractedValues.put("authToken", authToken);
+        Matcher usernameMatcher = usernamePattern.matcher(json);
+        Matcher tokenMatcher = tokenPattern.matcher(json);
+
+        if (usernameMatcher.find()) {
+            extractedValues.put("username", usernameMatcher.group(1));
+        }
+        if (tokenMatcher.find()) {
+            extractedValues.put("authToken", tokenMatcher.group(1));
+        }
         return extractedValues;
     }
 
