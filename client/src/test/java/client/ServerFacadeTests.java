@@ -88,8 +88,7 @@ public class ServerFacadeTests {
                 "/user", "bob", "password", "bob@gmail.com");
         serverFacade.loginUser("localhost", actualPort,
                 "/session", "bob", "password");
-//        serverFacade.loginUser("localhost", actualPort,
-//                "/session", "bob", "password");
+        serverFacade.logoutUser("localhost", actualPort, "/session");
         assertEquals(200, serverFacade.status);
     }
 

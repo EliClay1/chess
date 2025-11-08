@@ -5,11 +5,14 @@ import exceptions.InvalidException;
 import static ui.EscapeSequences.*;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 // TODO - implement port into initialization.
 
@@ -70,7 +73,7 @@ public class ServerFacade {
     }
 
     // TODO - duplicate code.
-    public void loginUser(String host, int port, String path, String username,
+    public Map<String, String> loginUser(String host, int port, String path, String username,
                              String password) throws Exception {
 
         if (invalidCharacters(password) || invalidCharacters(username)) {
@@ -105,6 +108,8 @@ public class ServerFacade {
         else {
             System.out.println("Error: recieved status code: " + status);
         }
+
+        return authTokenExtractor(response.body());
     }
 
     public void logoutUser(String host, int port, String path) throws Exception {
@@ -124,7 +129,6 @@ public class ServerFacade {
             System.out.printf("%sError: received status code: %s\n%s",
                     "\u001b[38;5;1m", status, RESET_TEXT_COLOR);
         }
-
     }
 
 
@@ -140,7 +144,9 @@ public class ServerFacade {
 
 
 
-    public boolean invalidCharacters(String string) {
+
+
+    private boolean invalidCharacters(String string) {
         String[] invalidCharacters = {"\"", " ", "#", "%", "&", "<", ">", "{", "}", "|", "\\", "~", "`", "'", "/", "="};
         for (var character : invalidCharacters) {
             if (string.contains(character)) {
@@ -148,7 +154,17 @@ public class ServerFacade {
             }
         }
         return false;
+    }
 
+    private Map<String, String> authTokenExtractor(String json) {
+        Map<String, String> extractedValues = new HashMap<>();
+        Pattern usernamePattern = Pattern.compile("\"username\"\\s*:\\s*\"([^\"]+)\"");
+        Pattern tokenPattern = Pattern.compile("\"authToken\"\\s*:\\s*\"([^\"]+)\"");
+        var username = usernamePattern.matcher(json).group(1);
+        var authToken = tokenPattern.matcher(json).group(1);
+        extractedValues.put("username", username);
+        extractedValues.put("authToken", authToken);
+        return extractedValues;
     }
 
 // TEMPLATE CODE

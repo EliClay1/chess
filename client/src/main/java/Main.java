@@ -4,10 +4,12 @@ import exceptions.InvalidException;
 import static ui.EscapeSequences.*;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
     private static ServerFacade httpClient = new ServerFacade();
+    private String authToken;
 
     public Main() {
         httpClient = new ServerFacade();
@@ -59,7 +61,10 @@ public class Main {
                     }
                     String username = listOfInputData.get(1);
                     String password = listOfInputData.get(2);
-                    httpClient.loginUser("localhost", 8080, "/session", username, password);
+                    Map<String, String> body = httpClient.loginUser("localhost", 8080, "/session", username, password);
+
+                    System.out.print(body);
+
                     // if correct registration information provided.
                     loggedIn = true;
                 } catch(Exception e) {
