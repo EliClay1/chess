@@ -50,7 +50,9 @@ public class HelpCommand implements CommandInterface{
     public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) {
         System.out.printf("%sOptions:\n", SET_TEXT_COLOR_BLUE);
         for (CommandInterface command : registery.getAllCommands()) {
-            if (userState.isLoggedIn() || !command.requiresLogin()) {
+            if (!userState.isLoggedIn() && !command.requiresLogin()) {
+                System.out.print(" - " + command.getUsage());
+            } else if (userState.isLoggedIn() && command.requiresLogin()) {
                 System.out.print(" - " + command.getUsage());
             }
         }
