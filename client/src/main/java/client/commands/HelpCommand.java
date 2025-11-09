@@ -20,7 +20,7 @@ public class HelpCommand implements CommandInterface{
 
     @Override
     public String getUsage() {
-        return "Print this message: \"h\", \"help\"\n";
+        return "\"h\", \"help\"\n";
     }
 
     @Override
@@ -54,7 +54,6 @@ public class HelpCommand implements CommandInterface{
                 System.out.print(" - " + command.getUsage());
             }
         }
-
-        return null;
+        return new CommandResult(true, "");
     }
 }
