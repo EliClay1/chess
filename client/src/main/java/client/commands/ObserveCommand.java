@@ -11,6 +11,7 @@ import java.util.List;
 public class ObserveCommand implements CommandInterface{
 
     private final ServerFacade serverFacade = new ServerFacade();
+    private final int argumentCount = 1;
 
     @Override
     public String getName() {
@@ -28,16 +29,6 @@ public class ObserveCommand implements CommandInterface{
     }
 
     @Override
-    public int getMinArgs() {
-        return 1;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 1;
-    }
-
-    @Override
     public boolean requiresLogin() {
         return true;
     }
@@ -45,7 +36,7 @@ public class ObserveCommand implements CommandInterface{
     @Override
     public ValidationResult validate(String[] args, UserState userState) {
         // argument length check
-        if (args.length == getMinArgs()) {
+        if (args.length == argumentCount) {
             return new ValidationResult(true, "");
         }
         return new ValidationResult(false, "Incorrect amount of arguments, expected 1.");

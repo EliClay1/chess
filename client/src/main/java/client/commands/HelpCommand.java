@@ -8,6 +8,9 @@ import java.util.List;
 import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
 
 public class HelpCommand implements CommandInterface{
+
+    private final int argumentCount = 0;
+
     @Override
     public String getName() {
         return "help";
@@ -24,23 +27,13 @@ public class HelpCommand implements CommandInterface{
     }
 
     @Override
-    public int getMinArgs() {
-        return 0;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 0;
-    }
-
-    @Override
     public boolean requiresLogin() {
         return false;
     }
 
     @Override
     public ValidationResult validate(String[] args, UserState userState) {
-        if (args.length == 0) {
+        if (args.length == argumentCount) {
             return new ValidationResult(true, "").ok();
         }
         return new ValidationResult(false, "Help doesn't take any arguments.").error();

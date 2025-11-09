@@ -10,6 +10,7 @@ import java.util.List;
 public class LogoutCommand implements CommandInterface{
 
     private final ServerFacade serverFacade = new ServerFacade();
+    private final int argumentCount = 0;
 
     @Override
     public String getName() {
@@ -27,23 +28,13 @@ public class LogoutCommand implements CommandInterface{
     }
 
     @Override
-    public int getMinArgs() {
-        return 0;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 0;
-    }
-
-    @Override
     public boolean requiresLogin() {
         return true;
     }
 
     @Override
     public ValidationResult validate(String[] args, UserState userState) {
-        if (args.length == 0) {
+        if (args.length == argumentCount) {
             return new ValidationResult(true, "").ok();
         }
         return new ValidationResult(false, "Logout doesn't take any arguments.").error();

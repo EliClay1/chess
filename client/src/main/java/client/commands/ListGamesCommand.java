@@ -14,6 +14,7 @@ import static ui.EscapeSequences.SET_TEXT_COLOR_MAGENTA;
 public class ListGamesCommand implements CommandInterface{
 
     private final ServerFacade serverFacade = new ServerFacade();
+    private final int argumentCount = 0;
 
     @Override
     public String getName() {
@@ -31,16 +32,6 @@ public class ListGamesCommand implements CommandInterface{
     }
 
     @Override
-    public int getMinArgs() {
-        return 0;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 0;
-    }
-
-    @Override
     public boolean requiresLogin() {
         return true;
     }
@@ -48,7 +39,7 @@ public class ListGamesCommand implements CommandInterface{
     @Override
     public ValidationResult validate(String[] args, UserState userState) {
         // argument length check
-        if (args.length == getMinArgs()) {
+        if (args.length == argumentCount) {
             return new ValidationResult(true, "");
         }
         return new ValidationResult(false, "List games shouldn't have any arguments.");

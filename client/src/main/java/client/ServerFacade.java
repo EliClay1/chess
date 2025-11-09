@@ -17,7 +17,7 @@ import java.time.Duration;
 import java.util.*;
 
 public class ServerFacade {
-    public static final java.net.http.HttpClient httpClient = java.net.http.HttpClient.newHttpClient();
+    public static final java.net.http.HttpClient HTTP_CLIENT = java.net.http.HttpClient.newHttpClient();
 
     public int status;
 
@@ -40,7 +40,7 @@ public class ServerFacade {
                 .build();
 
         // What in the heckerdundooskis is going on here.
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         status = response.statusCode();
 
         if (status >= 200 && status < 300) {
@@ -71,7 +71,7 @@ public class ServerFacade {
                 .POST(body)
                 .build();
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         status = response.statusCode();
 
         if (status >= 200 && status < 300) {
@@ -94,7 +94,7 @@ public class ServerFacade {
                 .header("Authorization", authToken)
                 .build();
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         status = response.statusCode();
         if (!(status >= 200 && status < 300)) {
             throw new Exception(String.format("%d", status));
@@ -111,7 +111,7 @@ public class ServerFacade {
                 .header("Authorization", authToken)
                 .build();
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         status = response.statusCode();
         if (!(status >= 200 && status < 300)) {
             throw new Exception(String.format("%d", status));
@@ -135,7 +135,7 @@ public class ServerFacade {
                 .header("Authorization", authToken)
                 .build();
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         status = response.statusCode();
         jsonParser(response.body(), "gameID", "gameName", "whiteUsername", "blackUsername");
 
@@ -160,7 +160,7 @@ public class ServerFacade {
                 .header("Authorization", authToken)
                 .build();
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         status = response.statusCode();
 
         if (status >= 200 && status < 300) {
@@ -194,41 +194,37 @@ public class ServerFacade {
         }
 
         // TODO - build the board based off the gameData.
-//        String gameData = null;
-//        for (var game : activeGames) {
-//            if (Objects.equals(game.get("GameID"), gameID)) {
-//                gameData = game.get("gameData");
-//            } else {
-//                status = 400;
-//            }
-//        }
-
-
         printBoard("white");
     }
 
     public void printBoard(String color) {
         final boolean blackView = "black".equalsIgnoreCase(color);
 
-        String[] lettersAtoH = {"   ", " \u2009a ", " \u2007b ", " \u2004c ", " \u2007d ", " \u2004e ", " \u2007f ", " \u2004g ", " \u2007h ", "   \u200A"};
-        String[] lettersHtoA = {"   ", " \u2009h ", " \u2007g ", " \u2004f ", " \u2007e ", " \u2004d ", " \u2007c ", " \u2004b ", " \u2007a ", "   \u200A"};
+        String[] lettersAtoH = {"   ", " \u2009a ", " \u2007b ", " \u2004c ", " \u2007d ", " \u2004e ", " \u2007f ",
+                " \u2004g ", " \u2007h ", "   \u200A"};
+        String[] lettersHtoA = {"   ", " \u2009h ", " \u2007g ", " \u2004f ", " \u2007e ", " \u2004d ", " \u2007c ",
+                " \u2004b ", " \u2007a ", "   \u200A"};
         String[] letters = blackView ? lettersHtoA : lettersAtoH;
 
         String[] numsWhite = {" 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 "};
         String[] numsBlack = {" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 "};
         String[] numbers = blackView ? numsBlack : numsWhite;
 
-        String[] whitePieceIndex = {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK}; // [web:2]
-        String[] blackPieceIndex = {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK}; // [web:2]
+        String[] whitePieceIndex = {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN,
+                WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK};
+        String[] blackPieceIndex = {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP,
+                BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK};
 
         for (var letter : letters) {
-            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE, letter, RESET_TEXT_COLOR, RESET_BG_COLOR); // [web:42]
+            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE,
+                    letter, RESET_TEXT_COLOR, RESET_BG_COLOR);
         }
 
         for (int x = 0; x < 8; x++) {
             System.out.print("\n");
 
-            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE, numbers[x], RESET_TEXT_COLOR, RESET_BG_COLOR); // [web:42]
+            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE,
+                    numbers[x], RESET_TEXT_COLOR, RESET_BG_COLOR);
 
             for (int y = 0; y < 8; y++) {
                 int bx = blackView ? 7 - x : x;
@@ -259,12 +255,14 @@ public class ServerFacade {
                     System.out.printf("%s%s%s", bg, EMPTY, RESET_BG_COLOR);
                 }
             }
-            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE, numbers[x], RESET_TEXT_COLOR, RESET_BG_COLOR);
+            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE,
+                    numbers[x], RESET_TEXT_COLOR, RESET_BG_COLOR);
         }
 
         System.out.print("\n");
         for (var letter : letters) {
-            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE, letter, RESET_TEXT_COLOR, RESET_BG_COLOR);
+            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE,
+                    letter, RESET_TEXT_COLOR, RESET_BG_COLOR);
         }
         System.out.print("\n");
     }

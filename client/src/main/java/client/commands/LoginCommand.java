@@ -12,6 +12,7 @@ import java.util.Map;
 
 public class LoginCommand implements CommandInterface{
 
+    private final int argumentCount = 2;
     private final ServerFacade serverFacade = new ServerFacade();
 
     @Override
@@ -30,16 +31,6 @@ public class LoginCommand implements CommandInterface{
     }
 
     @Override
-    public int getMinArgs() {
-        return 2;
-    }
-
-    @Override
-    public int getMaxArgs() {
-        return 2;
-    }
-
-    @Override
     public boolean requiresLogin() {
         return false;
     }
@@ -47,7 +38,7 @@ public class LoginCommand implements CommandInterface{
     @Override
     public ValidationResult validate(String[] args, UserState userState) {
         // argument length check
-        if (args.length == getMinArgs()) {
+        if (args.length == argumentCount) {
             return new ValidationResult(true, "");
         }
         return new ValidationResult(false, "Incorrect amount of arguments, expected 2.");
