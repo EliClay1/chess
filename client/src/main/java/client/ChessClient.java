@@ -21,6 +21,7 @@ public class ChessClient {
         // Login Commands
         commandRegistry.register(new LogoutCommand());
         commandRegistry.register(new CreateGameCommand());
+        commandRegistry.register(new ListGamesCommand());
 
 
         // registers base userState

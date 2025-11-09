@@ -115,7 +115,7 @@ public class ServerFacade {
         }
     }
 
-    public void listGames(String host, int port, String path, String authToken) throws Exception {
+    public List<Map<String, String>> listGames(String host, int port, String path, String authToken) throws Exception {
         // TODO - Maybe say if no games are created, and suggest making one?
         String url = String.format(Locale.getDefault(), "http://%s:%d%s", host, port, path);
         HttpRequest request = HttpRequest.newBuilder()
@@ -127,17 +127,10 @@ public class ServerFacade {
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         status = response.statusCode();
-        var parsedResponse = jsonParser(response.body(), "gameID", "gameName", "whiteUsername", "blackUsername", "gameData");
-        if (status >= 200 && status < 300) {
-            for (Map<String, String> gameData : parsedResponse) {
-                System.out.printf("%s%s. Game Name: %s, White: %s, Black: %s\n%s", SET_TEXT_COLOR_BLUE, gameData.get("gameID"),
-                        gameData.get("gameName"), gameData.get("whiteUsername"), gameData.get("blackUsername"), RESET_TEXT_COLOR);
-            }
-            gameList = parsedResponse;
-        } else {
-            System.out.printf("%sError: received status code: %s\n%s",
-                    "\u001b[38;5;1m", status, RESET_TEXT_COLOR);
+        if (!(status >= 200 && status < 300)) {
+            throw new Exception(String.format("%d", status));
         }
+        return jsonParser(response.body(), "gameID", "gameName", "whiteUsername", "blackUsername", "gameData");
     }
 
     public void createGame(String host, int port, String path, String authToken, String gameName) throws Exception {

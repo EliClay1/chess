@@ -22,7 +22,7 @@ public class LoginCommand implements CommandInterface{
 
     @Override
     public List<String> getAliases() {
-        return List.of("l");
+        return List.of();
     }
 
     @Override
