@@ -59,6 +59,9 @@ public class ObserveCommand implements CommandInterface{
             serverFacade.observeGame(gameID, userState.getActiveGames());
             return new CommandResult(true, "");
         } catch (Exception e) {
+            if (e instanceof InvalidException) {
+                return new CommandResult(false, "Please print out a list of games before attempting to observe. (l)");
+            }
             return new CommandResult(false, "Error: " + e.getMessage());
         }
     }

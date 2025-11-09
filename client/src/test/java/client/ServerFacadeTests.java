@@ -6,6 +6,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import exceptions.InvalidException;
 import org.junit.jupiter.api.*;
 import server.Server;
+
+import java.util.List;
+import java.util.Map;
+
 public class ServerFacadeTests {
 
     private static Server server;
@@ -198,5 +202,44 @@ public class ServerFacadeTests {
         serverFacade.createGame("localhost", actualPort, "/game", authMap.get("authToken"), "Bobs_Game");
         serverFacade.joinGame("localhost", actualPort, "/game", authMap.get("authToken"), "2", "white");
         assertEquals(400, serverFacade.status);
+    }
+
+    @Test
+    public void observeGamePass() throws Exception {
+        serverFacade.registerUser("localhost", actualPort,
+                "/user", "bob", "password", "bob@gmail.com");
+        var authMap = serverFacade.loginUser("localhost", actualPort,
+                "/session", "bob", "password");
+        serverFacade.createGame("localhost", actualPort, "/game", authMap.get("authToken"), "Bobs_Game");
+        serverFacade.createGame("localhost", actualPort, "/game", authMap.get("authToken"), "Joes_Game");
+        serverFacade.createGame("localhost", actualPort, "/game", authMap.get("authToken"), "Steves_Game");
+        var gameList = serverFacade.listGames("localhost", actualPort, "/game", authMap.get("authToken"));
+        serverFacade.observeGame("1", gameList);
+        assertEquals(200, serverFacade.status);
+    }
+
+    @Test
+    public void observeGameNoList() throws Exception {
+        serverFacade.registerUser("localhost", actualPort,
+                "/user", "bob", "password", "bob@gmail.com");
+        var authMap = serverFacade.loginUser("localhost", actualPort,
+                "/session", "bob", "password");
+        serverFacade.createGame("localhost", actualPort, "/game", authMap.get("authToken"), "Bobs_Game");
+        serverFacade.createGame("localhost", actualPort, "/game", authMap.get("authToken"), "Joes_Game");
+        serverFacade.createGame("localhost", actualPort, "/game", authMap.get("authToken"), "Steves_Game");
+        assertThrows(InvalidException.class, () -> serverFacade.observeGame("1", null));
+    }
+
+    @Test
+    public void observeGameInvalidGameID() throws Exception {
+        serverFacade.registerUser("localhost", actualPort,
+                "/user", "bob", "password", "bob@gmail.com");
+        var authMap = serverFacade.loginUser("localhost", actualPort,
+                "/session", "bob", "password");
+        serverFacade.createGame("localhost", actualPort, "/game", authMap.get("authToken"), "Bobs_Game");
+        serverFacade.createGame("localhost", actualPort, "/game", authMap.get("authToken"), "Joes_Game");
+        serverFacade.createGame("localhost", actualPort, "/game", authMap.get("authToken"), "Steves_Game");
+        var gameList = serverFacade.listGames("localhost", actualPort, "/game", authMap.get("authToken"));
+        assertThrows(Exception.class, () -> serverFacade.observeGame("p", gameList));
     }
 }

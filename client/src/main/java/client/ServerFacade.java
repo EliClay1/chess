@@ -16,24 +16,10 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.*;
 
-// TODO - implement port into initialization.
-
-
-/*TODO
-*  Register ---
-*  Login ---
-*  Logout ---
-*  Create ---
-*  Observe
-*  List ---
-*  Join
-* */
-
 public class ServerFacade {
     public static final java.net.http.HttpClient httpClient = java.net.http.HttpClient.newHttpClient();
 
     public int status;
-    private List<Map<String, String>> gameList;
 
 
     public Map<String, String> registerUser(String host, int port, String path, String username,
@@ -189,10 +175,10 @@ public class ServerFacade {
 
     public void observeGame(String gameID, List<Map<String, String>> activeGames) throws Exception {
 
+        status = 200;
+
         if (activeGames == null || activeGames.isEmpty()) {
-            System.out.printf("%sPlease print out a list of games before attempting to observe. (l)\n%s",
-                    "\u001b[38;5;1m", RESET_TEXT_COLOR);
-            return;
+            throw new InvalidException();
         }
 
         if (gameID == null || gameID.isEmpty()) {

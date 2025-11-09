@@ -1,12 +1,4 @@
 import client.ChessClient;
-import client.ServerFacade;
-import exceptions.InvalidException;
-
-import static ui.EscapeSequences.*;
-
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Scanner;
 
 public class Main {
 
