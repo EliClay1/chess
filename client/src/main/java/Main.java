@@ -82,10 +82,6 @@ public class Main {
             } else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("q")) {
                 simplePrint(19, "Exiting Chess...");
                 isActive = false;
-            } else if (command.equalsIgnoreCase("b")) {
-                httpClient.printBoard("black");
-//                simplePrint(19, "Exiting Chess...");
-//                isActive = false;
             } else {
                 System.out.print("I'm sorry, but I don't know that command.\n");
             }
@@ -112,8 +108,13 @@ public class Main {
                     httpClient.createGame("localhost", 8080, "/game", authToken, gameName);
                 } else if (loggedInCommand.equalsIgnoreCase("join") || loggedInCommand.equalsIgnoreCase("j")) {
                     // TODO - add error handling for excessive arguments, makes sure it's on all of them.
-                    String gameName = loggedInListOfInputData.get(1);
-                    httpClient.createGame("localhost", 8080, "/game", authToken, gameName);
+                    try {
+                        String gameID = loggedInListOfInputData.get(1);
+                        String playerColor = loggedInListOfInputData.get(2);
+                        httpClient.joinGame("localhost", 8080, "/game", authToken, gameID, playerColor);
+                    } catch (Exception e) {
+                        simplePrint(1, "Invalid Color. Try again");
+                    }
                 }
             }
         }

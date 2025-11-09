@@ -152,4 +152,51 @@ public class ServerFacadeTests {
                 authMap.get("authToken"), "#Bobs_Game"));
     }
 
+    @Test
+    public void joinGamePass() throws Exception {
+        serverFacade.registerUser("localhost", actualPort,
+                "/user", "bob", "password", "bob@gmail.com");
+        var authMap = serverFacade.loginUser("localhost", actualPort,
+                "/session", "bob", "password");
+        serverFacade.createGame("localhost", actualPort, "/game", authMap.get("authToken"), "Bobs_Game");
+        serverFacade.joinGame("localhost", actualPort, "/game", authMap.get("authToken"), "1", "white");
+        assertEquals(200, serverFacade.status);
+    }
+
+    @Test
+    public void joinGameInvalidColor() throws Exception {
+        serverFacade.registerUser("localhost", actualPort,
+                "/user", "bob", "password", "bob@gmail.com");
+        var authMap = serverFacade.loginUser("localhost", actualPort,
+                "/session", "bob", "password");
+        serverFacade.createGame("localhost", actualPort, "/game", authMap.get("authToken"), "Bobs_Game");
+        assertThrows(InvalidException.class, () -> serverFacade.joinGame("localhost", actualPort, "/game",
+                authMap.get("authToken"), "1", "#white"));
+        assertThrows(InvalidException.class, () -> serverFacade.joinGame("localhost", actualPort, "/game",
+                authMap.get("authToken"), "1", "blue"));
+        assertThrows(InvalidException.class, () -> serverFacade.joinGame("localhost", actualPort, "/game",
+                authMap.get("authToken"), "1", ""));
+    }
+
+    @Test
+    public void joinGameInvalidGameID() throws Exception {
+        serverFacade.registerUser("localhost", actualPort,
+                "/user", "bob", "password", "bob@gmail.com");
+        var authMap = serverFacade.loginUser("localhost", actualPort,
+                "/session", "bob", "password");
+        serverFacade.createGame("localhost", actualPort, "/game", authMap.get("authToken"), "Bobs_Game");
+        serverFacade.joinGame("localhost", actualPort, "/game", authMap.get("authToken"), "p", "white");
+        assertEquals(400, serverFacade.status);
+    }
+
+    @Test
+    public void joinGameNonexistent() throws Exception {
+        serverFacade.registerUser("localhost", actualPort,
+                "/user", "bob", "password", "bob@gmail.com");
+        var authMap = serverFacade.loginUser("localhost", actualPort,
+                "/session", "bob", "password");
+        serverFacade.createGame("localhost", actualPort, "/game", authMap.get("authToken"), "Bobs_Game");
+        serverFacade.joinGame("localhost", actualPort, "/game", authMap.get("authToken"), "2", "white");
+        assertEquals(400, serverFacade.status);
+    }
 }

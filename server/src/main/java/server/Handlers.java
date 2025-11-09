@@ -22,7 +22,7 @@ public class Handlers {
     private final DataAccessService dataAccessService;
     private final GameService gameService;
     private final Gson serializer = new Gson();
-    private final List<String> availablePieces = Arrays.asList("WHITE", "BLACK");
+    private final List<String> availablePieces = Arrays.asList("white", "black");
 
     // This is private so that the database can be safely initialized.
     private Handlers(MySQLDataAccess dataAccess) {
@@ -139,7 +139,7 @@ public class Handlers {
             try {
                 gameID = Integer.parseInt(request.get("gameID"));
             } catch (NumberFormatException e) {
-                throw new RuntimeException(e);
+                errorReturnHandling(ctx, new InvalidException());
             }
         }
 

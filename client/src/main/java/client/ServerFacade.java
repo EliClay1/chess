@@ -185,15 +185,13 @@ public class ServerFacade {
     }
 
     public void joinGame(String host, int port, String path, String authToken, String gameID, String playerColor) throws Exception {
-        if (invalidCharacters(playerColor)) {
+        if (invalidCharacters(playerColor) || !Arrays.asList(new String[]{"white", "black"}).contains(playerColor)) {
             throw new InvalidException();
         }
 
-        // TODO - Convert GameID to int, if it fails, no bueno, throw invalid exception.
-
         String url = String.format(Locale.getDefault(), "http://%s:%d%s", host, port, path);
         HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(
-                String.format("{\"playerColor\": \"%s\"}, \"gameID\": \"%s\"", playerColor, gameID));
+                String.format("{\"playerColor\": \"%s\", \"gameID\": \"%s\"}", playerColor.toLowerCase(), gameID));
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(url))
@@ -204,11 +202,10 @@ public class ServerFacade {
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         status = response.statusCode();
-        jsonParser(response.body(), "gameID", "gameName", "whiteUsername", "blackUsername");
 
         if (status >= 200 && status < 300) {
             // TODO - Generate board print code. Don't worry about calculation of moves.
-//            System.out.printf("%sSuccessfully created game: %s\n%s", SET_TEXT_COLOR_BLUE, gameName, RESET_TEXT_COLOR);
+            printBoard(playerColor);
         } else {
             System.out.printf("%sError: received status code: %s\n%s",
                     "\u001b[38;5;1m", status, RESET_TEXT_COLOR);
