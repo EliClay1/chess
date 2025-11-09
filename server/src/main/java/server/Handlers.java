@@ -185,6 +185,8 @@ public class Handlers {
 
     private void errorReturnHandling(Context ctx, Exception e) {
         var response = Map.of();
+        // TODO - rearrage errors, ensure that there is an error for each problem, don't mix them together.
+
         //noinspection IfCanBeSwitch
         if (e instanceof DoesntExistException) {
             response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));

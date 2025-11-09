@@ -1,9 +1,6 @@
 package client;
 
-import client.commands.CommandInterface;
-import client.commands.CommandRegistry;
-import client.commands.HelpCommand;
-import client.commands.RegisterCommand;
+import client.commands.*;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 
@@ -19,6 +16,8 @@ public class ChessClient {
         CommandRegistry commandRegistry = new CommandRegistry();
         commandRegistry.register(new HelpCommand());
         commandRegistry.register(new RegisterCommand());
+        commandRegistry.register(new LoginCommand());
+        commandRegistry.register(new LogoutCommand());
         // can add more commands here.
 
         // registers base userState
@@ -45,7 +44,7 @@ public class ChessClient {
             }
             // gets hold of the remaining arguments inputted.
             String[] arguments = Arrays.copyOfRange(inputData, 1, inputData.length);
-            if (!userState.isLoggedIn() || command.requiresLogin()) {
+            if (userState.isLoggedIn() || !command.requiresLogin()) {
                 ValidationResult validationResult = command.validate(arguments, userState);
                 if (!validationResult.ok) {
                     simplePrint(1, validationResult.message + "\n");
@@ -55,7 +54,7 @@ public class ChessClient {
                 if (commandResult.ok()) {
                     simplePrint(5, commandResult.message());
                 } else {
-                    simplePrint(1, commandResult.message());
+                    simplePrint(1, commandResult.message() + "\n");
                 }
             } else {
                 simplePrint(1, "You must be logged in to use that command.\n");

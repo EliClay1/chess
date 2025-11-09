@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import exceptions.AlreadyTakenException;
 import exceptions.InvalidException;
+import exceptions.UnauthorizedException;
 
 import static ui.EscapeSequences.*;
 
@@ -57,7 +58,7 @@ public class ServerFacade {
         status = response.statusCode();
 
         if (status >= 200 && status < 300) {
-            return jsonParser(response.body(), "authToken").getFirst();
+            return jsonParser(response.body(), "username", "authToken").getFirst();
         } else if (status == 403) {
             throw new AlreadyTakenException();
         } else if (status == 400) {
@@ -88,23 +89,14 @@ public class ServerFacade {
         status = response.statusCode();
 
         if (status >= 200 && status < 300) {
-            System.out.printf("%sYou are now logged in!\n%s",
-                    SET_TEXT_COLOR_MAGENTA, RESET_TEXT_COLOR);
+            return jsonParser(response.body(), "username", "authToken").getFirst();
         } else if (status == 401) {
-            System.out.printf("%sIncorrect Password! Try again.\n%s",
-                    "\u001b[38;5;1m", RESET_TEXT_COLOR);
+            throw new UnauthorizedException();
         } else if (status == 406) {
-            System.out.printf("%sBad inputs! Try again.\n%s",
-                    "\u001b[38;5;1m", RESET_TEXT_COLOR);
-        } else if (status == 500) {
-            System.out.printf("%sAn error occurred. Please try again.\n%s",
-                    "\u001b[38;5;1m", RESET_TEXT_COLOR);
+            throw new InvalidException();
+        } else {
+            throw new Exception("recieved status code " + status);
         }
-        else {
-            System.out.println("Error: recieved status code: " + status);
-        }
-
-        return jsonParser(response.body(), "username", "authToken").getFirst();
     }
 
     public void logoutUser(String host, int port, String path, String authToken) throws Exception {
@@ -118,12 +110,8 @@ public class ServerFacade {
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         status = response.statusCode();
-        if (status >= 200 && status < 300) {
-            System.out.printf("%sLogged Out.\n%s",
-                    SET_TEXT_COLOR_MAGENTA, RESET_TEXT_COLOR);
-        } else {
-            System.out.printf("%sError: received status code: %s\n%s",
-                    "\u001b[38;5;1m", status, RESET_TEXT_COLOR);
+        if (!(status >= 200 && status < 300)) {
+            throw new Exception(String.format("%d", status));
         }
     }
 
