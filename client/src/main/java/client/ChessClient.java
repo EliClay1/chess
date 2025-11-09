@@ -12,27 +12,29 @@ import static ui.EscapeSequences.*;
 public class ChessClient {
 
     public static void main(String[] args) {
-        // registration of commands
         CommandRegistry commandRegistry = new CommandRegistry();
+        // Logout Commands
         commandRegistry.register(new HelpCommand());
         commandRegistry.register(new RegisterCommand());
         commandRegistry.register(new LoginCommand());
-        commandRegistry.register(new LogoutCommand());
         commandRegistry.register(new QuitCommand());
-        // can add more commands here.
+        // Login Commands
+        commandRegistry.register(new LogoutCommand());
+        commandRegistry.register(new CreateGameCommand());
+
 
         // registers base userState
         UserState userState = new UserState("localhost", 8080, null, null, false);
 
         simplePrint(12, String.format("%sWelcome to Chess! Feel free to sign in, or type 'h' for help.%s\n\n",
                 WHITE_KING, WHITE_QUEEN));
+        Scanner scanner = new Scanner(System.in);
 
         while (true) {
             // determines log-in state for command inputs.
             String loginState = userState.isLoggedIn() ? "Logged In" : "Logged Out";
             simplePrint(6, String.format("[%s] >>> ", loginState));
 
-            Scanner scanner = new Scanner(System.in);
             String line = scanner.nextLine();
             var inputData = line.split(" ");
             String commandName = inputData[0].toLowerCase();

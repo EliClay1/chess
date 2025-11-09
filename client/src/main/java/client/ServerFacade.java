@@ -160,11 +160,8 @@ public class ServerFacade {
         status = response.statusCode();
         jsonParser(response.body(), "gameID", "gameName", "whiteUsername", "blackUsername");
 
-        if (status >= 200 && status < 300) {
-            System.out.printf("%sSuccessfully created game: %s\n%s", SET_TEXT_COLOR_BLUE, gameName, RESET_TEXT_COLOR);
-        } else {
-            System.out.printf("%sError: received status code: %s\n%s",
-                    "\u001b[38;5;1m", status, RESET_TEXT_COLOR);
+        if (!(status >= 200 && status < 300)) {
+            throw new Exception(String.format("%d", status));
         }
     }
 
