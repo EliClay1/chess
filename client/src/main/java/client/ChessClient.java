@@ -18,6 +18,7 @@ public class ChessClient {
         commandRegistry.register(new RegisterCommand());
         commandRegistry.register(new LoginCommand());
         commandRegistry.register(new LogoutCommand());
+        commandRegistry.register(new QuitCommand());
         // can add more commands here.
 
         // registers base userState
@@ -41,6 +42,9 @@ public class ChessClient {
             if (command == null) {
                 simplePrint(1, "Please enter a valid command. Type \"help\" for assistance.\n");
                 continue;
+            } else if (commandName.equals("quit")) {
+                simplePrint(12, "Exiting Chess...\n");
+                break;
             }
             // gets hold of the remaining arguments inputted.
             String[] arguments = Arrays.copyOfRange(inputData, 1, inputData.length);
