@@ -3,12 +3,11 @@ package client;
 import dataaccess.MySQLDataAccess;
 import static org.junit.jupiter.api.Assertions.*;
 
+import exceptions.AlreadyTakenException;
 import exceptions.InvalidException;
+import exceptions.UnauthorizedException;
 import org.junit.jupiter.api.*;
 import server.Server;
-
-import java.util.List;
-import java.util.Map;
 
 public class ServerFacadeTests {
 
@@ -55,9 +54,8 @@ public class ServerFacadeTests {
     public void registerUserAlreadyExists() throws Exception {
         serverFacade.registerUser("localhost", actualPort,
                 "/user", "bob", "password", "bob@gmail.com");
-        serverFacade.registerUser("localhost", actualPort,
-                "/user", "bob", "password", "bob@gmail.com");
-        assertEquals(403, serverFacade.status);
+        assertThrows(AlreadyTakenException.class, () -> serverFacade.registerUser("localhost", actualPort,
+                "/user", "bob", "password", "bob@gmail.com"));
     }
 
     @Test
@@ -73,9 +71,8 @@ public class ServerFacadeTests {
     public void loginIncorrectPassword() throws Exception {
         serverFacade.registerUser("localhost", actualPort,
                 "/user", "bob", "password", "bob@gmail.com");
-        serverFacade.loginUser("localhost", actualPort,
-                "/session", "bob", "password1");
-        assertEquals(401, serverFacade.status);
+        assertThrows(UnauthorizedException.class, () -> serverFacade.loginUser("localhost", actualPort,
+                "/session", "bob", "password!"));
     }
 
     @Test
@@ -102,8 +99,7 @@ public class ServerFacadeTests {
                 "/user", "bob", "password", "bob@gmail.com");
         serverFacade.loginUser("localhost", actualPort,
                 "/session", "bob", "password");
-        serverFacade.logoutUser("localhost", actualPort, "/session", "0");
-        assertEquals(401, serverFacade.status);
+        assertThrows(Exception.class, () -> serverFacade.logoutUser("localhost", actualPort, "/session", "0"));
     }
 
     @Test
@@ -122,8 +118,7 @@ public class ServerFacadeTests {
                 "/user", "bob", "password", "bob@gmail.com");
         serverFacade.loginUser("localhost", actualPort,
                 "/session", "bob", "password");
-        serverFacade.listGames("localhost", actualPort, "/game", "0");
-        assertEquals(401, serverFacade.status);
+        assertThrows(Exception.class, () -> serverFacade.listGames("localhost", actualPort, "/game", "0"));
     }
 
     @Test
@@ -142,8 +137,8 @@ public class ServerFacadeTests {
                 "/user", "bob", "password", "bob@gmail.com");
         var authMap = serverFacade.loginUser("localhost", actualPort,
                 "/session", "bob", "password");
-        serverFacade.createGame("localhost", actualPort, "/game", "0", "Bobs_Game");
-        assertEquals(401, serverFacade.status);
+        assertThrows(Exception.class, () -> serverFacade.createGame("localhost", actualPort,
+                "/game", "0", "Bobs_Game"));
     }
 
     @Test
@@ -189,8 +184,8 @@ public class ServerFacadeTests {
         var authMap = serverFacade.loginUser("localhost", actualPort,
                 "/session", "bob", "password");
         serverFacade.createGame("localhost", actualPort, "/game", authMap.get("authToken"), "Bobs_Game");
-        serverFacade.joinGame("localhost", actualPort, "/game", authMap.get("authToken"), "p", "white");
-        assertEquals(400, serverFacade.status);
+        assertThrows(Exception.class, () -> serverFacade.joinGame("localhost", actualPort, "/game",
+                authMap.get("authToken"), "p", "white"));
     }
 
     @Test
@@ -200,8 +195,8 @@ public class ServerFacadeTests {
         var authMap = serverFacade.loginUser("localhost", actualPort,
                 "/session", "bob", "password");
         serverFacade.createGame("localhost", actualPort, "/game", authMap.get("authToken"), "Bobs_Game");
-        serverFacade.joinGame("localhost", actualPort, "/game", authMap.get("authToken"), "2", "white");
-        assertEquals(400, serverFacade.status);
+        assertThrows(Exception.class, () -> serverFacade.joinGame("localhost", actualPort, "/game",
+                authMap.get("authToken"), "2", "white"));
     }
 
     @Test
