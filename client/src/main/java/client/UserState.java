@@ -20,7 +20,7 @@ public class UserState {
         return loggedIn;
     }
 
-    public static void setLoggedIn(boolean loggedIn) {
+    public void setLoggedIn(boolean loggedIn) {
         UserState.loggedIn = loggedIn;
     }
 
@@ -28,7 +28,7 @@ public class UserState {
         return username;
     }
 
-    public static void setUsername(String username) {
+    public void setUsername(String username) {
         UserState.username = username;
     }
 
@@ -36,7 +36,7 @@ public class UserState {
         return authToken;
     }
 
-    public static void setAuthToken(String authToken) {
+    public void setAuthToken(String authToken) {
         UserState.authToken = authToken;
     }
 

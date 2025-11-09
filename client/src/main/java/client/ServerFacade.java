@@ -4,12 +4,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import exceptions.AlreadyTakenException;
 import exceptions.InvalidException;
 
 import static ui.EscapeSequences.*;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
@@ -29,20 +29,19 @@ import java.util.*;
 * */
 
 public class ServerFacade {
-    private static final java.net.http.HttpClient httpClient = java.net.http.HttpClient.newHttpClient();
+    public static final java.net.http.HttpClient httpClient = java.net.http.HttpClient.newHttpClient();
 
     public int status;
     private List<Map<String, String>> gameList;
 
 
-    public void registerUser(String host, int port, String path, String username,
-                             String password, String email) throws Exception {
+    public Map<String, String> registerUser(String host, int port, String path, String username,
+                                            String password, String email) throws Exception {
 
-        // TODO - putting a # causes the password input and email inputs to break. Check to ensure those characters aren't in the email.
+        // TODO - putting a # causes the password input and email inputs to break. Check to ensure those characters aren't in the email
         if (invalidCharacters(password) || invalidCharacters(email) || invalidCharacters(username)) {
             throw new InvalidException();
         }
-        // TODO - This makes it impossible to send a bad password, but the double handling checks never hurt anyone.
 
         HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(
                 String.format("{\"username\": \"%s\", \"password\": \"%s\", \"email\": \"%s\"}", username, password, email));
@@ -58,20 +57,13 @@ public class ServerFacade {
         status = response.statusCode();
 
         if (status >= 200 && status < 300) {
-            System.out.printf("%sSuccessfully registed!\n%s",
-                    SET_TEXT_COLOR_MAGENTA, RESET_TEXT_COLOR);
+            return jsonParser(response.body(), "authToken").getFirst();
         } else if (status == 403) {
-            System.out.printf("%sThat user already exists! Try again.\n%s",
-                    "\u001b[38;5;1m", RESET_TEXT_COLOR);
-        } else if (status == 406) {
-            System.out.printf("%sBad inputs! Try again.\n%s",
-                    "\u001b[38;5;1m", RESET_TEXT_COLOR);
-        } else if (status == 500) {
-            System.out.printf("%sAn error occurred. Please try again.\n%s",
-                    "\u001b[38;5;1m", RESET_TEXT_COLOR);
-        }
-        else {
-            System.out.println("Error: recieved status code: " + status);
+            throw new AlreadyTakenException();
+        } else if (status == 400) {
+            throw new InvalidException();
+        } else {
+            throw new Exception("recieved status code " + status);
         }
     }
 

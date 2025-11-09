@@ -3,6 +3,7 @@ package client;
 import client.commands.CommandInterface;
 import client.commands.CommandRegistry;
 import client.commands.HelpCommand;
+import client.commands.RegisterCommand;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 
@@ -17,6 +18,7 @@ public class ChessClient {
         // registration of commands
         CommandRegistry commandRegistry = new CommandRegistry();
         commandRegistry.register(new HelpCommand());
+        commandRegistry.register(new RegisterCommand());
         // can add more commands here.
 
         // registers base userState
@@ -43,14 +45,20 @@ public class ChessClient {
             }
             // gets hold of the remaining arguments inputted.
             String[] arguments = Arrays.copyOfRange(inputData, 1, inputData.length);
-            ValidationResult validationResult = command.validate(arguments, userState);
-            if (!validationResult.ok) {
-                simplePrint(1, validationResult.message + " Usage => " + command.getUsage());
-                continue;
-            }
-            CommandResult commandResult = command.execute(args, userState, commandRegistry);
-            if (commandResult.ok()) {
-                simplePrint(12, commandResult.message());
+            if (!userState.isLoggedIn() || command.requiresLogin()) {
+                ValidationResult validationResult = command.validate(arguments, userState);
+                if (!validationResult.ok) {
+                    simplePrint(1, validationResult.message + "\n");
+                    continue;
+                }
+                CommandResult commandResult = command.execute(arguments, userState, commandRegistry);
+                if (commandResult.ok()) {
+                    simplePrint(5, commandResult.message());
+                } else {
+                    simplePrint(1, commandResult.message());
+                }
+            } else {
+                simplePrint(1, "You must be logged in to use that command.\n");
             }
         }
     }

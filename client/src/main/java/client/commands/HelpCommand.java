@@ -15,7 +15,7 @@ public class HelpCommand implements CommandInterface{
 
     @Override
     public List<String> getAliases() {
-        return List.of(new String[]{"h"});
+        return List.of("h");
     }
 
     @Override
