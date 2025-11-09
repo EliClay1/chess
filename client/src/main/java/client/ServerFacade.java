@@ -187,34 +187,38 @@ public class ServerFacade {
         }
     }
 
-    public void observeGame(String gameID) {
+    public void observeGame(String gameID, List<Map<String, String>> activeGames) throws Exception {
 
-        if (gameList == null || gameList.isEmpty()) {
+        if (activeGames == null || activeGames.isEmpty()) {
             System.out.printf("%sPlease print out a list of games before attempting to observe. (l)\n%s",
                     "\u001b[38;5;1m", RESET_TEXT_COLOR);
             return;
         }
 
-        if (!gameList.contains(gameID)) {
-            status = 400;
-        }
-
         if (gameID == null || gameID.isEmpty()) {
             status = 400;
+            throw new Exception(String.format("%d", status));
         } else {
             try {
-                var parsedID = Integer.parseInt(gameID);
+                Integer.parseInt(gameID);
             } catch (NumberFormatException e) {
                 status = 400;
+                throw new Exception(String.format("%d", status));
             }
         }
 
-        if (status >= 200) {
-            printBoard("white");
-        } else {
-            System.out.printf("%sError: received status code: %s\n%s",
-                    "\u001b[38;5;1m", status, RESET_TEXT_COLOR);
-        }
+        // TODO - build the board based off the gameData.
+//        String gameData = null;
+//        for (var game : activeGames) {
+//            if (Objects.equals(game.get("GameID"), gameID)) {
+//                gameData = game.get("gameData");
+//            } else {
+//                status = 400;
+//            }
+//        }
+
+
+        printBoard("white");
     }
 
     public void printBoard(String color) {

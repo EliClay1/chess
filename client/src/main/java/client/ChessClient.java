@@ -23,6 +23,7 @@ public class ChessClient {
         commandRegistry.register(new CreateGameCommand());
         commandRegistry.register(new ListGamesCommand());
         commandRegistry.register(new JoinGameCommand());
+        commandRegistry.register(new ObserveCommand());
 
 
         // registers base userState

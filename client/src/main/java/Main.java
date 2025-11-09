@@ -118,7 +118,7 @@ public class Main {
                 } else if (loggedInCommand.equalsIgnoreCase("watch") || loggedInCommand.equalsIgnoreCase("w")) {
                     try {
                         String gameID = loggedInListOfInputData.get(1);
-                        httpClient.observeGame(gameID);
+                        httpClient.observeGame(gameID, null);
                     } catch (Exception e) {
                         simplePrint(1, "Error. Try again");
                     }
