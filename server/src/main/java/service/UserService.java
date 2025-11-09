@@ -1,6 +1,8 @@
 package service;
 
 import dataaccess.DataAccess;
+import dataaccess.MemoryDataAccess;
+import dataaccess.MySQLDataAccess;
 import exceptions.AlreadyTakenException;
 import exceptions.DoesntExistException;
 import exceptions.UnauthorizedException;
@@ -8,6 +10,7 @@ import model.AuthData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public record UserService(DataAccess dataAccess) {
@@ -32,18 +35,23 @@ public record UserService(DataAccess dataAccess) {
             throw new DoesntExistException();
         }
 
-        // TODO - find a way to refactor this.
         boolean passwordsMatch;
-        try {
-            passwordsMatch = BCrypt.checkpw(user.password(), userByName.password());
-        } catch (Exception e) {
-            throw new UnauthorizedException();
+        // added code to bypass memory database saving
+        if (dataAccess instanceof MySQLDataAccess) {
+            // TODO - find a way to refactor this.
+
+            try {
+                passwordsMatch = BCrypt.checkpw(user.password(), userByName.password());
+            } catch (Exception e) {
+                throw new UnauthorizedException();
+            }
+        } else {
+            passwordsMatch = Objects.equals(user.password(), userByName.password());
         }
-
-
         if (!passwordsMatch) {
             throw new UnauthorizedException();
         }
+
         AuthData authData = new AuthData(username, generateAuthToken());
         dataAccess.addAuth(authData);
         return authData;

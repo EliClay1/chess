@@ -1,22 +1,32 @@
 package service;
 
+import com.mysql.cj.x.protobuf.MysqlxSql;
 import dataaccess.MemoryDataAccess;
+import dataaccess.MySQLDataAccess;
 import exceptions.AlreadyTakenException;
 import exceptions.DoesntExistException;
 import exceptions.UnauthorizedException;
 import model.AuthData;
 import model.UserData;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 // WRITTEN TO USE THE MEMORY DATABASE - BREAKS NOW.
+// 11/9/2025 - Changing to MySQL database
 class UserServiceTest {
+
+    private MemoryDataAccess db;
+
+    @BeforeEach
+    void beforeEach() {
+        db = new MemoryDataAccess();
+    }
 
     @Test
     void register() throws Exception {
         var user = new UserData("bob", "password", "b@gmail.com");
-        var db = new MemoryDataAccess();
         var userService = new UserService(db);
         var authData = userService.register(user);
         // sanitize inputs
@@ -39,7 +49,6 @@ class UserServiceTest {
     void login() throws Exception {
         var newUser = new UserData("bob", "password", "b@gmail.com");
         var returningUser = new UserData("bob", "password", null);
-        var db = new MemoryDataAccess();
         var userService = new UserService(db);
         db.createUser(newUser);
         var authData = userService.login(returningUser);

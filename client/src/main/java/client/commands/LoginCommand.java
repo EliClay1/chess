@@ -68,7 +68,7 @@ public class LoginCommand implements CommandInterface{
             if (e instanceof InvalidException) {
                 return new CommandResult(false, "Invalid characters.");
             } else if (e instanceof UnauthorizedException) {
-                return new CommandResult(false, "Incorrect password.");
+                return new CommandResult(false, "Incorrect password or that username doesn't exist.");
             } else {
                 return new CommandResult(false, "Error: " + e.getMessage());
             }

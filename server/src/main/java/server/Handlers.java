@@ -146,7 +146,7 @@ public class Handlers {
 
         // Check if the piece is a valid color
         try {
-            if (teamColor == null || teamColor.isEmpty() || !availablePieces.contains(teamColor)) {throw new MissingFieldException();}
+            if (teamColor == null || teamColor.isEmpty() || !availablePieces.contains(teamColor.toLowerCase())) {throw new MissingFieldException();}
         } catch (MissingFieldException e) {
             errorReturnHandling(ctx, e);
             return;

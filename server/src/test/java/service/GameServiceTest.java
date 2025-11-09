@@ -43,7 +43,7 @@ class GameServiceTest {
         db.addAuth(auth);
         var gameService = new GameService(db);
         GameData newGame = gameService.createGame("game1", auth.authToken());
-        gameService.joinGame(auth.authToken(), newGame.gameID(), "WHITE");
+        gameService.joinGame(auth.authToken(), newGame.gameID(), "white");
         GameData updatedGame = db.getGame(newGame.gameID());
         assertNotNull(updatedGame);
         if (updatedGame.whiteUsername() == null) {
@@ -84,8 +84,8 @@ class GameServiceTest {
         db.addAuth(joiningAuth);
         var gameService = new GameService(db);
         GameData newGame = gameService.createGame("game1", auth.authToken());
-        gameService.joinGame(auth.authToken(), newGame.gameID(), "WHITE");
-        assertThrows(AlreadyTakenException.class, () -> gameService.joinGame(joiningAuth.authToken(), newGame.gameID(), "WHITE"));
+        gameService.joinGame(auth.authToken(), newGame.gameID(), "white");
+        assertThrows(AlreadyTakenException.class, () -> gameService.joinGame(joiningAuth.authToken(), newGame.gameID(), "white"));
     }
 
     @Test
@@ -97,8 +97,8 @@ class GameServiceTest {
         db.addAuth(joiningAuth);
         var gameService = new GameService(db);
         GameData newGame = gameService.createGame("game1", auth.authToken());
-        gameService.joinGame(auth.authToken(), newGame.gameID(), "BLACK");
-        assertThrows(AlreadyTakenException.class, () -> gameService.joinGame(joiningAuth.authToken(), newGame.gameID(), "BLACK"));
+        gameService.joinGame(auth.authToken(), newGame.gameID(), "black");
+        assertThrows(AlreadyTakenException.class, () -> gameService.joinGame(joiningAuth.authToken(), newGame.gameID(), "black"));
     }
 
     @Test
