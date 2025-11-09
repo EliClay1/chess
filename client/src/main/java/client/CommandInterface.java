@@ -1,12 +1,14 @@
 package client;
 
+import java.util.List;
+
 public interface CommandInterface {
     String getName();
-    String getAliases();
+    List<String> getAliases();
     String getUsage();
     int getMinArgs();
     int getMaxArgs();
     boolean requiresLogin();
-    void validate(String[] args, UserState userState);
-    void execute(String[] args, UserState userState);
+    ValidationResult validate(String[] args, UserState userState);
+    CommandResult execute(String[] args, UserState userState);
 }

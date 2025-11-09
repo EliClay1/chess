@@ -6,7 +6,6 @@ import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
 public class ChessClient {
-    // TODO - transfer main code here.
 
     public static void main(String[] args) {
         UserState userState = new UserState("localhost", 8080, null, null, false);
@@ -15,7 +14,7 @@ public class ChessClient {
 
         while (true) {
             // determines log-in state for command inputs.
-            String loginState = userState.loggedIn() ? "Logged In" : "Logged Out";
+            String loginState = userState.isLoggedIn() ? "Logged In" : "Logged Out";
             simplePrint(6, String.format("[%s] >>> ", loginState));
 
             Scanner scanner = new Scanner(System.in);
