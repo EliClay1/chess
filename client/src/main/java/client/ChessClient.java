@@ -11,7 +11,7 @@ import static ui.EscapeSequences.*;
 
 public class ChessClient {
 
-    public static void main(String[] args) {
+    public void run() {
         CommandRegistry commandRegistry = new CommandRegistry();
         // Logout Commands
         commandRegistry.register(new HelpCommand());
