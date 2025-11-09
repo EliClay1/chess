@@ -4,11 +4,8 @@ import client.ServerFacade;
 import client.UserState;
 import client.results.CommandResult;
 import client.results.ValidationResult;
-import exceptions.InvalidException;
-import exceptions.UnauthorizedException;
 
 import java.util.List;
-import java.util.Map;
 
 public class LogoutCommand implements CommandInterface{
 

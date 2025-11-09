@@ -4,7 +4,6 @@ import client.ServerFacade;
 import client.UserState;
 import client.results.CommandResult;
 import client.results.ValidationResult;
-import exceptions.AlreadyTakenException;
 import exceptions.InvalidException;
 import exceptions.UnauthorizedException;
 

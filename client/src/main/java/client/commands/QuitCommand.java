@@ -6,8 +6,6 @@ import client.results.ValidationResult;
 
 import java.util.List;
 
-import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
-
 public class QuitCommand implements CommandInterface{
     @Override
     public String getName() {
