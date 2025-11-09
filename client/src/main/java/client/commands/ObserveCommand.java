@@ -3,15 +3,13 @@ package client.commands;
 import client.ServerFacade;
 import client.UserState;
 import client.results.CommandResult;
-import client.results.ValidationResult;
 import exceptions.InvalidException;
 
 import java.util.List;
 
-public class ObserveCommand implements CommandInterface{
+public class ObserveCommand extends BaseCommand {
 
     private final ServerFacade serverFacade = new ServerFacade();
-    private final int argumentCount = 1;
 
     @Override
     public String getName() {
@@ -31,15 +29,6 @@ public class ObserveCommand implements CommandInterface{
     @Override
     public boolean requiresLogin() {
         return true;
-    }
-
-    @Override
-    public ValidationResult validate(String[] args, UserState userState) {
-        // argument length check
-        if (args.length == argumentCount) {
-            return new ValidationResult(true, "");
-        }
-        return new ValidationResult(false, "Incorrect amount of arguments, expected 1.");
     }
 
     @Override

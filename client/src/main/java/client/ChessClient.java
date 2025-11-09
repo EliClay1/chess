@@ -25,7 +25,6 @@ public class ChessClient {
         commandRegistry.register(new JoinGameCommand());
         commandRegistry.register(new ObserveCommand());
 
-
         // registers base userState
         UserState userState = new UserState("localhost", 8080, null, null, false, null);
 
