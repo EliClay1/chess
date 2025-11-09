@@ -1,5 +1,8 @@
 package client;
 
+import java.util.List;
+import java.util.Map;
+
 public class UserState {
 
     private static String host;
@@ -7,13 +10,23 @@ public class UserState {
     private static String authToken;
     private static String username;
     private static boolean loggedIn;
+    private static List<Map<String, String>> activeGames;
 
-    public UserState(String host, int port, String authToken, String username, boolean loggedIn) {
+    public UserState(String host, int port, String authToken, String username, boolean loggedIn, List<Map<String, String>> activeGames) {
         setHost(host);
         setPort(port);
         setAuthToken(authToken);
         setUsername(username);
         setLoggedIn(loggedIn);
+        setActiveGames(activeGames);
+    }
+
+    public List<Map<String, String>> getActiveGames() {
+        return activeGames;
+    }
+
+    public void setActiveGames(List<Map<String, String>> activeGames) {
+        UserState.activeGames = activeGames;
     }
 
     public boolean isLoggedIn() {

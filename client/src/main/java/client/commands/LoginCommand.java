@@ -27,7 +27,7 @@ public class LoginCommand implements CommandInterface{
 
     @Override
     public String getUsage() {
-        return "Login as an existing user: \"l\", \"login\" <USERNAME> <PASSWORD>\n";
+        return "Login as an existing user: \"login\" <USERNAME> <PASSWORD>\n";
     }
 
     @Override

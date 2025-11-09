@@ -22,10 +22,11 @@ public class ChessClient {
         commandRegistry.register(new LogoutCommand());
         commandRegistry.register(new CreateGameCommand());
         commandRegistry.register(new ListGamesCommand());
+        commandRegistry.register(new JoinGameCommand());
 
 
         // registers base userState
-        UserState userState = new UserState("localhost", 8080, null, null, false);
+        UserState userState = new UserState("localhost", 8080, null, null, false, null);
 
         simplePrint(12, String.format("%sWelcome to Chess! Feel free to sign in, or type 'h' for help.%s\n\n",
                 WHITE_KING, WHITE_QUEEN));

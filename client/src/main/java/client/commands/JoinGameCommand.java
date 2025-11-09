@@ -8,33 +8,33 @@ import exceptions.InvalidException;
 
 import java.util.List;
 
-public class CreateGameCommand implements CommandInterface{
+public class JoinGameCommand implements CommandInterface{
 
     private final ServerFacade serverFacade = new ServerFacade();
 
     @Override
     public String getName() {
-        return "create";
+        return "join";
     }
 
     @Override
     public List<String> getAliases() {
-        return List.of("c");
+        return List.of("j");
     }
 
     @Override
     public String getUsage() {
-        return "Create a new game: \"c\", \"create\" <GAME NAME>\n";
+        return "Join an existing game: \"j\", \"join\" <GAME ID> <COLOR>\n";
     }
 
     @Override
     public int getMinArgs() {
-        return 1;
+        return 2;
     }
 
     @Override
     public int getMaxArgs() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -48,16 +48,17 @@ public class CreateGameCommand implements CommandInterface{
         if (args.length == getMinArgs()) {
             return new ValidationResult(true, "");
         }
-        return new ValidationResult(false, "Incorrect amount of arguments, expected 1.");
+        return new ValidationResult(false, "Incorrect amount of arguments, expected 2.");
     }
 
     @Override
     public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) {
-        String gameName = args[0];
+        String gameID = args[0];
+        String teamColor = args[1];
 
         try {
-            serverFacade.createGame("localhost", 8080, "/game", userState.getAuthToken(), gameName);
-            return new CommandResult(true, String.format("Successfully created game: %s\n", gameName));
+            serverFacade.joinGame("localhost", 8080, "/game", userState.getAuthToken(), gameID, teamColor);
+            return new CommandResult(true, "");
         } catch (Exception e) {
             if (e instanceof InvalidException) {
                 return new CommandResult(false, "Invalid characters.");

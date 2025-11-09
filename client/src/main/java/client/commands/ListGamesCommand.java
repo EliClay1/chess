@@ -54,7 +54,6 @@ public class ListGamesCommand implements CommandInterface{
         return new ValidationResult(false, "List games shouldn't have any arguments.");
     }
 
-    // TODO - How can I keep track of game data?
     @Override
     public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) {
         try {
@@ -63,6 +62,7 @@ public class ListGamesCommand implements CommandInterface{
                 System.out.printf(" %s%s. Game Name: %s, White: %s, Black: %s\n%s", SET_TEXT_COLOR_MAGENTA, gameData.get("gameID"),
                         gameData.get("gameName"), gameData.get("whiteUsername"), gameData.get("blackUsername"), RESET_TEXT_COLOR);
             }
+            userState.setActiveGames(body);
             return new CommandResult(true, "");
         } catch (Exception e) {
             return new CommandResult(false, "Error: " + e.getMessage());

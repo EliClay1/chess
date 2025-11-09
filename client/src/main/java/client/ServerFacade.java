@@ -179,10 +179,11 @@ public class ServerFacade {
 
         if (status >= 200 && status < 300) {
             // TODO - Generate board print code. Don't worry about calculation of moves.
+
+            // TODO - Should this be moved to the JoinGameCommand class?
             printBoard(playerColor);
         } else {
-            System.out.printf("%sError: received status code: %s\n%s",
-                    "\u001b[38;5;1m", status, RESET_TEXT_COLOR);
+            throw new Exception(String.format("%d", status));
         }
     }
 
