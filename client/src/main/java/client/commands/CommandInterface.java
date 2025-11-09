@@ -1,4 +1,8 @@
-package client;
+package client.commands;
+
+import client.UserState;
+import client.results.CommandResult;
+import client.results.ValidationResult;
 
 import java.util.List;
 
@@ -10,5 +14,5 @@ public interface CommandInterface {
     int getMaxArgs();
     boolean requiresLogin();
     ValidationResult validate(String[] args, UserState userState);
-    CommandResult execute(String[] args, UserState userState);
+    CommandResult execute(String[] args, UserState userState, CommandRegistry registery);
 }

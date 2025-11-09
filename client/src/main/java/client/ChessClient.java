@@ -1,5 +1,8 @@
 package client;
 
+import client.commands.CommandRegistry;
+import client.commands.HelpCommand;
+
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -8,6 +11,12 @@ import static ui.EscapeSequences.*;
 public class ChessClient {
 
     public static void main(String[] args) {
+        // registration of commands
+        CommandRegistry commandRegistry = new CommandRegistry();
+        commandRegistry.register(new HelpCommand());
+
+
+
         UserState userState = new UserState("localhost", 8080, null, null, false);
         simplePrint(12, String.format("%sWelcome to Chess! Feel free to sign in, or type 'h' for help.%s\n\n",
                 WHITE_KING, WHITE_QUEEN));
@@ -21,7 +30,6 @@ public class ChessClient {
             String line = scanner.nextLine();
             var listOfInputData = Arrays.stream(line.split(" ")).toList();
             String command = listOfInputData.getFirst();
-
         }
     }
 
