@@ -80,7 +80,7 @@ public class Main {
                 }
 
             } else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("q")) {
-                simplePrint(19, "Exiting Chess...");
+                simplePrint(12, "Exiting Chess...");
                 isActive = false;
             } else {
                 System.out.print("I'm sorry, but I don't know that command.\n");
@@ -114,6 +114,13 @@ public class Main {
                         httpClient.joinGame("localhost", 8080, "/game", authToken, gameID, playerColor);
                     } catch (Exception e) {
                         simplePrint(1, "Invalid Color. Try again");
+                    }
+                } else if (loggedInCommand.equalsIgnoreCase("watch") || loggedInCommand.equalsIgnoreCase("w")) {
+                    try {
+                        String gameID = loggedInListOfInputData.get(1);
+                        httpClient.observeGame(gameID);
+                    } catch (Exception e) {
+                        simplePrint(1, "Error. Try again");
                     }
                 }
             }

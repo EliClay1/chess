@@ -9,6 +9,7 @@ import exceptions.InvalidException;
 import static ui.EscapeSequences.*;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
@@ -31,6 +32,8 @@ public class ServerFacade {
     private static final java.net.http.HttpClient httpClient = java.net.http.HttpClient.newHttpClient();
 
     public int status;
+    private List<Map<String, String>> gameList;
+
 
     public void registerUser(String host, int port, String path, String username,
                              String password, String email) throws Exception {
@@ -144,12 +147,13 @@ public class ServerFacade {
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         status = response.statusCode();
-        var parsedResponse = jsonParser(response.body(), "gameID", "gameName", "whiteUsername", "blackUsername");
+        var parsedResponse = jsonParser(response.body(), "gameID", "gameName", "whiteUsername", "blackUsername", "gameData");
         if (status >= 200 && status < 300) {
             for (Map<String, String> gameData : parsedResponse) {
                 System.out.printf("%s%s. Game Name: %s, White: %s, Black: %s\n%s", SET_TEXT_COLOR_BLUE, gameData.get("gameID"),
                         gameData.get("gameName"), gameData.get("whiteUsername"), gameData.get("blackUsername"), RESET_TEXT_COLOR);
             }
+            gameList = parsedResponse;
         } else {
             System.out.printf("%sError: received status code: %s\n%s",
                     "\u001b[38;5;1m", status, RESET_TEXT_COLOR);
@@ -206,6 +210,36 @@ public class ServerFacade {
         if (status >= 200 && status < 300) {
             // TODO - Generate board print code. Don't worry about calculation of moves.
             printBoard(playerColor);
+        } else {
+            System.out.printf("%sError: received status code: %s\n%s",
+                    "\u001b[38;5;1m", status, RESET_TEXT_COLOR);
+        }
+    }
+
+    public void observeGame(String gameID) {
+
+        if (gameList == null || gameList.isEmpty()) {
+            System.out.printf("%sPlease print out a list of games before attempting to observe. (l)\n%s",
+                    "\u001b[38;5;1m", RESET_TEXT_COLOR);
+            return;
+        }
+
+        if (!gameList.contains(gameID)) {
+            status = 400;
+        }
+
+        if (gameID == null || gameID.isEmpty()) {
+            status = 400;
+        } else {
+            try {
+                var parsedID = Integer.parseInt(gameID);
+            } catch (NumberFormatException e) {
+                status = 400;
+            }
+        }
+
+        if (status >= 200) {
+            printBoard("white");
         } else {
             System.out.printf("%sError: received status code: %s\n%s",
                     "\u001b[38;5;1m", status, RESET_TEXT_COLOR);
@@ -273,16 +307,6 @@ public class ServerFacade {
         }
         System.out.print("\n");
     }
-
-
-
-
-
-
-
-
-
-
 
     private boolean invalidCharacters(String string) {
         String[] invalidCharacters = {"\"", " ", "#", "%", "&", "<", ">", "{", "}", "|", "\\", "~", "`", "'", "/", "="};

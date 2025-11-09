@@ -1,6 +1,8 @@
 package service;
 
 import chess.ChessGame;
+import com.google.gson.Gson;
+import com.google.gson.JsonSerializer;
 import dataaccess.DataAccess;
 import exceptions.AlreadyTakenException;
 import exceptions.InvalidException;
@@ -64,8 +66,13 @@ public record GameService(DataAccess dataAccess) {
             mapOfGameData.put("whiteUsername", game.whiteUsername());
             mapOfGameData.put("blackUsername", game.blackUsername());
             mapOfGameData.put("gameName", game.gameName());
+            mapOfGameData.put("gameData", serializeFromGameObject(game.game()));
             arrayOfGameData.add(mapOfGameData);
         }
         return arrayOfGameData;
+    }
+
+    private String serializeFromGameObject(ChessGame chessGame) {
+        return new Gson().toJson(chessGame);
     }
 }
