@@ -83,7 +83,7 @@ public class Main {
                 simplePrint(19, "Exiting Chess...");
                 isActive = false;
             } else if (command.equalsIgnoreCase("b")) {
-                httpClient.printBoard("white");
+                httpClient.printBoard("black");
 //                simplePrint(19, "Exiting Chess...");
 //                isActive = false;
             } else {

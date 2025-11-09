@@ -216,51 +216,60 @@ public class ServerFacade {
     }
 
     public void printBoard(String color) {
-        String[] letters = {"   ", " \u2009a ", " \u2007b ", " \u2004c ", " \u2007d ", " \u2004e ", " \u2007f ", " \u2004g ", " \u2007h ", "   \u200A"};
-        String[] numbers = {" 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 "};
+        final boolean blackView = "black".equalsIgnoreCase(color);
 
-        // TODO - Piece index needs to be generate THROUGH the game data.
-        String[] whitePieceIndex = {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK};
-        String[] blackPieceIndex = {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK};
+        String[] lettersAtoH = {"   ", " \u2009a ", " \u2007b ", " \u2004c ", " \u2007d ", " \u2004e ", " \u2007f ", " \u2004g ", " \u2007h ", "   \u200A"};
+        String[] lettersHtoA = {"   ", " \u2009h ", " \u2007g ", " \u2004f ", " \u2007e ", " \u2004d ", " \u2007c ", " \u2004b ", " \u2007a ", "   \u200A"};
+        String[] letters = blackView ? lettersHtoA : lettersAtoH;
+
+        String[] numsWhite = {" 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 "};
+        String[] numsBlack = {" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 "};
+        String[] numbers = blackView ? numsBlack : numsWhite;
+
+        String[] whitePieceIndex = {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK}; // [web:2]
+        String[] blackPieceIndex = {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK}; // [web:2]
 
         for (var letter : letters) {
-            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE, letter, RESET_TEXT_COLOR, RESET_BG_COLOR);
+            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE, letter, RESET_TEXT_COLOR, RESET_BG_COLOR); // [web:42]
         }
+
         for (int x = 0; x < 8; x++) {
             System.out.print("\n");
-            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE, numbers[x], RESET_TEXT_COLOR, RESET_BG_COLOR);
-            for (int y = 0; y < 8; y++) {
 
-                boolean dark = ((x + y) & 1) == 1;
+            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE, numbers[x], RESET_TEXT_COLOR, RESET_BG_COLOR); // [web:42]
+
+            for (int y = 0; y < 8; y++) {
+                int bx = blackView ? 7 - x : x;
+                int by = blackView ? 7 - y : y;
+
+                boolean dark = ((bx + by) & 1) == 1;
                 String bg = dark ? SET_BOARD_BLACK : SET_BOARD_WHITE;
+
                 String piece = null;
                 String pieceColor = null;
 
-                if (x == 0) {
-                    piece = blackPieceIndex[y];
+                if (bx == 0) {
+                    piece = blackPieceIndex[by];
                     pieceColor = SET_PIECE_COLOR_BLACK;
-                } else if (x == 1) {
-                    piece = BLACK_PAWN;
-                    pieceColor = SET_PIECE_COLOR_BLACK;
-                } else if (x == 6) {
-                    piece = WHITE_PAWN;
-                    pieceColor = SET_PIECE_COLOR_WHITE;
-                } else if (x == 7) {
-                    piece = whitePieceIndex[y];
+                } else if (bx == 1) {
+                    piece = BLACK_PAWN; pieceColor = SET_PIECE_COLOR_BLACK;
+                } else if (bx == 6) {
+                    piece = WHITE_PAWN; pieceColor = SET_PIECE_COLOR_WHITE;
+                } else if (bx == 7) {
+                    piece = whitePieceIndex[by];
                     pieceColor = SET_PIECE_COLOR_WHITE;
                 }
 
                 if (piece != null) {
                     String cell = dark ? piece : piece + HAIRSPACE;
                     System.out.printf("%s%s%s%s", bg, pieceColor, cell, RESET_BG_COLOR);
-                } else if ((x + y) % 2 == 0) {
-                    System.out.printf("%s%s%s", SET_BOARD_WHITE, EMPTY, RESET_BG_COLOR);
                 } else {
-                    System.out.printf("%s%s%s", SET_BOARD_BLACK, EMPTY, RESET_BG_COLOR);
+                    System.out.printf("%s%s%s", bg, EMPTY, RESET_BG_COLOR);
                 }
             }
             System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE, numbers[x], RESET_TEXT_COLOR, RESET_BG_COLOR);
         }
+
         System.out.print("\n");
         for (var letter : letters) {
             System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE, letter, RESET_TEXT_COLOR, RESET_BG_COLOR);
