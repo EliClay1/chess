@@ -12,6 +12,8 @@ import java.util.Map;
 
 public class LoginCommand implements CommandInterface{
 
+    // TODO - allow login and list to both use l. Essentially block running auth-required commands. Figure this out.
+
     private final int argumentCount = 2;
     private final ServerFacade serverFacade = new ServerFacade();
 

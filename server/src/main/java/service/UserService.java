@@ -36,9 +36,9 @@ public record UserService(DataAccess dataAccess) {
         }
 
         boolean passwordsMatch;
-        // added code to bypass memory database saving
+
+        // TODO - Open-Close principle violation.
         if (dataAccess instanceof MySQLDataAccess) {
-            // TODO - find a way to refactor this.
 
             try {
                 passwordsMatch = BCrypt.checkpw(user.password(), userByName.password());

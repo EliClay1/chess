@@ -86,7 +86,6 @@ public class ServerFacade {
         }
     }
 
-    // TODO - should this require an authToken? If the system DB gets dropped, users cannot logout without resetting the entire system.
     public void logoutUser(String host, int port, String path, String authToken) throws Exception {
         String url = String.format(Locale.getDefault(), "http://%s:%d%s", host, port, path);
         HttpRequest request = HttpRequest.newBuilder()
