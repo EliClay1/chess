@@ -187,7 +187,9 @@ public class Handlers {
         var response = Map.of();
         // FIXME - rearrage errors, ensure that there is an error for each problem, don't mix them together.
 
-        // FIXME - Ensure that error handling is happening at the root of the problem, and arrange that data / information accordingly. Follow OWASP #9
+        // FIXME - Ensure that error handling is happening at the root of the problem, and arrange
+        //  that data / information accordingly. Follow OWASP #9
+
 
         //noinspection IfCanBeSwitch
         if (e instanceof DoesntExistException) {
