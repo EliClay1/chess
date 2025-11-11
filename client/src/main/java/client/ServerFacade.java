@@ -18,8 +18,9 @@ import java.util.*;
 
 public class ServerFacade {
     public static final java.net.http.HttpClient HTTP_CLIENT = java.net.http.HttpClient.newHttpClient();
-
     public int status;
+
+    // TODO - Cannot send ANY error codes back.
 
 
     public Map<String, String> registerUser(String host, int port, String path, String username,
@@ -50,7 +51,7 @@ public class ServerFacade {
         } else if (status == 400) {
             throw new InvalidException();
         } else {
-            throw new Exception("recieved status code " + status);
+            throw new Exception("Invalid");
         }
     }
 
@@ -81,10 +82,11 @@ public class ServerFacade {
         } else if (status == 406) {
             throw new InvalidException();
         } else {
-            throw new Exception("recieved status code " + status);
+            throw new Exception("Invalid");
         }
     }
 
+    // TODO - should this require an authToken? If the system DB gets dropped, users cannot logout without resetting the entire system.
     public void logoutUser(String host, int port, String path, String authToken) throws Exception {
         String url = String.format(Locale.getDefault(), "http://%s:%d%s", host, port, path);
         HttpRequest request = HttpRequest.newBuilder()
@@ -97,7 +99,7 @@ public class ServerFacade {
         HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         status = response.statusCode();
         if (!(status >= 200 && status < 300)) {
-            throw new Exception(String.format("%d", status));
+            throw new Exception("Invalid");
         }
     }
 
@@ -119,7 +121,8 @@ public class ServerFacade {
         return jsonParser(response.body(), "gameID", "gameName", "whiteUsername", "blackUsername", "gameData");
     }
 
-    public void createGame(String host, int port, String path, String authToken, String gameName) throws Exception {
+    // FIXME - Change the Game Name size allowed by the system. Too long could break it. Check the spec.
+    public String createGame(String host, int port, String path, String authToken, String gameName) throws Exception {
         if (invalidCharacters(gameName)) {
             throw new InvalidException();
         }
@@ -137,15 +140,17 @@ public class ServerFacade {
 
         HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         status = response.statusCode();
+        // TODO - what is the purpose of this?
         jsonParser(response.body(), "gameID", "gameName", "whiteUsername", "blackUsername");
 
         if (!(status >= 200 && status < 300)) {
-            throw new Exception(String.format("%d", status));
+            throw new Exception("Invalid");
         }
+        return jsonParser(response.body(), "gameID").getFirst().get("gameID");
     }
 
     public void joinGame(String host, int port, String path, String authToken, String gameID, String playerColor) throws Exception {
-        if (invalidCharacters(playerColor) || !Arrays.asList(new String[]{"white", "black"}).contains(playerColor)) {
+        if (invalidCharacters(playerColor) || !Arrays.asList(new String[]{"white", "black"}).contains(playerColor.toLowerCase())) {
             throw new InvalidException();
         }
 
@@ -164,17 +169,24 @@ public class ServerFacade {
         status = response.statusCode();
 
         if (status >= 200 && status < 300) {
-            // TODO - Generate board print code. Don't worry about calculation of moves.
+            // TODO - Generate board print code. Don't worry about calculation of moves
 
             // TODO - Should this be moved to the JoinGameCommand class?
             printBoard(playerColor);
-        } else {
-            throw new Exception(String.format("%d", status));
+        } else if (status == 400) {
+            throw new NumberFormatException();
+        } else if (status == 403) {
+            throw new AlreadyTakenException();
+        }
+        else {
+            throw new Exception("Invalid");
         }
     }
 
+    // FIXME - Error handling for invalid game ID. Check to ensure that the gameID actually exists.
     public void observeGame(String gameID, List<Map<String, String>> activeGames) throws Exception {
 
+        // TODO - what the heck is the status even doing here?
         status = 200;
 
         if (activeGames == null || activeGames.isEmpty()) {
@@ -183,14 +195,26 @@ public class ServerFacade {
 
         if (gameID == null || gameID.isEmpty()) {
             status = 400;
-            throw new Exception(String.format("%d", status));
+            throw new Exception("GameID doesn't exist.");
         } else {
             try {
                 Integer.parseInt(gameID);
             } catch (NumberFormatException e) {
                 status = 400;
-                throw new Exception(String.format("%d", status));
+                throw new Exception("GameID must be a number.");
             }
+        }
+
+        // FIXME - Check if the gameID actually exists
+        boolean found = false;
+        for (var game : activeGames) {
+            if (game.containsValue(gameID)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            throw new Exception("GameID doesn't exist.");
         }
 
         // TODO - build the board based off the gameData.

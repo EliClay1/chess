@@ -139,7 +139,7 @@ public class Handlers {
             try {
                 gameID = Integer.parseInt(request.get("gameID"));
             } catch (NumberFormatException e) {
-                errorReturnHandling(ctx, new InvalidException());
+                errorReturnHandling(ctx, e);
             }
         }
 
@@ -185,7 +185,9 @@ public class Handlers {
 
     private void errorReturnHandling(Context ctx, Exception e) {
         var response = Map.of();
-        // TODO - rearrage errors, ensure that there is an error for each problem, don't mix them together.
+        // FIXME - rearrage errors, ensure that there is an error for each problem, don't mix them together.
+
+        // FIXME - Ensure that error handling is happening at the root of the problem, and arrange that data / information accordingly. Follow OWASP #9
 
         //noinspection IfCanBeSwitch
         if (e instanceof DoesntExistException) {
@@ -208,7 +210,11 @@ public class Handlers {
             response = Map.of("message", String.format("Error: bad request, %s", e.getMessage()));
             ctx.status(400).result(serializer.toJson(response));
 
-        } else {
+        } else if (e instanceof NumberFormatException) {
+            response = Map.of("message", String.format("Error: Found string where there should be int, %s", e.getMessage()));
+            ctx.status(400).result(serializer.toJson(response));
+        }
+        else {
             response = Map.of("message", String.format("Error: %s", e.getMessage()));
             ctx.status(500).result(serializer.toJson(response));
         }

@@ -36,8 +36,8 @@ public class CreateGameCommand extends BaseCommand {
         String gameName = args[0];
 
         try {
-            serverFacade.createGame("localhost", 8080, "/game", userState.getAuthToken(), gameName);
-            return new CommandResult(true, String.format("Successfully created game: %s\n", gameName));
+            String gameID = serverFacade.createGame("localhost", 8080, "/game", userState.getAuthToken(), gameName);
+            return new CommandResult(true, String.format("Successfully created game: %s, ID: %s\n", gameName, gameID));
         } catch (Exception e) {
             if (e instanceof InvalidException) {
                 return new CommandResult(false, "Invalid characters.");

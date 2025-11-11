@@ -46,9 +46,6 @@ public class ChessClient {
             if (command == null) {
                 simplePrint(1, "Please enter a valid command. Type \"help\" for assistance.\n");
                 continue;
-            } else if (commandName.equals("quit")) {
-                simplePrint(12, "Exiting Chess...\n");
-                break;
             }
             // gets hold of the remaining arguments inputted.
             String[] arguments = Arrays.copyOfRange(inputData, 1, inputData.length);
@@ -58,6 +55,12 @@ public class ChessClient {
                     simplePrint(1, validationResult.message + "\n");
                     continue;
                 }
+                // check for quit command
+                if (commandName.equals("quit")) {
+                    simplePrint(12, "Exiting Chess...\n");
+                    break;
+                }
+
                 CommandResult commandResult = command.execute(arguments, userState, commandRegistry);
                 if (commandResult.ok()) {
                     simplePrint(5, commandResult.message());

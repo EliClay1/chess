@@ -50,7 +50,7 @@ public class ListGamesCommand implements CommandInterface{
         try {
             var body = serverFacade.listGames("localhost", 8080, "/game", userState.getAuthToken());
             for (Map<String, String> gameData : body) {
-                System.out.printf(" %s%s. Game Name: %s, White: %s, Black: %s\n%s", SET_TEXT_COLOR_MAGENTA, gameData.get("gameID"),
+                System.out.printf(" %s - Game Name: %s, White: %s, Black: %s\n%s", SET_TEXT_COLOR_MAGENTA,
                         gameData.get("gameName"), gameData.get("whiteUsername"), gameData.get("blackUsername"), RESET_TEXT_COLOR);
             }
             userState.setActiveGames(body);

@@ -4,6 +4,7 @@ import client.ServerFacade;
 import client.UserState;
 import client.results.CommandResult;
 import client.results.ValidationResult;
+import exceptions.AlreadyTakenException;
 import exceptions.InvalidException;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 public class JoinGameCommand implements CommandInterface{
 
     private final ServerFacade serverFacade = new ServerFacade();
-    private final int argumentCount = 0;
+    private final int argumentCount = 2;
 
     @Override
     public String getName() {
@@ -52,8 +53,13 @@ public class JoinGameCommand implements CommandInterface{
             return new CommandResult(true, "");
         } catch (Exception e) {
             if (e instanceof InvalidException) {
-                return new CommandResult(false, "Invalid characters.");
-            } else {
+                return new CommandResult(false, "Invalid team color.");
+            } else if (e instanceof NumberFormatException) {
+                return new CommandResult(false, "Invalid GameID.");
+            } else if (e instanceof AlreadyTakenException) {
+                return new CommandResult(false, "That team is already taken.");
+            }
+            else {
                 return new CommandResult(false, "Error: " + e.getMessage());
             }
         }
