@@ -1,13 +1,23 @@
 package server;
 
 import io.javalin.*;
+import org.eclipse.jetty.websocket.core.server.WebSocketUpgradeHandler;
+import server.websocket.WebSocketHandler;
 
 public class Server {
 
     private final Javalin javalinServer;
+    private final WebSocketHandler webSocketHandler;
 
     public Server() {
-        javalinServer = Javalin.create(config -> config.staticFiles.add("web"));
+
+        webSocketHandler = new WebSocketHandler();
+
+        javalinServer = Javalin.create(config -> config.staticFiles.add("web")).ws("/ws", ws -> {
+            ws.onConnect(webSocketHandler);
+            ws.onMessage(webSocketHandler);
+            ws.onClose(webSocketHandler);
+        });
 
         try {
             // Handlers must be created with the Handlers.create...() function because of saftey precautions. i.e, you
