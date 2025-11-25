@@ -7,8 +7,6 @@ import org.jetbrains.annotations.NotNull;
 import websocket.commands.UserGameCommand;
 import websocket.commands.UserGameCommand.CommandType.*;
 
-import java.util.Map;
-
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
     private final Gson serializer = new Gson();
@@ -28,11 +26,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public void handleMessage(@NotNull WsMessageContext ctx) {
-        var jsonMessage = serializer.fromJson(ctx.message(), Map.class);
-
         // Need to check if a specific command has gone through
 
-        UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
+        UserGameCommand command = serializer.fromJson(ctx.message(), UserGameCommand.class);
 
         // TODO do I need to check for null?
 

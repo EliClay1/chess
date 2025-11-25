@@ -29,6 +29,7 @@ public record GameService(DataAccess dataAccess) {
         return new GameData(gameID, null, null, gameName, new ChessGame());
     }
 
+    // TODO - catch a request times out so that teams can't be joined and then locked out.
     public void joinGame(String authToken, int gameID, String playerColor) throws Exception {
         AuthData userByAuth = dataAccess.getAuth(authToken);
         // no auth token

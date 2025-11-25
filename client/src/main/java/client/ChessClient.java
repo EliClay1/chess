@@ -11,20 +11,21 @@ import static ui.EscapeSequences.*;
 
 public class ChessClient {
 
-    public void run() {
+    public void run() throws Exception {
         CommandRegistry commandRegistry = new CommandRegistry();
-        // Logout Commands
-        commandRegistry.register(new HelpCommand());
-        commandRegistry.register(new RegisterCommand());
-        commandRegistry.register(new LoginCommand());
-        commandRegistry.register(new QuitCommand());
-        // Login Commands
-        commandRegistry.register(new LogoutCommand());
-        commandRegistry.register(new CreateGameCommand());
-        commandRegistry.register(new ListGamesCommand());
-
-        // WebSocket Commands
         try {
+            // Logout Commands
+            commandRegistry.register(new HelpCommand());
+            commandRegistry.register(new RegisterCommand());
+            commandRegistry.register(new LoginCommand());
+            commandRegistry.register(new QuitCommand());
+            // Login Commands
+            commandRegistry.register(new LogoutCommand());
+            commandRegistry.register(new CreateGameCommand());
+            commandRegistry.register(new ListGamesCommand());
+
+            // WebSocket Commands
+
             commandRegistry.register(new JoinGameCommand());
             commandRegistry.register(new ObserveCommand());
         } catch (Exception e) {
@@ -69,6 +70,10 @@ public class ChessClient {
                 }
 
                 CommandResult commandResult = command.execute(arguments, userState, commandRegistry);
+                if (commandResult == null) {
+                    simplePrint(1, "failed command." + "\n");
+                    continue;
+                }
                 if (commandResult.ok()) {
                     simplePrint(5, commandResult.message());
                 } else {

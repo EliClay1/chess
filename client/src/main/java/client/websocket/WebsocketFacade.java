@@ -10,7 +10,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 
-public class WebsocketFacade extends Endpoint {
+public class WebsocketFacade extends Endpoint implements AutoCloseable {
 
     Session session;
     NotificationHandler notificationHandler;
@@ -47,5 +47,10 @@ public class WebsocketFacade extends Endpoint {
         } catch (IOException e) {
             System.out.print("Failed to send message, " + e.getMessage());
         }
+    }
+
+    @Override
+    public void close() throws Exception {
+
     }
 }

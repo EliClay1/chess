@@ -128,7 +128,7 @@ public class Handlers {
     void joinGameHandler(Context ctx) {
         String requestHeader = ctx.header("authorization");
         String requestJson = ctx.body();
-        // gets access to the request data without having to create a new record object to map the data to.
+        // gets access to the request data without having to create a new record object to map the data to. Update, Just make a stupid record object...
         Type type = new TypeToken<Map<String, String>>() {}.getType();
         Map<String, String> request = serializer.fromJson(requestJson, type);
 

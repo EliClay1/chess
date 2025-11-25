@@ -12,5 +12,5 @@ public interface CommandInterface {
     String getUsage();
     boolean requiresLogin();
     ValidationResult validate(String[] args, UserState userState);
-    CommandResult execute(String[] args, UserState userState, CommandRegistry registery);
+    CommandResult execute(String[] args, UserState userState, CommandRegistry registery) throws Exception;
 }
