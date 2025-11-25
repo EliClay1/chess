@@ -1,7 +1,6 @@
 package client.commands;
 
-import client.ClientState;
-import client.UserStateData;
+import client.UserState;
 import client.results.*;
 
 import java.util.List;
@@ -33,7 +32,7 @@ public class HelpCommand implements CommandInterface{
     }
 
     @Override
-    public ValidationResult validate(String[] args, UserStateData userStateData) {
+    public ValidationResult validate(String[] args, UserState userState) {
         if (args.length == argumentCount) {
             return new ValidationResult(true, "").ok();
         }
@@ -41,12 +40,12 @@ public class HelpCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) {
         System.out.printf("%sOptions:\n", SET_TEXT_COLOR_BLUE);
         for (CommandInterface command : registery.getAllCommands()) {
-            if (userStateData.clientState() == ClientState.LOGGED_OUT && !command.requiresLogin()) {
+            if (!userState.isLoggedIn() && !command.requiresLogin()) {
                 System.out.print(" - " + command.getUsage());
-            } else if (userStateData.clientState() == ClientState.LOGGED_IN && command.requiresLogin()) {
+            } else if (userState.isLoggedIn() && command.requiresLogin()) {
                 System.out.print(" - " + command.getUsage());
             }
         }

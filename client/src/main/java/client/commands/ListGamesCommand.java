@@ -1,6 +1,7 @@
 package client.commands;
 
 import client.ServerFacade;
+import client.UserState;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 
@@ -36,7 +37,7 @@ public class ListGamesCommand implements CommandInterface{
     }
 
     @Override
-    public ValidationResult validate(String[] args, UserStateData userStateData) {
+    public ValidationResult validate(String[] args, UserState userState) {
         // argument length check
         if (args.length == argumentCount) {
             return new ValidationResult(true, "");
@@ -45,14 +46,14 @@ public class ListGamesCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) {
         try {
-            var body = serverFacade.listGames("localhost", 8080, "/game", userStateData.getAuthToken());
+            var body = serverFacade.listGames("localhost", 8080, "/game", userState.getAuthToken());
             for (Map<String, String> gameData : body) {
                 System.out.printf(" %s - Game Name: %s, White: %s, Black: %s\n%s", SET_TEXT_COLOR_MAGENTA,
                         gameData.get("gameName"), gameData.get("whiteUsername"), gameData.get("blackUsername"), RESET_TEXT_COLOR);
             }
-            userStateData.setActiveGames(body);
+            userState.setActiveGames(body);
             return new CommandResult(true, "");
         } catch (Exception e) {
             return new CommandResult(false, "Error: " + e.getMessage());

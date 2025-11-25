@@ -1,10 +1,9 @@
 package client.commands;
 
 import client.ServerFacade;
-import client.UserStateData;
+import client.UserState;
 import client.results.CommandResult;
 import client.results.ValidationResult;
-import model.UserData;
 
 import java.util.List;
 
@@ -34,7 +33,7 @@ public class LogoutCommand implements CommandInterface{
     }
 
     @Override
-    public ValidationResult validate(String[] args, UserStateData userStateData) {
+    public ValidationResult validate(String[] args, UserState userState) {
         if (args.length == argumentCount) {
             return new ValidationResult(true, "").ok();
         }
@@ -42,13 +41,13 @@ public class LogoutCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) {
 
         try {
-            serverFacade.logoutUser("localhost", 8080, "/session", userStateData.authToken());
-            userStateData.setAuthToken(null);
-            userStateData.setUsername(null);
-            userStateData.setLoggedIn(false);
+            serverFacade.logoutUser("localhost", 8080, "/session", userState.getAuthToken());
+            userState.setAuthToken(null);
+            userState.setUsername(null);
+            userState.setLoggedIn(false);
             return new CommandResult(true, "Successfully logged out.\n");
         } catch (Exception e) {
             return new CommandResult(false, "Error: " + e.getMessage());

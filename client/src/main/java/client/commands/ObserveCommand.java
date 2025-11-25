@@ -1,7 +1,7 @@
 package client.commands;
 
 import client.ServerFacade;
-import client.UserStateData;
+import client.UserState;
 import client.results.CommandResult;
 import exceptions.InvalidException;
 
@@ -32,11 +32,11 @@ public class ObserveCommand extends BaseCommand {
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) {
         String gameID = args[0];
 
         try {
-            serverFacade.observeGame(gameID, userStateData.activeGames());
+            serverFacade.observeGame(gameID, userState.getActiveGames());
             return new CommandResult(true, "");
         } catch (Exception e) {
             if (e instanceof InvalidException) {

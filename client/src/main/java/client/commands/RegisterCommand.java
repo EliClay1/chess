@@ -1,6 +1,7 @@
 package client.commands;
 
 import client.ServerFacade;
+import client.UserState;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 import exceptions.AlreadyTakenException;
@@ -35,7 +36,7 @@ public class RegisterCommand implements CommandInterface{
     }
 
     @Override
-    public ValidationResult validate(String[] args, UserStateData userStateData) {
+    public ValidationResult validate(String[] args, UserState userState) {
         // argument length check
         if (args.length == argumentCount) {
             return new ValidationResult(true, "");
@@ -44,16 +45,16 @@ public class RegisterCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) {
         String username = args[0];
         String password = args[1];
         String email = args[2];
 
         try {
             Map<String, String> body = serverFacade.registerUser("localhost", 8080, "/user", username, password, email);
-            userStateData.setAuthToken(body.get("authToken"));
-            userStateData.setUsername(body.get("username"));
-            userStateData.setLoggedIn(true);
+            userState.setAuthToken(body.get("authToken"));
+            userState.setUsername(body.get("username"));
+            userState.setLoggedIn(true);
             return new CommandResult(true, String.format("Successfully registered new user %s.\n", username));
         } catch (Exception e) {
             if (e instanceof InvalidException) {

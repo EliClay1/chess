@@ -33,24 +33,17 @@ public class ChessClient {
         }
 
 
-        // registers base userStateData
-        UserStateData userStateData = new UserStateData("localhost", 8080, null, null, ClientState.LOGGED_OUT, null);
+        // registers base userState
+        UserState userState = new UserState("localhost", 8080, null, null, false, null);
 
         simplePrint(12, String.format("%sWelcome to Chess! Feel free to sign in, or type 'h' for help.%s\n\n",
                 WHITE_KING, WHITE_QUEEN));
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            String statePrintValue;
-
-            switch (userStateData.clientState()) {
-                case LOGGED_OUT -> statePrintValue = "Logged Out";
-                case LOGGED_IN -> statePrintValue = "Logged In";
-                case IN_GAME -> statePrintValue = "Playing";
-                default -> throw new IllegalStateException("Unexpected value: " + userStateData);
-            }
-
-            simplePrint(6, String.format("[%s] >>> ", statePrintValue));
+            // determines log-in state for command inputs.
+            String loginState = userState.isLoggedIn() ? "Logged In" : "Logged Out";
+            simplePrint(6, String.format("[%s] >>> ", loginState));
 
             String line = scanner.nextLine();
             var inputData = line.split(" ");
@@ -64,8 +57,8 @@ public class ChessClient {
             }
             // gets hold of the remaining arguments inputted.
             String[] arguments = Arrays.copyOfRange(inputData, 1, inputData.length);
-            if (userStateData.clientState() == ClientState.LOGGED_IN || !command.requiresLogin()) {
-                ValidationResult validationResult = command.validate(arguments, userStateData);
+            if (userState.isLoggedIn() || !command.requiresLogin()) {
+                ValidationResult validationResult = command.validate(arguments, userState);
                 if (!validationResult.ok) {
                     simplePrint(1, validationResult.message + "\n");
                     continue;
@@ -76,7 +69,7 @@ public class ChessClient {
                     break;
                 }
 
-                CommandResult commandResult = command.execute(arguments, userStateData, commandRegistry);
+                CommandResult commandResult = command.execute(arguments, userState, commandRegistry);
                 if (commandResult == null) {
                     simplePrint(1, "failed command." + "\n");
                     continue;

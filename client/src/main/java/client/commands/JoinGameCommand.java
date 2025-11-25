@@ -1,6 +1,7 @@
 package client.commands;
 
 import client.ServerFacade;
+import client.UserState;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 import client.websocket.WebsocketFacade;
@@ -9,7 +10,9 @@ import exceptions.AlreadyTakenException;
 import exceptions.InvalidException;
 import websocket.commands.UserGameCommand;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class JoinGameCommand implements CommandInterface{
 
@@ -41,7 +44,7 @@ public class JoinGameCommand implements CommandInterface{
     }
 
     @Override
-    public ValidationResult validate(String[] args, UserStateData userStateData) {
+    public ValidationResult validate(String[] args, UserState userState) {
         // argument length check
         if (args.length == argumentCount) {
             return new ValidationResult(true, "");
@@ -50,14 +53,14 @@ public class JoinGameCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) throws Exception {
-        try (WebsocketFacade websocketFacade = new WebsocketFacade(String.format("http://%s:%s", userStateData.getHost(), userStateData.getPort()))) {
+    public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) throws Exception {
+        try (WebsocketFacade websocketFacade = new WebsocketFacade(String.format("http://%s:%s", userState.getHost(), userState.getPort()))) {
             String gameID = args[0];
             String teamColor = args[1];
 
             try {
-                serverFacade.joinGame("localhost", 8080, "/game", userStateData.getAuthToken(), gameID, teamColor);
-                UserGameCommand connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userStateData.getAuthToken(),
+                serverFacade.joinGame("localhost", 8080, "/game", userState.getAuthToken(), gameID, teamColor);
+                UserGameCommand connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userState.getAuthToken(),
                         Integer.parseInt(gameID));
                 websocketFacade.sendMessage(new Gson().toJson(connectCommand));
 
