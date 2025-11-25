@@ -22,8 +22,15 @@ public class ChessClient {
         commandRegistry.register(new LogoutCommand());
         commandRegistry.register(new CreateGameCommand());
         commandRegistry.register(new ListGamesCommand());
-        commandRegistry.register(new JoinGameCommand());
-        commandRegistry.register(new ObserveCommand());
+
+        // WebSocket Commands
+        try {
+            commandRegistry.register(new JoinGameCommand());
+            commandRegistry.register(new ObserveCommand());
+        } catch (Exception e) {
+            simplePrint(1, e.getMessage());
+        }
+
 
         // registers base userState
         UserState userState = new UserState("localhost", 8080, null, null, false, null);

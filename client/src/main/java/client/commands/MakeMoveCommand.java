@@ -4,40 +4,44 @@ import client.ServerFacade;
 import client.UserState;
 import client.results.CommandResult;
 import client.results.ValidationResult;
+import client.websocket.NotificationHandler;
 import client.websocket.WebsocketFacade;
 import exceptions.AlreadyTakenException;
 import exceptions.InvalidException;
+import websocket.messages.ServerMessage;
 
 import java.util.List;
 
-public class JoinGameCommand implements CommandInterface{
+public class MakeMoveCommand implements CommandInterface{
 
     private final ServerFacade serverFacade = new ServerFacade();
     private final WebsocketFacade websocketFacade = new WebsocketFacade("localhost:8080");
     private final int argumentCount = 2;
 
-    public JoinGameCommand() throws Exception {
+    public MakeMoveCommand() throws Exception {
     }
 
     @Override
     public String getName() {
-        return "join";
+        return "move";
     }
 
     @Override
     public List<String> getAliases() {
-        return List.of("j");
+        return List.of("m");
     }
 
     @Override
     public String getUsage() {
-        return "Join an existing game: \"j\", \"join\" <GAME ID> <COLOR>\n";
+        return "Make a move: \"m\", \"move\" <move>\n";
     }
 
     @Override
     public boolean requiresLogin() {
         return true;
     }
+
+    // TODO - requires
 
     @Override
     public ValidationResult validate(String[] args, UserState userState) {
@@ -55,6 +59,7 @@ public class JoinGameCommand implements CommandInterface{
 
         try {
             serverFacade.joinGame("localhost", 8080, "/game", userState.getAuthToken(), gameID, teamColor);
+            websocketFacade.sendMessage("CONNECT");
 
             return new CommandResult(true, "");
         } catch (Exception e) {

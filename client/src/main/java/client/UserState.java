@@ -19,7 +19,7 @@ public class UserState {
         setUsername(username);
         setLoggedIn(loggedIn);
         setActiveGames(activeGames);
-    }
+}
 
     public List<Map<String, String>> getActiveGames() {
         return activeGames;
