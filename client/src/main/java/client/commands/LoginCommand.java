@@ -1,7 +1,7 @@
 package client.commands;
 
 import client.ServerFacade;
-import client.UserState;
+import client.UserStateData;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 import exceptions.InvalidException;
@@ -38,7 +38,7 @@ public class LoginCommand implements CommandInterface{
     }
 
     @Override
-    public ValidationResult validate(String[] args, UserState userState) {
+    public ValidationResult validate(String[] args, UserStateData userStateData) {
         // argument length check
         if (args.length == argumentCount) {
             return new ValidationResult(true, "");
@@ -47,15 +47,15 @@ public class LoginCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
         String username = args[0];
         String password = args[1];
 
         try {
             Map<String, String> body = serverFacade.loginUser("localhost", 8080, "/session", username, password);
-            userState.setAuthToken(body.get("authToken"));
-            userState.setUsername(body.get("username"));
-            userState.setLoggedIn(true);
+            userStateData.setAuthToken(body.get("authToken"));
+            userStateData.setUsername(body.get("username"));
+            userStateData.setLoggedIn(true);
             return new CommandResult(true, "Successfully logged in.\n");
         } catch (Exception e) {
             if (e instanceof InvalidException) {

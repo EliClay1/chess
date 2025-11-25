@@ -3,7 +3,7 @@ package client;
 import java.util.List;
 import java.util.Map;
 
-public class UserState {
+public class UserStateData {
 
     private static String host;
     private static int port;
@@ -12,21 +12,21 @@ public class UserState {
     private static boolean loggedIn;
     private static List<Map<String, String>> activeGames;
 
-    public UserState(String host, int port, String authToken, String username, boolean loggedIn, List<Map<String, String>> activeGames) {
+    public UserStateData(String host, int port, String authToken, String username, List<Map<String, String>> activeGames) {
         setHost(host);
         setPort(port);
         setAuthToken(authToken);
         setUsername(username);
         setLoggedIn(loggedIn);
         setActiveGames(activeGames);
-}
+    }
 
     public List<Map<String, String>> getActiveGames() {
         return activeGames;
     }
 
     public void setActiveGames(List<Map<String, String>> activeGames) {
-        UserState.activeGames = activeGames;
+        UserStateData.activeGames = activeGames;
     }
 
     public boolean isLoggedIn() {
@@ -34,7 +34,7 @@ public class UserState {
     }
 
     public void setLoggedIn(boolean loggedIn) {
-        UserState.loggedIn = loggedIn;
+        UserStateData.loggedIn = loggedIn;
     }
 
     public String getUsername() {
@@ -42,7 +42,7 @@ public class UserState {
     }
 
     public void setUsername(String username) {
-        UserState.username = username;
+        UserStateData.username = username;
     }
 
     public String getAuthToken() {
@@ -50,7 +50,7 @@ public class UserState {
     }
 
     public void setAuthToken(String authToken) {
-        UserState.authToken = authToken;
+        UserStateData.authToken = authToken;
     }
 
     public int getPort() {
@@ -58,7 +58,7 @@ public class UserState {
     }
 
     public void setPort(int port) {
-        UserState.port = port;
+        UserStateData.port = port;
     }
 
     public String getHost() {
@@ -66,6 +66,6 @@ public class UserState {
     }
 
     public void setHost(String host) {
-        UserState.host = host;
+        UserStateData.host = host;
     }
 }

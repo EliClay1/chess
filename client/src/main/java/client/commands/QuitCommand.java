@@ -1,6 +1,6 @@
 package client.commands;
 
-import client.UserState;
+import client.UserStateData;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 
@@ -30,7 +30,7 @@ public class QuitCommand implements CommandInterface{
     }
 
     @Override
-    public ValidationResult validate(String[] args, UserState userState) {
+    public ValidationResult validate(String[] args, UserStateData userStateData) {
         if (args.length == argumentCount) {
             return new ValidationResult(true, "").ok();
         }
@@ -38,7 +38,7 @@ public class QuitCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
         return new CommandResult(true, "");
     }
 }
