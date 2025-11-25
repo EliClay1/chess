@@ -300,6 +300,7 @@ public class ServerFacade {
         return false;
     }
 
+    // TODO - so... pretty sure this can be replace with a Gson.fromJson(jsonString, Map.class);...
     private List<Map<String, String>> jsonParser(String json, String... args) {
         List<Map<String, String>> resultList = new ArrayList<>();
         JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
