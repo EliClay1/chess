@@ -34,25 +34,23 @@ public class ChessClient {
 
 
         // registers base userStateData
-        UserStateData userStateData = new UserStateData("localhost", 8080, null, null, UserStateData.clientState.LOGGED_OUT, null);
+        UserStateData userStateData = new UserStateData("localhost", 8080, null, null, ClientState.LOGGED_OUT, null);
 
         simplePrint(12, String.format("%sWelcome to Chess! Feel free to sign in, or type 'h' for help.%s\n\n",
                 WHITE_KING, WHITE_QUEEN));
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            // determines log-in state for command inputs.
-//            String loginState = userStateData.isLoggedIn() ? "Logged In" : "Logged Out";
-            String loginState;
+            String statePrintValue;
 
-            switch (UserStateData.clientState) {
-
+            switch (userStateData.clientState()) {
+                case LOGGED_OUT -> statePrintValue = "Logged Out";
+                case LOGGED_IN -> statePrintValue = "Logged In";
+                case IN_GAME -> statePrintValue = "Playing";
+                default -> throw new IllegalStateException("Unexpected value: " + userStateData);
             }
-            // TODO - when joined into a game, the settings need to change.
 
-
-
-            simplePrint(6, String.format("[%s] >>> ", loginState));
+            simplePrint(6, String.format("[%s] >>> ", statePrintValue));
 
             String line = scanner.nextLine();
             var inputData = line.split(" ");
@@ -66,7 +64,7 @@ public class ChessClient {
             }
             // gets hold of the remaining arguments inputted.
             String[] arguments = Arrays.copyOfRange(inputData, 1, inputData.length);
-            if (userStateData.isLoggedIn() || !command.requiresLogin()) {
+            if (userStateData.clientState() == ClientState.LOGGED_IN || !command.requiresLogin()) {
                 ValidationResult validationResult = command.validate(arguments, userStateData);
                 if (!validationResult.ok) {
                     simplePrint(1, validationResult.message + "\n");

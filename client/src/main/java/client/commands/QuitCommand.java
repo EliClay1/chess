@@ -1,6 +1,5 @@
 package client.commands;
 
-import client.UserStateData;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 

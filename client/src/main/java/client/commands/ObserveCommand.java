@@ -36,7 +36,7 @@ public class ObserveCommand extends BaseCommand {
         String gameID = args[0];
 
         try {
-            serverFacade.observeGame(gameID, userStateData.getActiveGames());
+            serverFacade.observeGame(gameID, userStateData.activeGames());
             return new CommandResult(true, "");
         } catch (Exception e) {
             if (e instanceof InvalidException) {

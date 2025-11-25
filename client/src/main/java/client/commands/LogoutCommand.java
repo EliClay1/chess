@@ -4,6 +4,7 @@ import client.ServerFacade;
 import client.UserStateData;
 import client.results.CommandResult;
 import client.results.ValidationResult;
+import model.UserData;
 
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class LogoutCommand implements CommandInterface{
     public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
 
         try {
-            serverFacade.logoutUser("localhost", 8080, "/session", userStateData.getAuthToken());
+            serverFacade.logoutUser("localhost", 8080, "/session", userStateData.authToken());
             userStateData.setAuthToken(null);
             userStateData.setUsername(null);
             userStateData.setLoggedIn(false);

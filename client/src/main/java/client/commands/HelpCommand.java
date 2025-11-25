@@ -1,5 +1,6 @@
 package client.commands;
 
+import client.ClientState;
 import client.UserStateData;
 import client.results.*;
 
@@ -43,9 +44,9 @@ public class HelpCommand implements CommandInterface{
     public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
         System.out.printf("%sOptions:\n", SET_TEXT_COLOR_BLUE);
         for (CommandInterface command : registery.getAllCommands()) {
-            if (!userStateData.isLoggedIn() && !command.requiresLogin()) {
+            if (userStateData.clientState() == ClientState.LOGGED_OUT && !command.requiresLogin()) {
                 System.out.print(" - " + command.getUsage());
-            } else if (userStateData.isLoggedIn() && command.requiresLogin()) {
+            } else if (userStateData.clientState() == ClientState.LOGGED_IN && command.requiresLogin()) {
                 System.out.print(" - " + command.getUsage());
             }
         }
