@@ -1,6 +1,6 @@
 package client.commands;
 
-import client.UserStateData;
+import client.UserState;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 
@@ -11,6 +11,6 @@ public interface CommandInterface {
     List<String> getAliases();
     String getUsage();
     boolean requiresLogin();
-    ValidationResult validate(String[] args, UserStateData userStateData);
-    CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) throws Exception;
+    ValidationResult validate(String[] args, UserState userState);
+    CommandResult execute(String[] args, UserState userState, CommandRegistry registery) throws Exception;
 }
