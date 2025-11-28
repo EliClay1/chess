@@ -1,8 +1,10 @@
 package client.commands;
 
-import client.UserState;
+import client.ClientState;
+import client.UserStateData;
 import client.results.*;
 
+import java.util.Collection;
 import java.util.List;
 
 import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
@@ -27,12 +29,12 @@ public class HelpCommand implements CommandInterface{
     }
 
     @Override
-    public boolean requiresLogin() {
-        return false;
+    public Collection<ClientState> allowedStates() {
+        return List.of(ClientState.LOGGED_OUT);
     }
 
     @Override
-    public ValidationResult validate(String[] args, UserState userState) {
+    public ValidationResult validate(String[] args, UserStateData userStateData) {
         if (args.length == argumentCount) {
             return new ValidationResult(true, "").ok();
         }
@@ -40,12 +42,16 @@ public class HelpCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
         System.out.printf("%sOptions:\n", SET_TEXT_COLOR_BLUE);
         for (CommandInterface command : registery.getAllCommands()) {
-            if (!userState.isLoggedIn() && !command.requiresLogin()) {
+            if (command.allowedStates().contains(ClientState.LOGGED_IN)) {
                 System.out.print(" - " + command.getUsage());
-            } else if (userState.isLoggedIn() && command.requiresLogin()) {
+            } else if (command.allowedStates().contains(ClientState.LOGGED_OUT)) {
+                System.out.print(" - " + command.getUsage());
+            } else if (command.allowedStates().contains(ClientState.PLAYING_GAME)) {
+                System.out.print(" - " + command.getUsage());
+            } else if (command.allowedStates().contains(ClientState.OBSERVING_GAME)) {
                 System.out.print(" - " + command.getUsage());
             }
         }

@@ -1,7 +1,8 @@
 package client.commands;
 
+import client.ClientState;
 import client.ServerFacade;
-import client.UserState;
+import client.UserStateData;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 import client.websocket.WebsocketFacade;
@@ -10,9 +11,8 @@ import exceptions.AlreadyTakenException;
 import exceptions.InvalidException;
 import websocket.commands.UserGameCommand;
 
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 public class JoinGameCommand implements CommandInterface{
 
@@ -39,12 +39,12 @@ public class JoinGameCommand implements CommandInterface{
     }
 
     @Override
-    public boolean requiresLogin() {
-        return true;
+    public Collection<ClientState> allowedStates() {
+        return List.of(ClientState.LOGGED_IN);
     }
 
     @Override
-    public ValidationResult validate(String[] args, UserState userState) {
+    public ValidationResult validate(String[] args, UserStateData userStateData) {
         // argument length check
         if (args.length == argumentCount) {
             return new ValidationResult(true, "");
@@ -53,16 +53,17 @@ public class JoinGameCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) throws Exception {
-        try (WebsocketFacade websocketFacade = new WebsocketFacade(String.format("http://%s:%s", userState.getHost(), userState.getPort()))) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) throws Exception {
+        try (WebsocketFacade websocketFacade = new WebsocketFacade(String.format("http://%s:%s", userStateData.getHost(), userStateData.getPort()))) {
             String gameID = args[0];
             String teamColor = args[1];
 
             try {
-                serverFacade.joinGame("localhost", 8080, "/game", userState.getAuthToken(), gameID, teamColor);
-                UserGameCommand connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userState.getAuthToken(),
+                serverFacade.joinGame("localhost", 8080, "/game", userStateData.getAuthToken(), gameID, teamColor);
+                UserGameCommand connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userStateData.getAuthToken(),
                         Integer.parseInt(gameID));
                 websocketFacade.sendMessage(new Gson().toJson(connectCommand));
+                userStateData.setClientState(ClientState.PLAYING_GAME);
 
                 return new CommandResult(true, "");
             } catch (Exception e) {

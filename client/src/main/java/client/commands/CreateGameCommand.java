@@ -1,10 +1,12 @@
 package client.commands;
 
+import client.ClientState;
 import client.ServerFacade;
-import client.UserState;
+import client.UserStateData;
 import client.results.CommandResult;
 import exceptions.InvalidException;
 
+import java.util.Collection;
 import java.util.List;
 
 public class CreateGameCommand extends BaseCommand {
@@ -27,16 +29,16 @@ public class CreateGameCommand extends BaseCommand {
     }
 
     @Override
-    public boolean requiresLogin() {
-        return true;
+    public Collection<ClientState> allowedStates() {
+        return List.of(ClientState.LOGGED_IN);
     }
 
     @Override
-    public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
         String gameName = args[0];
 
         try {
-            String gameID = serverFacade.createGame("localhost", 8080, "/game", userState.getAuthToken(), gameName);
+            String gameID = serverFacade.createGame("localhost", 8080, "/game", userStateData.getAuthToken(), gameName);
             return new CommandResult(true, String.format("Successfully created game: %s, ID: %s\n", gameName, gameID));
         } catch (Exception e) {
             if (e instanceof InvalidException) {

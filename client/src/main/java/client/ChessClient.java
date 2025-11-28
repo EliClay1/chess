@@ -25,25 +25,33 @@ public class ChessClient {
             commandRegistry.register(new ListGamesCommand());
 
             // WebSocket Commands
-
             commandRegistry.register(new JoinGameCommand());
             commandRegistry.register(new ObserveCommand());
+            commandRegistry.register(new MakeMoveCommand());
+
         } catch (Exception e) {
             simplePrint(1, e.getMessage());
         }
 
 
-        // registers base userState
-        UserState userState = new UserState("localhost", 8080, null, null, false, null);
+        // registers base userStateData
+        UserStateData userStateData = new UserStateData("localhost", 8080, null, null, ClientState.LOGGED_OUT, null);
 
         simplePrint(12, String.format("%sWelcome to Chess! Feel free to sign in, or type 'h' for help.%s\n\n",
                 WHITE_KING, WHITE_QUEEN));
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            // determines log-in state for command inputs.
-            String loginState = userState.isLoggedIn() ? "Logged In" : "Logged Out";
-            simplePrint(6, String.format("[%s] >>> ", loginState));
+            String statePrintValue;
+
+            switch (userStateData.clientState()) {
+                case LOGGED_OUT -> statePrintValue = "Logged Out";
+                case LOGGED_IN -> statePrintValue = "Logged In";
+                case PLAYING_GAME -> statePrintValue = "Playing";
+                case OBSERVING_GAME -> statePrintValue = "Observing";
+                default -> throw new IllegalStateException("Unexpected value: " + userStateData);
+            }
+            simplePrint(6, String.format("[%s] >>> ", statePrintValue));
 
             String line = scanner.nextLine();
             var inputData = line.split(" ");
@@ -57,8 +65,9 @@ public class ChessClient {
             }
             // gets hold of the remaining arguments inputted.
             String[] arguments = Arrays.copyOfRange(inputData, 1, inputData.length);
-            if (userState.isLoggedIn() || !command.requiresLogin()) {
-                ValidationResult validationResult = command.validate(arguments, userState);
+            // TODO - Change the requirement for printing and allowing.
+            if (command.allowedStates().contains(userStateData.clientState())) {
+                ValidationResult validationResult = command.validate(arguments, userStateData);
                 if (!validationResult.ok) {
                     simplePrint(1, validationResult.message + "\n");
                     continue;
@@ -69,7 +78,7 @@ public class ChessClient {
                     break;
                 }
 
-                CommandResult commandResult = command.execute(arguments, userState, commandRegistry);
+                CommandResult commandResult = command.execute(arguments, userStateData, commandRegistry);
                 if (commandResult == null) {
                     simplePrint(1, "failed command." + "\n");
                     continue;

@@ -1,10 +1,12 @@
 package client.commands;
 
+import client.ClientState;
 import client.ServerFacade;
-import client.UserState;
+import client.UserStateData;
 import client.results.CommandResult;
 import exceptions.InvalidException;
 
+import java.util.Collection;
 import java.util.List;
 
 public class ObserveCommand extends BaseCommand {
@@ -27,16 +29,16 @@ public class ObserveCommand extends BaseCommand {
     }
 
     @Override
-    public boolean requiresLogin() {
-        return true;
+    public Collection<ClientState> allowedStates() {
+        return List.of(ClientState.LOGGED_IN, ClientState.OBSERVING_GAME);
     }
 
     @Override
-    public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
         String gameID = args[0];
 
         try {
-            serverFacade.observeGame(gameID, userState.getActiveGames());
+            serverFacade.observeGame(gameID, userStateData.getActiveGames());
             return new CommandResult(true, "");
         } catch (Exception e) {
             if (e instanceof InvalidException) {

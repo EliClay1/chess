@@ -1,12 +1,14 @@
 package client.commands;
 
+import client.ClientState;
 import client.ServerFacade;
-import client.UserState;
+import client.UserStateData;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 import exceptions.AlreadyTakenException;
 import exceptions.InvalidException;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -31,12 +33,12 @@ public class RegisterCommand implements CommandInterface{
     }
 
     @Override
-    public boolean requiresLogin() {
-        return false;
+    public Collection<ClientState> allowedStates() {
+        return List.of(ClientState.LOGGED_OUT);
     }
 
     @Override
-    public ValidationResult validate(String[] args, UserState userState) {
+    public ValidationResult validate(String[] args, UserStateData userStateData) {
         // argument length check
         if (args.length == argumentCount) {
             return new ValidationResult(true, "");
@@ -45,16 +47,16 @@ public class RegisterCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
         String username = args[0];
         String password = args[1];
         String email = args[2];
 
         try {
             Map<String, String> body = serverFacade.registerUser("localhost", 8080, "/user", username, password, email);
-            userState.setAuthToken(body.get("authToken"));
-            userState.setUsername(body.get("username"));
-            userState.setLoggedIn(true);
+            userStateData.setAuthToken(body.get("authToken"));
+            userStateData.setUsername(body.get("username"));
+            userStateData.setClientState(ClientState.LOGGED_IN);
             return new CommandResult(true, String.format("Successfully registered new user %s.\n", username));
         } catch (Exception e) {
             if (e instanceof InvalidException) {

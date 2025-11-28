@@ -1,9 +1,12 @@
 package client.commands;
 
-import client.UserState;
+import client.ClientState;
+import client.UserStateData;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class BaseCommand implements CommandInterface {
@@ -26,12 +29,12 @@ public class BaseCommand implements CommandInterface {
     }
 
     @Override
-    public boolean requiresLogin() {
-        return false;
+    public Collection<ClientState> allowedStates() {
+        return List.of();
     }
 
     @Override
-    public ValidationResult validate(String[] args, UserState userState) {
+    public ValidationResult validate(String[] args, UserStateData userStateData) {
         if (args.length == argumentCount) {
             return new ValidationResult(true, "");
         }
@@ -39,7 +42,7 @@ public class BaseCommand implements CommandInterface {
     }
 
     @Override
-    public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
         return null;
     }
 }

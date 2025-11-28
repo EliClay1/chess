@@ -1,10 +1,12 @@
 package client.commands;
 
+import client.ClientState;
 import client.ServerFacade;
-import client.UserState;
+import client.UserStateData;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -32,12 +34,12 @@ public class ListGamesCommand implements CommandInterface{
     }
 
     @Override
-    public boolean requiresLogin() {
-        return true;
+    public Collection<ClientState> allowedStates() {
+        return List.of(ClientState.LOGGED_IN);
     }
 
     @Override
-    public ValidationResult validate(String[] args, UserState userState) {
+    public ValidationResult validate(String[] args, UserStateData userStateData) {
         // argument length check
         if (args.length == argumentCount) {
             return new ValidationResult(true, "");
@@ -46,14 +48,14 @@ public class ListGamesCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
         try {
-            var body = serverFacade.listGames("localhost", 8080, "/game", userState.getAuthToken());
+            var body = serverFacade.listGames("localhost", 8080, "/game", userStateData.getAuthToken());
             for (Map<String, String> gameData : body) {
                 System.out.printf(" %s - Game Name: %s, White: %s, Black: %s\n%s", SET_TEXT_COLOR_MAGENTA,
                         gameData.get("gameName"), gameData.get("whiteUsername"), gameData.get("blackUsername"), RESET_TEXT_COLOR);
             }
-            userState.setActiveGames(body);
+            userStateData.setActiveGames(body);
             return new CommandResult(true, "");
         } catch (Exception e) {
             return new CommandResult(false, "Error: " + e.getMessage());

@@ -1,10 +1,12 @@
 package client.commands;
 
+import client.ClientState;
 import client.ServerFacade;
-import client.UserState;
+import client.UserStateData;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 
+import java.util.Collection;
 import java.util.List;
 
 public class LogoutCommand implements CommandInterface{
@@ -28,12 +30,12 @@ public class LogoutCommand implements CommandInterface{
     }
 
     @Override
-    public boolean requiresLogin() {
-        return true;
+    public Collection<ClientState> allowedStates() {
+        return List.of(ClientState.LOGGED_IN);
     }
 
     @Override
-    public ValidationResult validate(String[] args, UserState userState) {
+    public ValidationResult validate(String[] args, UserStateData userStateData) {
         if (args.length == argumentCount) {
             return new ValidationResult(true, "").ok();
         }
@@ -41,13 +43,13 @@ public class LogoutCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
 
         try {
-            serverFacade.logoutUser("localhost", 8080, "/session", userState.getAuthToken());
-            userState.setAuthToken(null);
-            userState.setUsername(null);
-            userState.setLoggedIn(false);
+            serverFacade.logoutUser("localhost", 8080, "/session", userStateData.getAuthToken());
+            userStateData.setAuthToken(null);
+            userStateData.setUsername(null);
+            userStateData.setClientState(ClientState.LOGGED_OUT);
             return new CommandResult(true, "Successfully logged out.\n");
         } catch (Exception e) {
             return new CommandResult(false, "Error: " + e.getMessage());

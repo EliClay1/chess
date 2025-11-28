@@ -1,12 +1,14 @@
 package client.commands;
 
+import client.ClientState;
 import client.ServerFacade;
-import client.UserState;
+import client.UserStateData;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 import exceptions.InvalidException;
 import exceptions.UnauthorizedException;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -33,12 +35,12 @@ public class LoginCommand implements CommandInterface{
     }
 
     @Override
-    public boolean requiresLogin() {
-        return false;
+    public Collection<ClientState> allowedStates() {
+        return List.of(ClientState.LOGGED_OUT);
     }
 
     @Override
-    public ValidationResult validate(String[] args, UserState userState) {
+    public ValidationResult validate(String[] args, UserStateData userStateData) {
         // argument length check
         if (args.length == argumentCount) {
             return new ValidationResult(true, "");
@@ -47,15 +49,17 @@ public class LoginCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
         String username = args[0];
         String password = args[1];
 
+        // TODO - throw an error if the server isn't live. Not here, but check within the loginUser serverFacade function.
+
         try {
             Map<String, String> body = serverFacade.loginUser("localhost", 8080, "/session", username, password);
-            userState.setAuthToken(body.get("authToken"));
-            userState.setUsername(body.get("username"));
-            userState.setLoggedIn(true);
+            userStateData.setAuthToken(body.get("authToken"));
+            userStateData.setUsername(body.get("username"));
+            userStateData.setClientState(ClientState.LOGGED_IN);
             return new CommandResult(true, "Successfully logged in.\n");
         } catch (Exception e) {
             if (e instanceof InvalidException) {

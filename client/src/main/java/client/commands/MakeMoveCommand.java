@@ -1,15 +1,15 @@
 package client.commands;
 
+import client.ClientState;
 import client.ServerFacade;
-import client.UserState;
+import client.UserStateData;
 import client.results.CommandResult;
 import client.results.ValidationResult;
-import client.websocket.NotificationHandler;
 import client.websocket.WebsocketFacade;
 import exceptions.AlreadyTakenException;
 import exceptions.InvalidException;
-import websocket.messages.ServerMessage;
 
+import java.util.Collection;
 import java.util.List;
 
 public class MakeMoveCommand implements CommandInterface{
@@ -37,14 +37,14 @@ public class MakeMoveCommand implements CommandInterface{
     }
 
     @Override
-    public boolean requiresLogin() {
-        return true;
+    public Collection<ClientState> allowedStates() {
+        return List.of(ClientState.LOGGED_IN, ClientState.PLAYING_GAME);
     }
 
     // TODO - requires
 
     @Override
-    public ValidationResult validate(String[] args, UserState userState) {
+    public ValidationResult validate(String[] args, UserStateData userStateData) {
         // argument length check
         if (args.length == argumentCount) {
             return new ValidationResult(true, "");
@@ -53,12 +53,12 @@ public class MakeMoveCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserState userState, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
         String gameID = args[0];
         String teamColor = args[1];
 
         try {
-            serverFacade.joinGame("localhost", 8080, "/game", userState.getAuthToken(), gameID, teamColor);
+            serverFacade.joinGame("localhost", 8080, "/game", userStateData.getAuthToken(), gameID, teamColor);
             websocketFacade.sendMessage("CONNECT");
 
             return new CommandResult(true, "");

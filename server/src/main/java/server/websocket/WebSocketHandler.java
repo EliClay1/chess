@@ -37,18 +37,17 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         var commandType = command.getCommandType();
 
         if (commandType == UserGameCommand.CommandType.CONNECT) {
-            connectUser(authToken, gameId, ctx.session);
+            connectUserToGame(authToken, gameId, ctx.session);
         } else if (commandType == UserGameCommand.CommandType.MAKE_MOVE) {
             makeMove(authToken, gameId);
         } else if (commandType == UserGameCommand.CommandType.LEAVE) {
-            disconnectUser(authToken, gameId, ctx.session);
+            disconnectUserFromGame(authToken, gameId, ctx.session);
         } else if (commandType == UserGameCommand.CommandType.RESIGN) {
             resignUser(authToken, gameId);
         } else {
             // TODO - replace with actual error handling.
             System.out.print("Error, Something went wrong.");
         }
-        System.out.print("testing");
     }
 
     // TODO - This handles pretty much everything that the base server handler does, It just
@@ -56,21 +55,26 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     // TODO - questionable naming convention, minor POLA. Is it connecting to the ws? the game? Better name would be good for this.
 
-    private void connectUser(String authToken, int gameID, Session session) {
+    private void connectUserToGame(String authToken, int gameID, Session session) {
         connections.addSession(session);
+        System.out.print("Successfully Joined User.\n");
     }
 
-    private void disconnectUser(String authToken, int gameID, Session session) {
+    private void disconnectUserFromGame(String authToken, int gameID, Session session) {
         connections.removeSession(session);
+        System.out.print("User has left the game.\n");
+
 
     }
 
     private void makeMove(String authToken, int gameID) {
         // Find some way to transfer over the game move choice.
+        System.out.print("User has made a move.\n");
     }
 
     private void resignUser(String authToken, int gameID) {
         // technically this should simutaneously disconnect the user from the game.
+        System.out.print("User has resigned from the game.\n");
     }
 
 
