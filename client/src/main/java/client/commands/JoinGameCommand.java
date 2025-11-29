@@ -54,7 +54,8 @@ public class JoinGameCommand implements CommandInterface{
 
     @Override
     public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) throws Exception {
-        try (WebsocketFacade websocketFacade = new WebsocketFacade(String.format("http://%s:%s", userStateData.getHost(), userStateData.getPort()))) {
+        try (WebsocketFacade websocketFacade = new WebsocketFacade(String.format("http://%s:%s", userStateData.getHost(),
+                userStateData.getPort()), serverFacade)) {
             String gameID = args[0];
             String teamColor = args[1];
 

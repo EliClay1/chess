@@ -51,7 +51,7 @@ public class ServerMessage {
         this.message = message;
     }
 
-    public String getMessage(String message) {
+    public String getMessage() {
         return this.message;
     }
 
