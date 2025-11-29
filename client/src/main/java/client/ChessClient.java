@@ -34,6 +34,7 @@ public class ChessClient {
         }
 
 
+        // FIXME - change how the commands interpret the userStateData and allow them to pull directly from it. ZERO HARD CODED VALUES
         // registers base userStateData
         UserStateData userStateData = new UserStateData("localhost", 8080, null, null, ClientState.LOGGED_OUT, null);
 

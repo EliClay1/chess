@@ -6,8 +6,10 @@ import client.UserStateData;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 import client.websocket.WebsocketFacade;
+import com.google.gson.Gson;
 import exceptions.AlreadyTakenException;
 import exceptions.InvalidException;
+import websocket.commands.UserGameCommand;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,7 +18,7 @@ public class MakeMoveCommand implements CommandInterface{
 
     private final ServerFacade serverFacade = new ServerFacade();
     private final WebsocketFacade websocketFacade = new WebsocketFacade("http://localhost:8080");
-    private final int argumentCount = 2;
+    private final int argumentCount = 1;
 
     public MakeMoveCommand() throws Exception {
     }
@@ -49,7 +51,7 @@ public class MakeMoveCommand implements CommandInterface{
         if (args.length == argumentCount) {
             return new ValidationResult(true, "");
         }
-        return new ValidationResult(false, "Incorrect amount of arguments, expected 2.");
+        return new ValidationResult(false, String.format("Incorrect amount of arguments, expected %d.", argumentCount));
     }
 
     @Override
@@ -58,7 +60,11 @@ public class MakeMoveCommand implements CommandInterface{
         String teamColor = args[1];
 
         try {
-            serverFacade.joinGame("localhost", 8080, "/game", userStateData.getAuthToken(), gameID, teamColor);
+            serverFacade.joinGame(userStateData.getHost(), userStateData.getPort(), "/game",
+                    userStateData.getAuthToken(), gameID, teamColor);
+            UserGameCommand moveCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userStateData.getAuthToken(),
+                    Integer.parseInt(gameID), "");
+            websocketFacade.sendMessage(new Gson().toJson(moveCommand));
             websocketFacade.sendMessage("CONNECT");
 
             return new CommandResult(true, "");

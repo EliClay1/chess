@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessGame;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -168,10 +169,9 @@ public class ServerFacade {
         status = response.statusCode();
 
         if (status >= 200 && status < 300) {
-            // TODO - Generate board print code. Don't worry about calculation of moves
 
             // TODO - Should this be moved to the JoinGameCommand class?
-            printBoard(playerColor);
+            printBoard(playerColor, new ChessGame());
         } else if (status == 400) {
             throw new NumberFormatException();
         } else if (status == 403) {
@@ -217,10 +217,10 @@ public class ServerFacade {
         }
 
         // TODO - build the board based off the gameData.
-        printBoard("white");
+        printBoard("white", new ChessGame());
     }
 
-    public void printBoard(String color) {
+    public void printBoard(String color, ChessGame chessGame) {
         final boolean blackView = "black".equalsIgnoreCase(color);
 
         String[] lettersAtoH = {"   ", " \u2009a ", " \u2007b ", " \u2004c ", " \u2007d ", " \u2004e ", " \u2007f ",
@@ -242,6 +242,8 @@ public class ServerFacade {
             System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE,
                     letter, RESET_TEXT_COLOR, RESET_BG_COLOR);
         }
+
+
 
         for (int x = 0; x < 8; x++) {
             System.out.print("\n");

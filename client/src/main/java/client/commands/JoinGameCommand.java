@@ -61,7 +61,7 @@ public class JoinGameCommand implements CommandInterface{
             try {
                 serverFacade.joinGame("localhost", 8080, "/game", userStateData.getAuthToken(), gameID, teamColor);
                 UserGameCommand connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userStateData.getAuthToken(),
-                        Integer.parseInt(gameID));
+                        Integer.parseInt(gameID), "");
                 websocketFacade.sendMessage(new Gson().toJson(connectCommand));
                 userStateData.setClientState(ClientState.PLAYING_GAME);
 

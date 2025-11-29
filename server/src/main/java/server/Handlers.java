@@ -45,6 +45,10 @@ public class Handlers {
         }
     }
 
+    public MySQLDataAccess getDb() {
+        return this.db;
+    }
+
     void registerHandler(Context ctx) {
         String requestJson = ctx.body();
         // TODO - error raised when "" is inputted as pasword. Might need to run some error handling here.

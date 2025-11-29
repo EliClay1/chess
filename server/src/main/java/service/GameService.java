@@ -1,6 +1,9 @@
 package service;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import com.google.gson.JsonSerializer;
 import dataaccess.DataAccess;
@@ -12,6 +15,7 @@ import model.GameData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public record GameService(DataAccess dataAccess) {
@@ -30,23 +34,23 @@ public record GameService(DataAccess dataAccess) {
     }
 
     // TODO - catch a request times out so that teams can't be joined and then locked out.
-    public void joinGame(String authToken, int gameID, String playerColor) throws Exception {
+    public void joinGame(String authToken, int gameId, String playerColor) throws Exception {
         AuthData userByAuth = dataAccess.getAuth(authToken);
         // no auth token
         if (userByAuth == null) {
             throw new UnauthorizedException();
         }
         String username = userByAuth.username();
-        GameData gameByID = dataAccess.getGame(gameID);
+        GameData gameByID = dataAccess.getGame(gameId);
         if (gameByID == null) {
             throw new InvalidException();
         }
         GameData updatedGame;
         // white path
         if (playerColor.equalsIgnoreCase("white") && gameByID.whiteUsername() == null) {
-            updatedGame = new GameData(gameID, username, gameByID.blackUsername(), gameByID.gameName(), gameByID.game());
+            updatedGame = new GameData(gameId, username, gameByID.blackUsername(), gameByID.gameName(), gameByID.game());
         } else if (playerColor.equalsIgnoreCase("black") && gameByID.blackUsername() == null) {
-            updatedGame = new GameData(gameID, gameByID.whiteUsername(), username, gameByID.gameName(), gameByID.game());
+            updatedGame = new GameData(gameId, gameByID.whiteUsername(), username, gameByID.gameName(), gameByID.game());
         } else {
             throw new AlreadyTakenException();
         }
@@ -71,6 +75,44 @@ public record GameService(DataAccess dataAccess) {
             arrayOfGameData.add(mapOfGameData);
         }
         return arrayOfGameData;
+    }
+
+    public void makeMove(String authToken, List<String> chessMove, int gameId, ChessPiece.PieceType promo) throws Exception {
+        AuthData userByAuth = dataAccess.getAuth(authToken);
+        if (userByAuth == null) {
+            throw new UnauthorizedException();
+        }
+
+        GameData gameData = dataAccess.getGame(gameId);
+        if (gameData.whiteUsername() == null || gameData.blackUsername() == null) {
+            // TODO - make it return an error of some kind, not neough players to start the game, something.
+            return;
+        }
+
+
+        // parses the information into positional moves.
+        List<ChessPosition> positions = new ArrayList<>(List.of());
+
+        for (var position : chessMove) {
+            String input = position.trim().toLowerCase();
+            char xChar = input.charAt(0);
+            char yChar = input.charAt(1);
+            int xInt = (xChar - 'a') + 1;
+            int yInt = (yChar - '1') + 1;
+            positions.add(new ChessPosition(xInt, yInt));
+        }
+
+        ChessMove move;
+        if (promo == null) {
+            move = new ChessMove(positions.getFirst(), positions.getLast(), null);
+        } else {
+            move = new ChessMove(positions.getFirst(), positions.getLast(), promo);
+        }
+
+        ChessGame game = gameData.game();
+        game.makeMove(move);
+        dataAccess.updateGame(new GameData(gameData.gameID(), gameData.whiteUsername(),
+                gameData.blackUsername(), gameData.gameName(), game));
     }
 
     private String serializeFromGameObject(ChessGame chessGame) {
