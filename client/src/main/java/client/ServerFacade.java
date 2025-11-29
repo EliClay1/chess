@@ -297,7 +297,6 @@ public class ServerFacade {
         }
         System.out.print("\n");
         System.out.print("\n");
-        System.out.print("\n");
     }
 
     private boolean invalidCharacters(String string) {

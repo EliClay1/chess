@@ -17,51 +17,6 @@ public class WebsocketFacade extends Endpoint {
     NotificationHandler notificationHandler;
     ServerFacade serverFacade;
 
-//    public WebsocketFacade(String url, ServerFacade facade, NotificationHandler notiHandler) throws Exception {
-//        try {
-//            url = url.replace("http", "ws");
-//            URI socketURI = new URI(url + "/ws");
-//            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-//
-//            this.serverFacade = facade;
-//            this.notificationHandler = notiHandler;
-//
-//            // Set up message handler BEFORE connecting
-//            container.connectToServer(new Endpoint() {
-//                @Override
-//                public void onOpen(Session session, EndpointConfig endpointConfig) {
-//                    WebsocketFacade.this.session = session;
-//
-//                    session.addMessageHandler((MessageHandler.Whole<String>) message -> {
-//                        System.out.println("DEBUG: Message received: " + message);
-//                        ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
-//                        if (notificationHandler != null) {
-//                            notificationHandler.notify(notification);
-//                        }
-//                    });
-//                }
-//            }, socketURI);
-//
-//
-//            // FIXME - remove debug code:
-//            System.out.println("DEBUG: WebSocket connected. Session ID: " + this.session.getId());
-//            System.out.println("DEBUG: Session is open? " + this.session.isOpen());
-//
-//            //set message handler
-////            this.session.addMessageHandler((MessageHandler.Whole<String>) message -> {
-////                System.out.println("DEBUG: Message received: " + message);
-////                ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
-////                System.out.println("DEBUG: Deserialized type: " + notification.getServerMessageType());
-////                System.out.println("DEBUG: notificationHandler is null? " + (notificationHandler == null));
-////                if (notificationHandler != null) {
-////                    notificationHandler.notify(notification);
-////                }
-////            });
-//        } catch (URISyntaxException | DeploymentException | IOException | IllegalStateException e) {
-//            throw new Exception(e);
-//        }
-//    }
-
     public WebsocketFacade(String url, ServerFacade facade, NotificationHandler notiHandler) throws Exception {
         try {
             url = url.replace("http", "ws");

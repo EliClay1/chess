@@ -14,10 +14,11 @@ public class UserStateData {
     private static ClientState clientState;
     private static List<Map<String, String>> activeGames;
     private static int activeGameId;
+    private static String activeTeamColor;
     private static WebsocketFacade websocketFacade;
 
     public UserStateData(String host, int port, String authToken, String username, ClientState clientState,
-                         List<Map<String, String>> activeGames, int activeGameId, WebsocketFacade wsFacade) {
+                         List<Map<String, String>> activeGames, int activeGameId, WebsocketFacade wsFacade, String teamColor) {
         setHost(host);
         setPort(port);
         setAuthToken(authToken);
@@ -26,6 +27,7 @@ public class UserStateData {
         setActiveGames(activeGames);
         setActiveGameId(activeGameId);
         setWebsocketFacade(wsFacade);
+        setActiveTeamColor(teamColor);
 }
 
     public List<Map<String, String>> getActiveGames() {
@@ -84,11 +86,19 @@ public class UserStateData {
         UserStateData.activeGameId = id;
     }
 
-    public static void setWebsocketFacade(WebsocketFacade websocketFacade) {
+    public void setWebsocketFacade(WebsocketFacade websocketFacade) {
         UserStateData.websocketFacade = websocketFacade;
     }
 
     public WebsocketFacade getWebsocketFacade() {
         return websocketFacade;
+    }
+
+    public void setActiveTeamColor(String teamColor) {
+        UserStateData.activeTeamColor = teamColor;
+    }
+
+    public String getActiveTeamColor() {
+        return activeTeamColor;
     }
 }

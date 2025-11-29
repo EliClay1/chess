@@ -66,13 +66,14 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
         try {
             WebsocketFacade websocketFacade = new WebsocketFacade(String.format("http://%s:%s", userStateData.getHost(),
                     userStateData.getPort()), serverFacade, this);
-            UserStateData.setWebsocketFacade(websocketFacade);
+            userStateData.setWebsocketFacade(websocketFacade);
             serverFacade.joinGame("localhost", 8080, "/game", userStateData.getAuthToken(), gameId, teamColor);
             UserGameCommand connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userStateData.getAuthToken(),
                     Integer.parseInt(gameId), "");
             websocketFacade.sendMessage(new Gson().toJson(connectCommand));
             userStateData.setClientState(ClientState.PLAYING_GAME);
             userStateData.setActiveGameId(Integer.parseInt(gameId));
+            userStateData.setActiveTeamColor(teamColor);
 
             return new CommandResult(true, "");
         } catch (Exception e) {
@@ -86,6 +87,9 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
         }
     }
 
+
+    // TODO - Board printing needs to be happening on an individual level, NOT every time a user joins the game. Moves on the
+    // - other hand should be shows on all ends every time.
     @Override
     public void notify(ServerMessage serverMessage) {
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {

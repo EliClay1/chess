@@ -1,6 +1,7 @@
 package server.websocket;
 
 import chess.ChessGame;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.MySQLDataAccess;
 import exceptions.DataAccessException;
@@ -13,6 +14,7 @@ import websocket.commands.UserGameCommand;
 import websocket.commands.UserGameCommand.CommandType.*;
 import websocket.messages.ServerMessage;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -57,10 +59,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         if (commandType == UserGameCommand.CommandType.CONNECT) {
             connectUserToGame(authToken, gameId, ctx.session);
         } else if (commandType == UserGameCommand.CommandType.MAKE_MOVE) {
-            makeMove(authToken, gameId, command.additionalArguments(), ctx);
+            makeMove(authToken, gameId, command.additionalArguments(), ctx.session);
             ctx.send("This is a test");
         } else if (commandType == UserGameCommand.CommandType.LEAVE) {
-            disconnectUserFromGame(authToken, gameId, ctx.session, ctx);
+            disconnectUserFromGame(authToken, gameId, ctx.session);
         } else if (commandType == UserGameCommand.CommandType.RESIGN) {
             resignUser(authToken, gameId, ctx);
         } else {
@@ -83,8 +85,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             ServerMessage notificationMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, chessGame);
             String serializedGame = serializer.toJson(notificationMessage);
 
-            // TODO - remove debug code:
-
             for (var sesh : connections.getSessionsForGame(gameId)) {
                 if (sesh.isOpen()) {
                     sesh.getRemote().sendString(serializedGame);
@@ -97,7 +97,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void disconnectUserFromGame(String authToken, int gameId, Session session, WsMessageContext ctx) {
+    private void disconnectUserFromGame(String authToken, int gameId, Session session) {
         connections.removeSessionFromGame(gameId, session);
         System.out.print("User has left the game.\n");
 
@@ -121,7 +121,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     }
 
-    private void makeMove(String authToken, int gameId, List<String> additionalArgs, WsMessageContext ctx) {
+    private void makeMove(String authToken, int gameId, List<String> additionalArgs, Session session) {
         // Find some way to transfer over the game move choice.
         System.out.print("User has made a move.\n");
 
@@ -141,6 +141,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             ChessGame chessGame = db.getGame(gameId).game();
             ServerMessage notificationMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, chessGame);
             String serializedGame = serializer.toJson(notificationMessage);
+            session.getRemote().sendString(serializedGame);
             for (var sesh : connections.getSessionsForGame(gameId)) {
                 if (sesh.isOpen()) {
                     sesh.getRemote().sendString(serializedGame);
@@ -149,7 +150,18 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 }
             }
         } catch (Exception e) {
-            System.out.printf("Make move failed, %s", e.getMessage());
+//            System.out.printf("Make move failed, %s", e.getMessage());
+            ServerMessage errorMessage = null;
+            if (e instanceof InvalidMoveException) {
+                errorMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                        String.format("Sorry, the move %s to %s is not valid. Please try again. \n",
+                                moveParts.getFirst(), moveParts.getLast()));
+            }
+            try {
+                session.getRemote().sendString(serializer.toJson(errorMessage));
+            } catch (Exception ex) {
+                System.out.print("SERVER ERROR: " + ex.getMessage());
+            }
         }
     }
 

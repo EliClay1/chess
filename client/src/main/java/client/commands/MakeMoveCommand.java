@@ -1,5 +1,6 @@
 package client.commands;
 
+import chess.ChessGame;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
@@ -8,19 +9,20 @@ import client.results.ValidationResult;
 import client.websocket.NotificationHandler;
 import client.websocket.WebsocketFacade;
 import com.google.gson.Gson;
-import exceptions.AlreadyTakenException;
-import exceptions.InvalidException;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
 import java.util.Collection;
 import java.util.List;
 
+import static ui.EscapeSequences.RESET_TEXT_COLOR;
+
 public class MakeMoveCommand implements CommandInterface, NotificationHandler {
 
     private final ServerFacade serverFacade = new ServerFacade();
     private WebsocketFacade websocketFacade;
     private final int argumentCount = 1;
+    private UserStateData userStateData;
 
     public MakeMoveCommand() throws Exception {
     }
@@ -57,7 +59,8 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery) {
+        userStateData = userState;
         String move = args[0];
 
 
@@ -80,5 +83,12 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
 
     @Override
     public void notify(ServerMessage serverMessage) {
+        if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+            ChessGame chessGame = serverMessage.getChessGame();
+            serverFacade.printBoard(userStateData.getActiveTeamColor(), chessGame);
+        } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+            String message = serverMessage.getMessage();
+            System.out.printf("\u001b[38;5;%dm%s%s\n", 4, message, RESET_TEXT_COLOR);
+        }
     }
 }
