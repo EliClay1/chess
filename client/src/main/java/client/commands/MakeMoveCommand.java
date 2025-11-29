@@ -35,7 +35,7 @@ public class MakeMoveCommand implements CommandInterface{
 
     @Override
     public String getUsage() {
-        return "Make a move: \"m\", \"move\" <move>\n";
+        return "Make a move: \"m\", \"move\" <move1,move2>\n";
     }
 
     @Override
@@ -60,9 +60,10 @@ public class MakeMoveCommand implements CommandInterface{
 
 
         try {
-            UserGameCommand moveCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userStateData.getAuthToken(),
+            UserGameCommand moveCommand = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, userStateData.getAuthToken(),
                     userStateData.getActiveGameId(), move);
             websocketFacade.sendMessage(new Gson().toJson(moveCommand));
+            // TODO - send the game back through the websocket.
 
             return new CommandResult(true, "");
         } catch (Exception e) {
