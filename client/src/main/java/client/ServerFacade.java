@@ -1,9 +1,6 @@
 package client;
 
-import chess.BoardSearcher;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -174,7 +171,16 @@ public class ServerFacade {
         if (status >= 200 && status < 300) {
 
             // TODO - Should this be moved to the JoinGameCommand class?
-            printBoard(playerColor, new ChessGame());
+
+            ChessGame testGame = new ChessGame();
+            testGame.makeMove(new ChessMove(
+                    new ChessPosition(2, 1),
+                    new ChessPosition(4, 1),
+                    null
+            ));
+
+
+            printBoard(playerColor, testGame);
         } else if (status == 400) {
             throw new NumberFormatException();
         } else if (status == 403) {
@@ -236,58 +242,51 @@ public class ServerFacade {
         String[] numsBlack = {" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 "};
         String[] numbers = blackView ? numsBlack : numsWhite;
 
-//        String[] whitePieceIndex = {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN,
-//                WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK};
-//        String[] blackPieceIndex = {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP,
-//                BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK};
-
         for (var letter : letters) {
             System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE,
                     letter, RESET_TEXT_COLOR, RESET_BG_COLOR);
         }
-
-//        List<ChessPosition> blackPositions = new BoardSearcher().findChessPieces(chessGame.getBoard(),
-//                (piece -> piece.getTeamColor() == ChessGame.TeamColor.BLACK));
-//
-//        List<ChessPosition> whitePositions = new BoardSearcher().findChessPieces(chessGame.getBoard(),
-//                (piece -> piece.getTeamColor() == ChessGame.TeamColor.WHITE));
-
-
 
         for (int x = 0; x < 8; x++) {
             System.out.print("\n");
 
             System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE,
                     numbers[x], RESET_TEXT_COLOR, RESET_BG_COLOR);
-
             for (int y = 0; y < 8; y++) {
-                int bx = blackView ? 7 - x : x;
+                int bx = blackView ? x : 7 - x;
                 int by = blackView ? 7 - y : y;
+
+                int xPos = bx + 1;
+                int yPos = by + 1;
 
                 boolean dark = ((bx + by) & 1) == 1;
                 String bg = dark ? SET_BOARD_BLACK : SET_BOARD_WHITE;
 
                 ChessPiece chessPiece = chessGame.getBoard().getPiece(
-                        new ChessPosition(bx + 1, by + 1));
+                        new ChessPosition(xPos, yPos));
 
                 String piece = null;
                 String pieceColor = null;
 
-                if (piece != null) {
-                    // do piece printing
-                } else {
-                    piece = EMPTY;
-                }
+                if (chessPiece != null) {
+                    switch (chessPiece.getPieceType()) {
+                        case PAWN -> piece = (chessPiece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                                ? WHITE_PAWN : BLACK_PAWN;
+                        case ROOK -> piece = (chessPiece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                                ? WHITE_ROOK : BLACK_ROOK;
+                        case KNIGHT -> piece = (chessPiece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                                ? WHITE_KNIGHT : BLACK_KNIGHT;
+                        case BISHOP -> piece = (chessPiece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                                ? WHITE_BISHOP : BLACK_BISHOP;
+                        case QUEEN -> piece = (chessPiece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                                ? WHITE_QUEEN : BLACK_QUEEN;
+                        case KING -> piece = (chessPiece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                                ? WHITE_KING : BLACK_KING;
+                    }
 
-                if (bx == 0) {
-                    // TODO - THIS MAY BREAK THE CODE
-                    pieceColor = SET_PIECE_COLOR_BLACK;
-                } else if (bx == 1) {
-                    pieceColor = SET_PIECE_COLOR_BLACK;
-                } else if (bx == 6) {
-                    pieceColor = SET_PIECE_COLOR_WHITE;
-                } else if (bx == 7) {
-                    pieceColor = SET_PIECE_COLOR_WHITE;
+                    pieceColor = (chessPiece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                            ? SET_PIECE_COLOR_WHITE
+                            : SET_PIECE_COLOR_BLACK;
                 }
 
                 if (piece != null) {

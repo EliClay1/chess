@@ -57,15 +57,14 @@ public class MakeMoveCommand implements CommandInterface{
     @Override
     public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
         String gameID = args[0];
-        String teamColor = args[1];
 
         try {
-            serverFacade.joinGame(userStateData.getHost(), userStateData.getPort(), "/game",
-                    userStateData.getAuthToken(), gameID, teamColor);
-            UserGameCommand moveCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userStateData.getAuthToken(),
-                    Integer.parseInt(gameID), "");
-            websocketFacade.sendMessage(new Gson().toJson(moveCommand));
-            websocketFacade.sendMessage("CONNECT");
+//            serverFacade.joinGame(userStateData.getHost(), userStateData.getPort(), "/game",
+//                    userStateData.getAuthToken(), gameID, teamColor);
+//            UserGameCommand moveCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userStateData.getAuthToken(),
+//                    Integer.parseInt(gameID), "");
+//            websocketFacade.sendMessage(new Gson().toJson(moveCommand));
+//            websocketFacade.sendMessage("MOVE");
 
             return new CommandResult(true, "");
         } catch (Exception e) {
