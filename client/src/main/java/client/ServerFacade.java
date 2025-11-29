@@ -253,6 +253,7 @@ public class ServerFacade {
 //                (piece -> piece.getTeamColor() == ChessGame.TeamColor.WHITE));
 
 
+
         for (int x = 0; x < 8; x++) {
             System.out.print("\n");
 
@@ -266,13 +267,15 @@ public class ServerFacade {
                 boolean dark = ((bx + by) & 1) == 1;
                 String bg = dark ? SET_BOARD_BLACK : SET_BOARD_WHITE;
 
+                ChessPiece chessPiece = chessGame.getBoard().getPiece(
+                        new ChessPosition(bx + 1, by + 1));
 
-                String piece = String.valueOf(chessGame.getBoard().getPiece(
-                        new ChessPosition(x + 1, y + 1)).getPieceType());
-                String pieceColor = String.valueOf(chessGame.getBoard().getPiece(
-                        new ChessPosition(x + 1, y + 1)).getTeamColor());
+                String piece = null;
+                String pieceColor = null;
 
-                if (piece == null) {
+                if (piece != null) {
+                    // do piece printing
+                } else {
                     piece = EMPTY;
                 }
 
