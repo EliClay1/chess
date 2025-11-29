@@ -60,7 +60,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             connectUserToGame(authToken, gameId, ctx.session);
         } else if (commandType == UserGameCommand.CommandType.MAKE_MOVE) {
             makeMove(authToken, gameId, command.additionalArguments(), ctx.session);
-            ctx.send("This is a test");
         } else if (commandType == UserGameCommand.CommandType.LEAVE) {
             disconnectUserFromGame(authToken, gameId, ctx.session);
         } else if (commandType == UserGameCommand.CommandType.RESIGN) {
@@ -85,9 +84,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             ServerMessage notificationMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, chessGame);
             String serializedGame = serializer.toJson(notificationMessage);
 
+            // Prevents duplicate printing
+            session.getRemote().sendString(serializedGame);
+
             for (var sesh : connections.getSessionsForGame(gameId)) {
                 if (sesh.isOpen()) {
-                    sesh.getRemote().sendString(serializedGame);
                     sesh.getRemote().sendString(serializedMessage);
                 }
             }
@@ -122,9 +123,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void makeMove(String authToken, int gameId, List<String> additionalArgs, Session session) {
-        // Find some way to transfer over the game move choice.
-        System.out.print("User has made a move.\n");
-
         // This should have two components in it.
         // TODO -  promotional pieces. Figure out when and how this will work.
         List<String> moveParts = List.of(additionalArgs.getFirst().split(","));
@@ -153,7 +151,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 //            System.out.printf("Make move failed, %s", e.getMessage());
             ServerMessage errorMessage = null;
             if (e instanceof InvalidMoveException) {
-                errorMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR,
                         String.format("Sorry, the move %s to %s is not valid. Please try again. \n",
                                 moveParts.getFirst(), moveParts.getLast()));
             }

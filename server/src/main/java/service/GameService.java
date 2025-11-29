@@ -1,9 +1,6 @@
 package service;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonSerializer;
 import dataaccess.DataAccess;
@@ -86,7 +83,7 @@ public record GameService(DataAccess dataAccess) {
         GameData gameData = dataAccess.getGame(gameId);
         if (gameData.whiteUsername() == null || gameData.blackUsername() == null) {
             // TODO - make it return an error of some kind, not neough players to start the game, something.
-            return;
+            throw new NotUsersTurnException("Not enough players to begin the game!");
         }
 
 
@@ -95,10 +92,10 @@ public record GameService(DataAccess dataAccess) {
 
         for (var position : chessMove) {
             String input = position.trim().toLowerCase();
-            char xChar = input.charAt(0);
-            char yChar = input.charAt(1);
-            int xInt = (xChar - 'a') + 1;
-            int yInt = (yChar - '1') + 1;
+            char yChar = input.charAt(0);
+            char xChar = input.charAt(1);
+            int yInt = (yChar - 'a') + 1;
+            int xInt = (xChar - '1') + 1;
             positions.add(new ChessPosition(xInt, yInt));
         }
 
