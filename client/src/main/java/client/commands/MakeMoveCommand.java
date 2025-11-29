@@ -15,7 +15,7 @@ import java.util.List;
 public class MakeMoveCommand implements CommandInterface{
 
     private final ServerFacade serverFacade = new ServerFacade();
-    private final WebsocketFacade websocketFacade = new WebsocketFacade("localhost:8080");
+    private final WebsocketFacade websocketFacade = new WebsocketFacade("http://localhost:8080");
     private final int argumentCount = 2;
 
     public MakeMoveCommand() throws Exception {

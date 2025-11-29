@@ -30,7 +30,7 @@ public class HelpCommand implements CommandInterface{
 
     @Override
     public Collection<ClientState> allowedStates() {
-        return List.of(ClientState.LOGGED_OUT);
+        return List.of(ClientState.LOGGED_OUT, ClientState.LOGGED_IN, ClientState.PLAYING_GAME, ClientState.OBSERVING_GAME);
     }
 
     @Override
@@ -45,13 +45,7 @@ public class HelpCommand implements CommandInterface{
     public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
         System.out.printf("%sOptions:\n", SET_TEXT_COLOR_BLUE);
         for (CommandInterface command : registery.getAllCommands()) {
-            if (command.allowedStates().contains(ClientState.LOGGED_IN)) {
-                System.out.print(" - " + command.getUsage());
-            } else if (command.allowedStates().contains(ClientState.LOGGED_OUT)) {
-                System.out.print(" - " + command.getUsage());
-            } else if (command.allowedStates().contains(ClientState.PLAYING_GAME)) {
-                System.out.print(" - " + command.getUsage());
-            } else if (command.allowedStates().contains(ClientState.OBSERVING_GAME)) {
+            if (command.allowedStates().contains(userStateData.clientState())) {
                 System.out.print(" - " + command.getUsage());
             }
         }
