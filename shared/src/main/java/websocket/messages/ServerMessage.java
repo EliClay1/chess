@@ -13,6 +13,7 @@ import java.util.Objects;
 public class ServerMessage {
     ServerMessageType serverMessageType;
     private ChessGame chessGame;
+    private String message;
 
     public enum ServerMessageType {
         LOAD_GAME,
@@ -29,6 +30,11 @@ public class ServerMessage {
         this.chessGame = chessGame;
     }
 
+    public ServerMessage(ServerMessageType type, String message) {
+        this.serverMessageType = type;
+        this.message = message;
+    }
+
     public ServerMessageType getServerMessageType() {
         return this.serverMessageType;
     }
@@ -39,6 +45,14 @@ public class ServerMessage {
 
     public ChessGame getChessGame() {
         return chessGame;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getMessage(String message) {
+        return this.message;
     }
 
     @Override

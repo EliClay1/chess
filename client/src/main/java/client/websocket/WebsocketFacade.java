@@ -1,5 +1,6 @@
 package client.websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 
 import jakarta.websocket.*;
@@ -28,6 +29,12 @@ public class WebsocketFacade extends Endpoint implements AutoCloseable {
             this.session.addMessageHandler((MessageHandler.Whole<String>) message -> {
                 ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
                 notificationHandler.notify(notification);
+
+                if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+                    ChessGame game = notification.getChessGame();
+
+                }
+
             });
         } catch (URISyntaxException | DeploymentException | IOException | IllegalStateException e) {
             throw new Exception(e);

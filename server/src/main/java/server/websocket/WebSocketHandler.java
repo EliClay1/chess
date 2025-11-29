@@ -1,5 +1,6 @@
 package server.websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.MySQLDataAccess;
 import exceptions.DataAccessException;
@@ -10,6 +11,7 @@ import service.GameService;
 import service.UserService;
 import websocket.commands.UserGameCommand;
 import websocket.commands.UserGameCommand.CommandType.*;
+import websocket.messages.ServerMessage;
 
 import java.util.List;
 import java.util.Objects;
@@ -51,8 +53,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         String authToken = command.getAuthToken();
         var commandType = command.getCommandType();
 
+        // TODO - remove ctx from all of these.
         if (commandType == UserGameCommand.CommandType.CONNECT) {
-            connectUserToGame(authToken, gameId, ctx.session, ctx);
+            connectUserToGame(authToken, gameId, ctx.session);
         } else if (commandType == UserGameCommand.CommandType.MAKE_MOVE) {
             makeMove(authToken, gameId, command.additionalArguments(), ctx);
             ctx.send("This is a test");
@@ -66,24 +69,57 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void connectUserToGame(String authToken, int gameID, Session session, WsMessageContext ctx) {
-        connections.addSession(session);
+    private void connectUserToGame(String authToken, int gameId, Session session) {
+        connections.addSessionToGame(gameId, session);
+
         try {
-            var user = db.getAuth(authToken).username();
-            var userColor = Objects.equals(db.getGame(gameID).whiteUsername(), user) ? "White" : "Black";
-            ctx.send(String.format("Successfully joined %s user: %s \n", userColor, user));
-        } catch (DataAccessException e) {
+            String user = db.getAuth(authToken).username();
+            String userColor = Objects.equals(db.getGame(gameId).whiteUsername(), user) ? "White" : "Black";
+            ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                    String.format("Successfully joined %s user: %s \n", userColor, user));
+            String serializedMessage = serializer.toJson(serverMessage);
+
+            ChessGame chessGame = db.getGame(gameId).game();
+            ServerMessage notificationMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, chessGame);
+            String serializedGame = serializer.toJson(notificationMessage);
+
+            for (var sesh : connections.getSessionsForGame(gameId)) {
+                if (sesh.isOpen()) {
+                    sesh.getRemote().sendString(serializedMessage);
+                    sesh.getRemote().sendString(serializedGame);
+                }
+            }
+        } catch (Exception e) {
+            // TODO - remove AFTER testing.
             System.out.printf("Erorr, %s", e.getMessage());
         }
     }
 
-    private void disconnectUserFromGame(String authToken, int gameID, Session session, WsMessageContext ctx) {
-        connections.removeSession(session);
+    private void disconnectUserFromGame(String authToken, int gameId, Session session, WsMessageContext ctx) {
+        connections.removeSessionFromGame(gameId, session);
         System.out.print("User has left the game.\n");
+
+
+        try {
+            String user = db.getAuth(authToken).username();
+            ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                    String.format("%s has left the game. \n", user));
+            String serializedMessage = serializer.toJson(serverMessage);
+
+            for (var sesh : connections.getSessionsForGame(gameId)) {
+                if (sesh.isOpen()) {
+                    sesh.getRemote().sendString(serializedMessage);
+                }
+            }
+
+        } catch (Exception e) {
+            // TODO - remove AFTER testing.
+            System.out.printf("Erorr, %s", e.getMessage());
+        }
 
     }
 
-    private void makeMove(String authToken, int gameID, List<String> additionalArgs, WsMessageContext ctx) {
+    private void makeMove(String authToken, int gameId, List<String> additionalArgs, WsMessageContext ctx) {
         // Find some way to transfer over the game move choice.
         System.out.print("User has made a move.\n");
 
@@ -91,10 +127,25 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         // TODO -  promotional pieces. Figure out when and how this will work.
         List<String> moveParts = List.of(additionalArgs.getFirst().split(","));
 
-
         // TODO - check and make sure that both players are in the game
         try {
-            gameService.makeMove(authToken, moveParts, gameID, null);
+            gameService.makeMove(authToken, moveParts, gameId, null);
+
+            String user = db.getAuth(authToken).username();
+            ServerMessage moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                    String.format("%s has made the move, %s to %s. \n", user, moveParts.getFirst(), moveParts.getLast()));
+            String serializedMoveMessage = serializer.toJson(moveMessage);
+
+            ChessGame chessGame = db.getGame(gameId).game();
+            ServerMessage notificationMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, chessGame);
+            String serializedGame = serializer.toJson(notificationMessage);
+            for (var sesh : connections.getSessionsForGame(gameId)) {
+                if (sesh.isOpen()) {
+                    sesh.getRemote().sendString(serializedGame);
+                    sesh.getRemote().sendString(serializedMoveMessage);
+
+                }
+            }
         } catch (Exception e) {
             System.out.printf("Make move failed, %s", e.getMessage());
         }
