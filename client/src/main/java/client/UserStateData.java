@@ -1,5 +1,7 @@
 package client;
 
+import client.websocket.WebsocketFacade;
+
 import java.util.List;
 import java.util.Map;
 
@@ -12,9 +14,10 @@ public class UserStateData {
     private static ClientState clientState;
     private static List<Map<String, String>> activeGames;
     private static int activeGameId;
+    private static WebsocketFacade websocketFacade;
 
     public UserStateData(String host, int port, String authToken, String username, ClientState clientState,
-                         List<Map<String, String>> activeGames, int activeGameId) {
+                         List<Map<String, String>> activeGames, int activeGameId, WebsocketFacade wsFacade) {
         setHost(host);
         setPort(port);
         setAuthToken(authToken);
@@ -22,6 +25,7 @@ public class UserStateData {
         setClientState(clientState);
         setActiveGames(activeGames);
         setActiveGameId(activeGameId);
+        setWebsocketFacade(wsFacade);
 }
 
     public List<Map<String, String>> getActiveGames() {
@@ -77,8 +81,14 @@ public class UserStateData {
     }
 
     public void setActiveGameId(int id) {
-        activeGameId = id;
+        UserStateData.activeGameId = id;
     }
 
+    public static void setWebsocketFacade(WebsocketFacade websocketFacade) {
+        UserStateData.websocketFacade = websocketFacade;
+    }
 
+    public WebsocketFacade getWebsocketFacade() {
+        return websocketFacade;
+    }
 }

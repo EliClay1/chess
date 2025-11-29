@@ -83,10 +83,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             ServerMessage notificationMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, chessGame);
             String serializedGame = serializer.toJson(notificationMessage);
 
+            // TODO - remove debug code:
+
             for (var sesh : connections.getSessionsForGame(gameId)) {
                 if (sesh.isOpen()) {
-                    sesh.getRemote().sendString(serializedMessage);
                     sesh.getRemote().sendString(serializedGame);
+                    sesh.getRemote().sendString(serializedMessage);
                 }
             }
         } catch (Exception e) {

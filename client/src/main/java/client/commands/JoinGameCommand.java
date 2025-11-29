@@ -1,24 +1,29 @@
 package client.commands;
 
+import chess.ChessGame;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
 import client.results.CommandResult;
 import client.results.ValidationResult;
+import client.websocket.NotificationHandler;
 import client.websocket.WebsocketFacade;
 import com.google.gson.Gson;
 import exceptions.AlreadyTakenException;
 import exceptions.InvalidException;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
 import java.util.Collection;
 import java.util.List;
 
-public class JoinGameCommand implements CommandInterface{
+import static ui.EscapeSequences.RESET_TEXT_COLOR;
+
+public class JoinGameCommand implements CommandInterface, NotificationHandler {
 
     private final ServerFacade serverFacade = new ServerFacade();
-
     private final int argumentCount = 2;
+    private String teamColor;
 
     public JoinGameCommand() throws Exception {
     }
@@ -54,35 +59,41 @@ public class JoinGameCommand implements CommandInterface{
 
     @Override
     public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) throws Exception {
-        try (WebsocketFacade websocketFacade = new WebsocketFacade(String.format("http://%s:%s", userStateData.getHost(),
-                userStateData.getPort()), serverFacade)) {
-            String gameID = args[0];
-            String teamColor = args[1];
 
-            try {
-                serverFacade.joinGame("localhost", 8080, "/game", userStateData.getAuthToken(), gameID, teamColor);
-                UserGameCommand connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userStateData.getAuthToken(),
-                        Integer.parseInt(gameID), "");
-                websocketFacade.sendMessage(new Gson().toJson(connectCommand));
-                userStateData.setClientState(ClientState.PLAYING_GAME);
-                userStateData.setActiveGameId(Integer.parseInt(gameID));
+        String gameId = args[0];
+        teamColor = args[1];
 
-                return new CommandResult(true, "");
-            } catch (Exception e) {
-                if (e instanceof InvalidException) {
-                    return new CommandResult(false, "Invalid team color.");
-                } else if (e instanceof NumberFormatException) {
-                    return new CommandResult(false, "Invalid GameID.");
-                } else if (e instanceof AlreadyTakenException) {
-                    return new CommandResult(false, "That team is already taken.");
-                }
-                else {
-                    return new CommandResult(false, "Error: " + e.getMessage());
-                }
-            }
+        try {
+            WebsocketFacade websocketFacade = new WebsocketFacade(String.format("http://%s:%s", userStateData.getHost(),
+                    userStateData.getPort()), serverFacade, this);
+            UserStateData.setWebsocketFacade(websocketFacade);
+            serverFacade.joinGame("localhost", 8080, "/game", userStateData.getAuthToken(), gameId, teamColor);
+            UserGameCommand connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userStateData.getAuthToken(),
+                    Integer.parseInt(gameId), "");
+            websocketFacade.sendMessage(new Gson().toJson(connectCommand));
+            userStateData.setClientState(ClientState.PLAYING_GAME);
+            userStateData.setActiveGameId(Integer.parseInt(gameId));
+
+            return new CommandResult(true, "");
         } catch (Exception e) {
-            System.out.print("Critical Failure - Couldn't connect to websocket.\n");
+            return switch (e) {
+                case InvalidException invalidException -> new CommandResult(false, "Invalid team color.");
+                case NumberFormatException numberFormatException -> new CommandResult(false, "Invalid GameID.");
+                case AlreadyTakenException alreadyTakenException ->
+                        new CommandResult(false, "That team is already taken.");
+                default -> new CommandResult(false, "Error: " + e.getMessage());
+            };
         }
-        return null;
+    }
+
+    @Override
+    public void notify(ServerMessage serverMessage) {
+        if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+            ChessGame chessGame = serverMessage.getChessGame();
+            serverFacade.printBoard(teamColor, chessGame);
+        } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+            String message = serverMessage.getMessage();
+            System.out.printf("\u001b[38;5;%dm%s%s\n", 4, message, RESET_TEXT_COLOR);
+        }
     }
 }

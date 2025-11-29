@@ -171,16 +171,7 @@ public class ServerFacade {
         // TODO - 11/28/2025 - parse the game and print the game. Code should be functioning now.
 
         if (status >= 200 && status < 300) {
-
-            ChessGame testGame = new ChessGame();
-            testGame.makeMove(new ChessMove(
-                    new ChessPosition(2, 1),
-                    new ChessPosition(4, 1),
-                    null
-            ));
-
-
-            printBoard(playerColor, testGame);
+            System.out.print("\n");
         } else if (status == 400) {
             throw new NumberFormatException();
         } else if (status == 403) {
@@ -304,6 +295,8 @@ public class ServerFacade {
             System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE,
                     letter, RESET_TEXT_COLOR, RESET_BG_COLOR);
         }
+        System.out.print("\n");
+        System.out.print("\n");
         System.out.print("\n");
     }
 

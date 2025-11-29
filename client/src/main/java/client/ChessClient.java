@@ -37,7 +37,7 @@ public class ChessClient {
         // FIXME - change how the commands interpret the userStateData and allow them to pull directly from it. ZERO HARD CODED VALUES
         // registers base userStateData
         UserStateData userStateData = new UserStateData("localhost", 8080, null,
-                null, ClientState.LOGGED_OUT, null, 0);
+                null, ClientState.LOGGED_OUT, null, 0, null);
 
         simplePrint(12, String.format("%sWelcome to Chess! Feel free to sign in, or type 'h' for help.%s\n\n",
                 WHITE_KING, WHITE_QUEEN));

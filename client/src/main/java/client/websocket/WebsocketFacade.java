@@ -1,6 +1,5 @@
 package client.websocket;
 
-import chess.ChessGame;
 import client.ServerFacade;
 import com.google.gson.Gson;
 
@@ -11,43 +10,83 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import static ui.EscapeSequences.RESET_TEXT_COLOR;
 
-
-public class WebsocketFacade extends Endpoint implements AutoCloseable {
+public class WebsocketFacade extends Endpoint {
 
     Session session;
     NotificationHandler notificationHandler;
     ServerFacade serverFacade;
 
-    public WebsocketFacade(String url, ServerFacade facade) throws Exception {
+//    public WebsocketFacade(String url, ServerFacade facade, NotificationHandler notiHandler) throws Exception {
+//        try {
+//            url = url.replace("http", "ws");
+//            URI socketURI = new URI(url + "/ws");
+//            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+//
+//            this.serverFacade = facade;
+//            this.notificationHandler = notiHandler;
+//
+//            // Set up message handler BEFORE connecting
+//            container.connectToServer(new Endpoint() {
+//                @Override
+//                public void onOpen(Session session, EndpointConfig endpointConfig) {
+//                    WebsocketFacade.this.session = session;
+//
+//                    session.addMessageHandler((MessageHandler.Whole<String>) message -> {
+//                        System.out.println("DEBUG: Message received: " + message);
+//                        ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
+//                        if (notificationHandler != null) {
+//                            notificationHandler.notify(notification);
+//                        }
+//                    });
+//                }
+//            }, socketURI);
+//
+//
+//            // FIXME - remove debug code:
+//            System.out.println("DEBUG: WebSocket connected. Session ID: " + this.session.getId());
+//            System.out.println("DEBUG: Session is open? " + this.session.isOpen());
+//
+//            //set message handler
+////            this.session.addMessageHandler((MessageHandler.Whole<String>) message -> {
+////                System.out.println("DEBUG: Message received: " + message);
+////                ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
+////                System.out.println("DEBUG: Deserialized type: " + notification.getServerMessageType());
+////                System.out.println("DEBUG: notificationHandler is null? " + (notificationHandler == null));
+////                if (notificationHandler != null) {
+////                    notificationHandler.notify(notification);
+////                }
+////            });
+//        } catch (URISyntaxException | DeploymentException | IOException | IllegalStateException e) {
+//            throw new Exception(e);
+//        }
+//    }
+
+    public WebsocketFacade(String url, ServerFacade facade, NotificationHandler notiHandler) throws Exception {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
-//            this.notificationHandler = notificationHandler;
-
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-            this.session = container.connectToServer(this, socketURI);
+
+            this.notificationHandler = notiHandler;  // Set it FIRST
             this.serverFacade = facade;
 
-            //set message handler
-            this.session.addMessageHandler((MessageHandler.Whole<String>) message -> {
-                ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
-                notificationHandler.notify(notification);
+            container.connectToServer(new Endpoint() {
+                @Override
+                public void onOpen(Session session, EndpointConfig endpointConfig) {
+                    WebsocketFacade.this.session = session;
 
-                if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-                    ChessGame game = notification.getChessGame();
-                    // TODO - figure out how you're going to get hold of the color.
-                    serverFacade.printBoard("white", game);
-                    String printMessage = notification.getMessage();
-                    // TODO - might want to change message color.
-                    System.out.printf("\u001b[38;5;%dm%s%s", 5, printMessage, RESET_TEXT_COLOR);
+                    session.addMessageHandler(String.class, message -> {
+                        ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
+                        if (WebsocketFacade.this.notificationHandler != null) {
+                            WebsocketFacade.this.notificationHandler.notify(notification);
+                        }
+                    });
                 }
-            });
+            }, socketURI);
         } catch (URISyntaxException | DeploymentException | IOException | IllegalStateException e) {
             throw new Exception(e);
         }
-
     }
 
     // required. no external purpose.
@@ -62,10 +101,5 @@ public class WebsocketFacade extends Endpoint implements AutoCloseable {
         } catch (IOException e) {
             System.out.print("Failed to send message, " + e.getMessage());
         }
-    }
-
-    @Override
-    public void close() throws Exception {
-
     }
 }
