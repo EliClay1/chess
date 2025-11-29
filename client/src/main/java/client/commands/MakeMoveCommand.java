@@ -56,26 +56,19 @@ public class MakeMoveCommand implements CommandInterface{
 
     @Override
     public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
-        String gameID = args[0];
+        String move = args[0];
+
 
         try {
-//            serverFacade.joinGame(userStateData.getHost(), userStateData.getPort(), "/game",
-//                    userStateData.getAuthToken(), gameID, teamColor);
-//            UserGameCommand moveCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userStateData.getAuthToken(),
-//                    Integer.parseInt(gameID), "");
-//            websocketFacade.sendMessage(new Gson().toJson(moveCommand));
-//            websocketFacade.sendMessage("MOVE");
+            UserGameCommand moveCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userStateData.getAuthToken(),
+                    userStateData.getActiveGameId(), move);
+            websocketFacade.sendMessage(new Gson().toJson(moveCommand));
 
             return new CommandResult(true, "");
         } catch (Exception e) {
-            if (e instanceof InvalidException) {
-                return new CommandResult(false, "Invalid team color.");
-            } else if (e instanceof NumberFormatException) {
+            if (e instanceof NumberFormatException) {
                 return new CommandResult(false, "Invalid GameID.");
-            } else if (e instanceof AlreadyTakenException) {
-                return new CommandResult(false, "That team is already taken.");
-            }
-            else {
+            } else {
                 return new CommandResult(false, "Error: " + e.getMessage());
             }
         }

@@ -64,6 +64,7 @@ public class JoinGameCommand implements CommandInterface{
                         Integer.parseInt(gameID), "");
                 websocketFacade.sendMessage(new Gson().toJson(connectCommand));
                 userStateData.setClientState(ClientState.PLAYING_GAME);
+                userStateData.setActiveGameId(Integer.parseInt(gameID));
 
                 return new CommandResult(true, "");
             } catch (Exception e) {

@@ -36,7 +36,8 @@ public class ChessClient {
 
         // FIXME - change how the commands interpret the userStateData and allow them to pull directly from it. ZERO HARD CODED VALUES
         // registers base userStateData
-        UserStateData userStateData = new UserStateData("localhost", 8080, null, null, ClientState.LOGGED_OUT, null);
+        UserStateData userStateData = new UserStateData("localhost", 8080, null,
+                null, ClientState.LOGGED_OUT, null, 0);
 
         simplePrint(12, String.format("%sWelcome to Chess! Feel free to sign in, or type 'h' for help.%s\n\n",
                 WHITE_KING, WHITE_QUEEN));
@@ -50,7 +51,7 @@ public class ChessClient {
                 case LOGGED_IN -> statePrintValue = "Logged In";
                 case PLAYING_GAME -> statePrintValue = "Playing";
                 case OBSERVING_GAME -> statePrintValue = "Observing";
-                default -> throw new IllegalStateException("Unexpected value: " + userStateData);
+                default -> throw new IllegalStateException("Unexpected value: " + userStateData.clientState());
             }
             simplePrint(6, String.format("[%s] >>> ", statePrintValue));
 

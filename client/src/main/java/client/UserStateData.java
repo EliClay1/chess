@@ -11,14 +11,17 @@ public class UserStateData {
     private static String username;
     private static ClientState clientState;
     private static List<Map<String, String>> activeGames;
+    private static int activeGameId;
 
-    public UserStateData(String host, int port, String authToken, String username, ClientState clientState, List<Map<String, String>> activeGames) {
+    public UserStateData(String host, int port, String authToken, String username, ClientState clientState,
+                         List<Map<String, String>> activeGames, int activeGameId) {
         setHost(host);
         setPort(port);
         setAuthToken(authToken);
         setUsername(username);
         setClientState(clientState);
         setActiveGames(activeGames);
+        setActiveGameId(activeGameId);
 }
 
     public List<Map<String, String>> getActiveGames() {
@@ -68,4 +71,14 @@ public class UserStateData {
     public void setHost(String host) {
         UserStateData.host = host;
     }
+
+    public int getActiveGameId() {
+        return activeGameId;
+    }
+
+    public void setActiveGameId(int id) {
+        activeGameId = id;
+    }
+
+
 }

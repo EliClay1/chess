@@ -168,9 +168,9 @@ public class ServerFacade {
         HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         status = response.statusCode();
 
-        if (status >= 200 && status < 300) {
+        // TODO - 11/28/2025 - parse the game and print the game. Code should be functioning now.
 
-            // TODO - Should this be moved to the JoinGameCommand class?
+        if (status >= 200 && status < 300) {
 
             ChessGame testGame = new ChessGame();
             testGame.makeMove(new ChessMove(
@@ -225,7 +225,6 @@ public class ServerFacade {
             throw new Exception("GameID doesn't exist.");
         }
 
-        // TODO - build the board based off the gameData.
         printBoard("white", new ChessGame());
     }
 
@@ -319,6 +318,8 @@ public class ServerFacade {
     }
 
     // TODO - so... pretty sure this can be replace with a Gson.fromJson(jsonString, Map.class);...
+    // 11/28/2025 update: Will fix this later, not important atm. this will cause a lot of refactoring.
+
     private List<Map<String, String>> jsonParser(String json, String... args) {
         List<Map<String, String>> resultList = new ArrayList<>();
         JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
