@@ -10,7 +10,7 @@ public class BoardSearcher implements PieceFilter {
         return false;
     }
 
-    List<ChessPosition> findChessPieces(ChessBoard board, PieceFilter filter) {
+    public List<ChessPosition> findChessPieces(ChessBoard board, PieceFilter filter) {
         List<ChessPosition> matchedPositions = new ArrayList<>();
         for (ChessPosition position : allBoardLocations(board)) {
             ChessPiece piece = board.getPiece(position);
@@ -21,7 +21,7 @@ public class BoardSearcher implements PieceFilter {
         return matchedPositions;
     }
 
-    List<ChessPosition> allBoardLocations(ChessBoard board) {
+    public List<ChessPosition> allBoardLocations(ChessBoard board) {
         List<ChessPosition> locations = new ArrayList<>();
         for (int row = 1; row <= board.gameBoard.length; row++) {
             for (int col = 1; col <= board.gameBoard.length; col++) {

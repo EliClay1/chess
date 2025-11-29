@@ -1,6 +1,9 @@
 package client;
 
+import chess.BoardSearcher;
 import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -233,16 +236,21 @@ public class ServerFacade {
         String[] numsBlack = {" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 "};
         String[] numbers = blackView ? numsBlack : numsWhite;
 
-        String[] whitePieceIndex = {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN,
-                WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK};
-        String[] blackPieceIndex = {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP,
-                BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK};
+//        String[] whitePieceIndex = {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN,
+//                WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK};
+//        String[] blackPieceIndex = {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP,
+//                BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK};
 
         for (var letter : letters) {
             System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE,
                     letter, RESET_TEXT_COLOR, RESET_BG_COLOR);
         }
 
+//        List<ChessPosition> blackPositions = new BoardSearcher().findChessPieces(chessGame.getBoard(),
+//                (piece -> piece.getTeamColor() == ChessGame.TeamColor.BLACK));
+//
+//        List<ChessPosition> whitePositions = new BoardSearcher().findChessPieces(chessGame.getBoard(),
+//                (piece -> piece.getTeamColor() == ChessGame.TeamColor.WHITE));
 
 
         for (int x = 0; x < 8; x++) {
@@ -258,18 +266,24 @@ public class ServerFacade {
                 boolean dark = ((bx + by) & 1) == 1;
                 String bg = dark ? SET_BOARD_BLACK : SET_BOARD_WHITE;
 
-                String piece = null;
-                String pieceColor = null;
+
+                String piece = String.valueOf(chessGame.getBoard().getPiece(
+                        new ChessPosition(x + 1, y + 1)).getPieceType());
+                String pieceColor = String.valueOf(chessGame.getBoard().getPiece(
+                        new ChessPosition(x + 1, y + 1)).getTeamColor());
+
+                if (piece == null) {
+                    piece = EMPTY;
+                }
 
                 if (bx == 0) {
-                    piece = blackPieceIndex[by];
+                    // TODO - THIS MAY BREAK THE CODE
                     pieceColor = SET_PIECE_COLOR_BLACK;
                 } else if (bx == 1) {
-                    piece = BLACK_PAWN; pieceColor = SET_PIECE_COLOR_BLACK;
+                    pieceColor = SET_PIECE_COLOR_BLACK;
                 } else if (bx == 6) {
-                    piece = WHITE_PAWN; pieceColor = SET_PIECE_COLOR_WHITE;
+                    pieceColor = SET_PIECE_COLOR_WHITE;
                 } else if (bx == 7) {
-                    piece = whitePieceIndex[by];
                     pieceColor = SET_PIECE_COLOR_WHITE;
                 }
 
