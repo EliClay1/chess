@@ -6,6 +6,7 @@ import chess.NotUsersTurnException;
 import com.google.gson.Gson;
 import dataaccess.MySQLDataAccess;
 import io.javalin.websocket.*;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
 import service.GameService;
@@ -92,6 +93,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
 
         // TODO - add messages for Check, Checkmate, and Stalemate. Make sure that moves are prevented and the game is completed if this happens.
+        // TODO - add message for when the move
         try {
             gameService.makeMove(authToken, moveParts, gameId, null);
 
@@ -118,11 +120,17 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                                 moveParts.getFirst(), moveParts.getLast()));
             } else if (e instanceof NotUsersTurnException) {
                 errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, e.getMessage());
+            } else {
+                errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR,
+                        "An unexpected error occurred: " + e.getMessage());
             }
             try {
-                session.getRemote().sendString(serializer.toJson(errorMessage));
+                // FIXME - Breaks when attempting to serialize the error message. not exactly sure what could be causing this.
+                String jsonError = serializer.toJson(errorMessage);
+                session.getRemote().sendString(jsonError);
             } catch (Exception ex) {
-                System.out.print("SERVER ERROR: " + ex.getMessage());
+                String test = ex.getMessage();
+                System.out.print("SERVER ERROR: " + test);
             }
         }
     }
@@ -132,6 +140,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
         try {
             String user = db.getAuth(authToken).username();
+            GameData gameData = db.getGame(gameId);
+            GameData updatedGameData;
+
+            if (Objects.equals(gameData.blackUsername(), user)) {
+                updatedGameData = new GameData(gameData.gameID(), gameData.whiteUsername(), null,
+                        gameData.gameName(), gameData.game());
+            } else {
+                updatedGameData = new GameData(gameData.gameID(), null, gameData.blackUsername(),
+                        gameData.gameName(), gameData.game());
+            }
+
+            db.updateGame(updatedGameData);
+
             ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                     String.format("%s has left the game. \n", user));
             String serializedMessage = serializer.toJson(serverMessage);

@@ -57,4 +57,9 @@ public class WebsocketFacade extends Endpoint {
             System.out.print("Failed to send message, " + e.getMessage());
         }
     }
+
+    public void setNotificationHandler(NotificationHandler handler) {
+        this.notificationHandler = handler;
+    }
+
 }

@@ -53,6 +53,8 @@ public class LeaveGameCommand implements CommandInterface, NotificationHandler {
         return new ValidationResult(false, String.format("Incorrect amount of arguments, expected %d.", argumentCount));
     }
 
+    // TODO - When the user leaves, their Websocket Connection is actually closed.
+
     @Override
     public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery) {
         userStateData = userState;
@@ -70,7 +72,12 @@ public class LeaveGameCommand implements CommandInterface, NotificationHandler {
         } catch (Exception e) {
             if (e instanceof NumberFormatException) {
                 return new CommandResult(false, "Invalid GameID.");
-            } else {
+            } else if (e instanceof IllegalStateException) {
+                // TODO - figure out some kind of error handling for when the connection gets closed.
+                // could have a kill sequence that will drop all players from the game to prevent continuity issues.
+                return new CommandResult(false, "Error: " + e.getMessage());
+            }
+            else {
                 return new CommandResult(false, "Error: " + e.getMessage());
             }
         }

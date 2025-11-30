@@ -99,6 +99,7 @@ public record GameService(DataAccess dataAccess) {
             positions.add(new ChessPosition(xInt, yInt));
         }
 
+        // TODO - Send an error if it isn't the user's turn.
         ChessMove move;
         if (promo == null) {
             move = new ChessMove(positions.getFirst(), positions.getLast(), null);

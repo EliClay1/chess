@@ -47,8 +47,6 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
         return List.of(ClientState.LOGGED_IN, ClientState.PLAYING_GAME);
     }
 
-    // TODO - requires
-
     @Override
     public ValidationResult validate(String[] args, UserStateData userStateData) {
         // argument length check
@@ -64,8 +62,12 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
         String move = args[0];
 
 
+        System.out.println("DEBUG: About to get websocketFacade");
         try {
             websocketFacade = userStateData.getWebsocketFacade();
+            System.out.println("DEBUG: Got websocketFacade: " + (websocketFacade != null));
+            websocketFacade.setNotificationHandler(this);
+            System.out.println("DEBUG: Set handler to MakeMoveCommand");
             UserGameCommand moveCommand = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, userStateData.getAuthToken(),
                     userStateData.getActiveGameId(), move);
             websocketFacade.sendMessage(new Gson().toJson(moveCommand));
@@ -73,6 +75,9 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
 
             return new CommandResult(true, "");
         } catch (Exception e) {
+            System.out.println("DEBUG: Exception caught: " + e.getClass().getName() + " - " + e.getMessage());
+            e.printStackTrace();
+
             if (e instanceof NumberFormatException) {
                 return new CommandResult(false, "Invalid GameID.");
             } else {
