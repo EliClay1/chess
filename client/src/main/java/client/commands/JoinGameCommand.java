@@ -72,10 +72,14 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
             serverFacade.joinGame("localhost", 8080, "/game", userStateData.getAuthToken(), gameId, teamColor);
             UserGameCommand connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userStateData.getAuthToken(),
                     Integer.parseInt(gameId), "");
+
+
             websocketFacade.sendMessage(new Gson().toJson(connectCommand));
             userStateData.setClientState(ClientState.PLAYING_GAME);
             userStateData.setActiveGameId(Integer.parseInt(gameId));
             userStateData.setActiveTeamColor(teamColor);
+
+            // TODO - it looks like this is a timing issue. Find someway to find when the message has been recieved? It needs to print AFTER.
 
             return new CommandResult(true, "");
         } catch (Exception e) {
