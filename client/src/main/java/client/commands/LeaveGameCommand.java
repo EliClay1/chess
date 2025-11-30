@@ -62,6 +62,10 @@ public class LeaveGameCommand implements CommandInterface, NotificationHandler {
             UserGameCommand leaveCommand = new UserGameCommand(UserGameCommand.CommandType.LEAVE, userStateData.getAuthToken(),
                     userStateData.getActiveGameId(), "");
             websocketFacade.sendMessage(new Gson().toJson(leaveCommand));
+            // reset character state.
+            userStateData.setClientState(ClientState.LOGGED_IN);
+            userStateData.setActiveTeamColor(null);
+            userStateData.setActiveGameId(0);
             return new CommandResult(true, "");
         } catch (Exception e) {
             if (e instanceof NumberFormatException) {
@@ -77,11 +81,6 @@ public class LeaveGameCommand implements CommandInterface, NotificationHandler {
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
             String message = serverMessage.getMessage();
             System.out.printf("\u001b[38;5;%dm%s%s\n", 4, message, RESET_TEXT_COLOR);
-            userStateData.setClientState(ClientState.LOGGED_IN);
-            userStateData.setActiveTeamColor(null);
-            userStateData.setActiveGameId(0);
-
-
         } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
             String message = serverMessage.getMessage();
             System.out.printf("\u001b[38;5;%dm%s%s\n", 1, message, RESET_TEXT_COLOR);

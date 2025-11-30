@@ -90,6 +90,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         // TODO -  promotional pieces. Figure out when and how this will work.
         List<String> moveParts = List.of(additionalArgs.getFirst().split(","));
 
+
+        // TODO - add messages for Check, Checkmate, and Stalemate. Make sure that moves are prevented and the game is completed if this happens.
         try {
             gameService.makeMove(authToken, moveParts, gameId, null);
 

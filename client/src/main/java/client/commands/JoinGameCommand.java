@@ -63,7 +63,7 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
         String gameId = args[0];
         teamColor = args[1];
 
-        // TODO - the game and gameID into active games for the user.
+        // TODO - the game and gameID into active games for the user. Allow the user to reconnect to the game after disconnecting.
 
         try {
             WebsocketFacade websocketFacade = new WebsocketFacade(String.format("http://%s:%s", userStateData.getHost(),
