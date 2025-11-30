@@ -62,12 +62,12 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
         String move = args[0];
 
 
-        System.out.println("DEBUG: About to get websocketFacade");
+//        System.out.println("DEBUG: About to get websocketFacade");
         try {
             websocketFacade = userStateData.getWebsocketFacade();
-            System.out.println("DEBUG: Got websocketFacade: " + (websocketFacade != null));
+//            System.out.println("DEBUG: Got websocketFacade: " + (websocketFacade != null));
             websocketFacade.setNotificationHandler(this);
-            System.out.println("DEBUG: Set handler to MakeMoveCommand");
+//            System.out.println("DEBUG: Set handler to MakeMoveCommand");
             UserGameCommand moveCommand = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, userStateData.getAuthToken(),
                     userStateData.getActiveGameId(), move);
             websocketFacade.sendMessage(new Gson().toJson(moveCommand));
