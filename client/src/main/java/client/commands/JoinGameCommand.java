@@ -63,6 +63,8 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
         String gameId = args[0];
         teamColor = args[1];
 
+        // TODO - the game and gameID into active games for the user.
+
         try {
             WebsocketFacade websocketFacade = new WebsocketFacade(String.format("http://%s:%s", userStateData.getHost(),
                     userStateData.getPort()), serverFacade, this);

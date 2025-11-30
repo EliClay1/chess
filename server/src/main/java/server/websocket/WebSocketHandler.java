@@ -127,8 +127,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void disconnectUserFromGame(String authToken, int gameId, Session session) {
         connections.removeSessionFromGame(gameId, session);
-        System.out.print("User has left the game.\n");
-
 
         try {
             String user = db.getAuth(authToken).username();

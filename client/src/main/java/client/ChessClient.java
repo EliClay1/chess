@@ -28,6 +28,7 @@ public class ChessClient {
             commandRegistry.register(new JoinGameCommand());
             commandRegistry.register(new ObserveCommand());
             commandRegistry.register(new MakeMoveCommand());
+            commandRegistry.register(new LeaveGameCommand());
 
         } catch (Exception e) {
             simplePrint(1, e.getMessage());

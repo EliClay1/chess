@@ -1,6 +1,5 @@
 package client.commands;
 
-import chess.ChessGame;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
@@ -17,29 +16,28 @@ import java.util.List;
 
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 
-public class MakeMoveCommand implements CommandInterface, NotificationHandler {
+public class LeaveGameCommand implements CommandInterface, NotificationHandler {
 
-    private final ServerFacade serverFacade = new ServerFacade();
     private WebsocketFacade websocketFacade;
-    private final int argumentCount = 1;
+    private final int argumentCount = 0;
     private UserStateData userStateData;
 
-    public MakeMoveCommand() {
+    public LeaveGameCommand() {
     }
 
     @Override
     public String getName() {
-        return "move";
+        return "leave";
     }
 
     @Override
     public List<String> getAliases() {
-        return List.of("m");
+        return List.of();
     }
 
     @Override
     public String getUsage() {
-        return "Make a move: \"m\", \"move\" <move1,move2>\n";
+        return "Leave the game: \"leave\"\n";
     }
 
     @Override
@@ -47,11 +45,8 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
         return List.of(ClientState.LOGGED_IN, ClientState.PLAYING_GAME);
     }
 
-    // TODO - requires
-
     @Override
     public ValidationResult validate(String[] args, UserStateData userStateData) {
-        // argument length check
         if (args.length == argumentCount) {
             return new ValidationResult(true, "");
         }
@@ -61,16 +56,12 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
     @Override
     public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery) {
         userStateData = userState;
-        String move = args[0];
-
 
         try {
             websocketFacade = userStateData.getWebsocketFacade();
-            UserGameCommand moveCommand = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, userStateData.getAuthToken(),
-                    userStateData.getActiveGameId(), move);
-            websocketFacade.sendMessage(new Gson().toJson(moveCommand));
-            // TODO - send the game back through the websocket.
-
+            UserGameCommand leaveCommand = new UserGameCommand(UserGameCommand.CommandType.LEAVE, userStateData.getAuthToken(),
+                    userStateData.getActiveGameId(), "");
+            websocketFacade.sendMessage(new Gson().toJson(leaveCommand));
             return new CommandResult(true, "");
         } catch (Exception e) {
             if (e instanceof NumberFormatException) {
@@ -83,12 +74,14 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
 
     @Override
     public void notify(ServerMessage serverMessage) {
-        if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-            ChessGame chessGame = serverMessage.getChessGame();
-            serverFacade.printBoard(userStateData.getActiveTeamColor(), chessGame);
-        } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+        if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
             String message = serverMessage.getMessage();
             System.out.printf("\u001b[38;5;%dm%s%s\n", 4, message, RESET_TEXT_COLOR);
+            userStateData.setClientState(ClientState.LOGGED_IN);
+            userStateData.setActiveTeamColor(null);
+            userStateData.setActiveGameId(0);
+
+
         } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
             String message = serverMessage.getMessage();
             System.out.printf("\u001b[38;5;%dm%s%s\n", 1, message, RESET_TEXT_COLOR);
