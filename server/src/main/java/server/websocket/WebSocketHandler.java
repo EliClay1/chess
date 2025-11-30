@@ -31,12 +31,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public void handleClose(@NotNull WsCloseContext wsCloseContext) {
-        System.out.println("Websocket closed.\n");
+        System.out.println("Websocket closed.");
     }
 
     @Override
     public void handleConnect(@NotNull WsConnectContext ctx) {
-        System.out.print("Websocket Connected.\n");
+        System.out.println("Websocket Connected.");
         ctx.enableAutomaticPings();
     }
 
@@ -162,6 +162,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     sesh.getRemote().sendString(serializedMessage);
                 }
             }
+
+            session.close();
 
         } catch (Exception e) {
             // TODO - remove AFTER testing.

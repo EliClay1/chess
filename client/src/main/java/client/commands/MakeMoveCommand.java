@@ -93,7 +93,7 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
             System.out.printf("\u001b[38;5;%dm%s%s", 6, "[Playing] >>> ", RESET_TEXT_COLOR);
         } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
             String message = serverMessage.getMessage();
-            System.out.printf("\u001b[38;5;%dm%s%s", 1, message, RESET_TEXT_COLOR);
+            System.out.printf("\u001b[38;5;%dm%s%s\n", 1, message, RESET_TEXT_COLOR);
             System.out.printf("\u001b[38;5;%dm%s%s", 6, "[Playing] >>> ", RESET_TEXT_COLOR);
         }
     }

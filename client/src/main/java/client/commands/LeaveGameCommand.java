@@ -68,6 +68,7 @@ public class LeaveGameCommand implements CommandInterface, NotificationHandler {
             userStateData.setClientState(ClientState.LOGGED_IN);
             userStateData.setActiveTeamColor(null);
             userStateData.setActiveGameId(0);
+
             return new CommandResult(true, "");
         } catch (Exception e) {
             if (e instanceof NumberFormatException) {
