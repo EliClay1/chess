@@ -24,7 +24,6 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
     private final ServerFacade serverFacade = new ServerFacade();
     private final int argumentCount = 2;
     private String teamColor;
-    private Boolean messageReceived = false;
 
     public JoinGameCommand() throws Exception {
     }
@@ -77,14 +76,6 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
             userStateData.setActiveGameId(Integer.parseInt(gameId));
             userStateData.setActiveTeamColor(teamColor);
 
-            // Waits for the message to be recieved before sending the okay.
-            // Checks every 50 ms for 5 seconds
-            long startTime = System.currentTimeMillis();
-            while (!messageReceived && System.currentTimeMillis() - startTime < 5000) {
-                Thread.sleep(50);
-            }
-
-
             return new CommandResult(true, "");
         } catch (Exception e) {
             return switch (e) {
@@ -106,11 +97,8 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
             String message = serverMessage.getMessage();
             System.out.printf("\n\u001b[38;5;%dm%s%s", 4, message, RESET_TEXT_COLOR);
 
-            System.out.print("\r\033[K");
-            System.out.printf("\n\u001b[38;5;%dm%s%s", 6, "[Playing]>>> ", RESET_TEXT_COLOR);
-            System.out.flush();
+            System.out.printf("\u001b[38;5;%dm%s%s", 6, "[Playing] >>> ", RESET_TEXT_COLOR);
 
         }
-        messageReceived = true;
     }
 }

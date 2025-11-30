@@ -7,6 +7,7 @@ import client.results.*;
 import java.util.Collection;
 import java.util.List;
 
+import static ui.EscapeSequences.RESET_TEXT_COLOR;
 import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
 
 public class HelpCommand implements CommandInterface{
@@ -48,6 +49,9 @@ public class HelpCommand implements CommandInterface{
             if (command.allowedStates().contains(userStateData.clientState())) {
                 System.out.print(" - " + command.getUsage());
             }
+        }
+        if (userStateData.clientState() == ClientState.PLAYING_GAME) {
+            System.out.printf("\u001b[38;5;%dm%s%s", 6, "[Playing] >>> ", RESET_TEXT_COLOR);
         }
         return new CommandResult(true, "");
     }

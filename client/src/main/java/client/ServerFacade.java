@@ -23,7 +23,6 @@ public class ServerFacade {
 
     // TODO - Cannot send ANY error codes back.
 
-
     public Map<String, String> registerUser(String host, int port, String path, String username,
                                             String password, String email) throws Exception {
 
@@ -232,7 +231,6 @@ public class ServerFacade {
         String[] numsBlack = {" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 "};
         String[] numbers = blackView ? numsBlack : numsWhite;
 
-        System.out.print("\n");
         for (var letter : letters) {
             System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE,
                     letter, RESET_TEXT_COLOR, RESET_BG_COLOR);
@@ -296,7 +294,6 @@ public class ServerFacade {
             System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE,
                     letter, RESET_TEXT_COLOR, RESET_BG_COLOR);
         }
-        System.out.print("\n");
         System.out.print("\n");
     }
 

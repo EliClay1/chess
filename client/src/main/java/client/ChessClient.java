@@ -52,11 +52,12 @@ public class ChessClient {
             switch (userStateData.clientState()) {
                 case LOGGED_OUT -> statePrintValue = "Logged Out";
                 case LOGGED_IN -> statePrintValue = "Logged In";
-//                case PLAYING_GAME -> statePrintValue = "Playing";
+                case PLAYING_GAME -> statePrintValue = "Playing";
                 case OBSERVING_GAME -> statePrintValue = "Observing";
                 default -> throw new IllegalStateException("Unexpected value: " + userStateData.clientState());
             }
 
+            // Prevents the Playing state from printing. It's handled on the command level. That may be a coupling issue or something, but honestly I don't care.
             if (userStateData.clientState() == ClientState.LOGGED_OUT || userStateData.clientState() == ClientState.LOGGED_IN
             || userStateData.clientState() == ClientState.OBSERVING_GAME) {
                 simplePrint(6, String.format("[%s] >>> ", statePrintValue));

@@ -71,13 +71,9 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
             UserGameCommand moveCommand = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, userStateData.getAuthToken(),
                     userStateData.getActiveGameId(), move);
             websocketFacade.sendMessage(new Gson().toJson(moveCommand));
-            // TODO - send the game back through the websocket.
 
             return new CommandResult(true, "");
         } catch (Exception e) {
-            System.out.println("DEBUG: Exception caught: " + e.getClass().getName() + " - " + e.getMessage());
-            e.printStackTrace();
-
             if (e instanceof NumberFormatException) {
                 return new CommandResult(false, "Invalid GameID.");
             } else {
@@ -94,9 +90,11 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
         } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
             String message = serverMessage.getMessage();
             System.out.printf("\u001b[38;5;%dm%s%s\n", 4, message, RESET_TEXT_COLOR);
+            System.out.printf("\u001b[38;5;%dm%s%s", 6, "[Playing] >>> ", RESET_TEXT_COLOR);
         } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
             String message = serverMessage.getMessage();
-            System.out.printf("\u001b[38;5;%dm%s%s\n", 1, message, RESET_TEXT_COLOR);
+            System.out.printf("\u001b[38;5;%dm%s%s", 1, message, RESET_TEXT_COLOR);
+            System.out.printf("\u001b[38;5;%dm%s%s", 6, "[Playing] >>> ", RESET_TEXT_COLOR);
         }
     }
 }
