@@ -5,6 +5,7 @@ import client.results.CommandResult;
 import client.results.ValidationResult;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -51,11 +52,16 @@ public class ChessClient {
             switch (userStateData.clientState()) {
                 case LOGGED_OUT -> statePrintValue = "Logged Out";
                 case LOGGED_IN -> statePrintValue = "Logged In";
-                case PLAYING_GAME -> statePrintValue = "Playing";
+//                case PLAYING_GAME -> statePrintValue = "Playing";
                 case OBSERVING_GAME -> statePrintValue = "Observing";
                 default -> throw new IllegalStateException("Unexpected value: " + userStateData.clientState());
             }
-            simplePrint(6, String.format("[%s] >>> ", statePrintValue));
+
+            if (userStateData.clientState() == ClientState.LOGGED_OUT || userStateData.clientState() == ClientState.LOGGED_IN
+            || userStateData.clientState() == ClientState.OBSERVING_GAME) {
+                simplePrint(6, String.format("[%s] >>> ", statePrintValue));
+            }
+
 
             String line = scanner.nextLine();
             var inputData = line.split(" ");

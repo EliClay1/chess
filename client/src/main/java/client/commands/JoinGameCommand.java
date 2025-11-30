@@ -24,6 +24,7 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
     private final ServerFacade serverFacade = new ServerFacade();
     private final int argumentCount = 2;
     private String teamColor;
+    private Boolean messageReceived = false;
 
     public JoinGameCommand() throws Exception {
     }
@@ -63,8 +64,6 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
         String gameId = args[0];
         teamColor = args[1];
 
-        // TODO - the game and gameID into active games for the user. Allow the user to reconnect to the game after disconnecting.
-
         try {
             WebsocketFacade websocketFacade = new WebsocketFacade(String.format("http://%s:%s", userStateData.getHost(),
                     userStateData.getPort()), serverFacade, this);
@@ -73,13 +72,18 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
             UserGameCommand connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userStateData.getAuthToken(),
                     Integer.parseInt(gameId), "");
 
-
             websocketFacade.sendMessage(new Gson().toJson(connectCommand));
             userStateData.setClientState(ClientState.PLAYING_GAME);
             userStateData.setActiveGameId(Integer.parseInt(gameId));
             userStateData.setActiveTeamColor(teamColor);
 
-            // TODO - it looks like this is a timing issue. Find someway to find when the message has been recieved? It needs to print AFTER.
+            // Waits for the message to be recieved before sending the okay.
+            // Checks every 50 ms for 5 seconds
+            long startTime = System.currentTimeMillis();
+            while (!messageReceived && System.currentTimeMillis() - startTime < 5000) {
+                Thread.sleep(50);
+            }
+
 
             return new CommandResult(true, "");
         } catch (Exception e) {
@@ -93,9 +97,6 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
         }
     }
 
-
-    // TODO - Board printing needs to be happening on an individual level, NOT every time a user joins the game. Moves on the
-    // - other hand should be shows on all ends every time.
     @Override
     public void notify(ServerMessage serverMessage) {
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
@@ -103,7 +104,13 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
             serverFacade.printBoard(teamColor, chessGame);
         } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
             String message = serverMessage.getMessage();
-            System.out.printf("\u001b[38;5;%dm%s%s\n", 4, message, RESET_TEXT_COLOR);
+            System.out.printf("\n\u001b[38;5;%dm%s%s", 4, message, RESET_TEXT_COLOR);
+
+            System.out.print("\r\033[K");
+            System.out.printf("\n\u001b[38;5;%dm%s%s", 6, "[Playing]>>> ", RESET_TEXT_COLOR);
+            System.out.flush();
+
         }
+        messageReceived = true;
     }
 }
