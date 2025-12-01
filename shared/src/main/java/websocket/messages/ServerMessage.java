@@ -14,15 +14,12 @@ public class ServerMessage {
     ServerMessageType serverMessageType;
     private ChessGame game;
     private String message;
+    private String errorMessage;
 
     public enum ServerMessageType {
         LOAD_GAME,
         ERROR,
         NOTIFICATION
-    }
-
-    public ServerMessage(ServerMessageType type) {
-        this.serverMessageType = type;
     }
 
     public ServerMessage(ServerMessageType type, ChessGame game) {
@@ -53,6 +50,14 @@ public class ServerMessage {
 
     public String getMessage() {
         return this.message;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
+    public String getErrorMessage() {
+        return this.errorMessage;
     }
 
     @Override

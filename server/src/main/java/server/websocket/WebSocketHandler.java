@@ -15,6 +15,7 @@ import websocket.commands.UserGameCommand;
 import websocket.commands.UserGameCommand.CommandType.*;
 import websocket.messages.ServerMessage;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -63,8 +64,18 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void connectUserToGame(String authToken, int gameId, Session session) {
         try {
+            if (db.getAuth(authToken) == null) {
+                throw new Exception("Invalid Authorization.");
+            }
+
             String username = db.getAuth(authToken).username();
-            GameData gameData = db.getGame(gameId);
+            GameData gameData;
+
+            if (db.getGame(gameId) == null) {
+                throw new Exception("Invalid GameID");
+            }
+            gameData = db.getGame(gameId);
+
             String userType;
             ServerMessage joinNotificationMessage;
 
@@ -91,6 +102,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 }
             }
         } catch (Exception e) {
+            try {
+                ServerMessage errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, (String) null);
+                errorMessage.setErrorMessage(e.getMessage());
+                session.getRemote().sendString(serializer.toJson(errorMessage));
+            } catch (Exception e1) {
+            }
+
         }
     }
 

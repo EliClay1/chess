@@ -1,6 +1,7 @@
 package client.commands;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
@@ -59,7 +60,10 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
     @Override
     public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery) {
         userStateData = userState;
-        String move = args[0];
+        String[] moveParts = args[0].split(",");
+        ChessMove
+
+        // TODO - Move needs to be converted into an actual chess move BEFORE sending to the websocket. ie. here.
 
 
 //        System.out.println("DEBUG: About to get websocketFacade");
