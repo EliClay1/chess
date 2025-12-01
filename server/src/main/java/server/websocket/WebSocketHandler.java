@@ -1,6 +1,7 @@
 package server.websocket;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.InvalidMoveException;
 import chess.NotUsersTurnException;
 import com.google.gson.Gson;
@@ -54,7 +55,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         if (commandType == UserGameCommand.CommandType.CONNECT) {
             connectUserToGame(authToken, gameId, ctx.session);
         } else if (commandType == UserGameCommand.CommandType.MAKE_MOVE) {
-            makeMove(authToken, gameId, command.additionalArguments(), ctx.session);
+            makeMove(authToken, gameId, command.getChessMove(), ctx.session);
         } else if (commandType == UserGameCommand.CommandType.LEAVE) {
             disconnectUserFromGame(authToken, gameId, ctx.session);
         } else if (commandType == UserGameCommand.CommandType.RESIGN) {
@@ -153,20 +154,36 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
 
-    private void makeMove(String authToken, int gameId, List<String> additionalArgs, Session session) {
-        // This should have two components in it.
-        // TODO -  promotional pieces. Figure out when and how this will work.
-        List<String> moveParts = List.of(additionalArgs.getFirst().split(","));
+    private void makeMove(String authToken, int gameId, ChessMove move, Session session) {
 
+        // TODO - check if the correct user is in the game, right players turn, etc, here within the handler.
 
         // TODO - add messages for Check, Checkmate, and Stalemate. Make sure that moves are prevented and the game is completed if this happens.
-        // TODO - add message for when the move
-        try {
-            gameService.makeMove(authToken, moveParts, gameId, null);
 
+
+        try {
+            // TODO - check for authentication
+            if (db.getAuth(authToken) == null) {
+                // throw error
+            }
             String user = db.getAuth(authToken).username();
+            GameData gameData = db.getGame(gameId);
+
+            if (gameData.whiteUsername() == null || gameData.blackUsername() == null) {
+                // throw error
+            }
+
+            try {
+                gameData.game().makeMove(move);
+            } catch (InvalidMoveException e) {
+                // throw error
+            }
+
+            if (gameData.game().isInCheck())
+
+
             ServerMessage moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                    String.format("%s has made the move, %s to %s. \n", user, moveParts.getFirst(), moveParts.getLast()));
+                    String.format("%s has made the move, %s to %s. \n", user, move.getStartPosition(), move.getEndPosition()));
             String serializedMoveMessage = serializer.toJson(moveMessage);
 
             ChessGame chessGame = db.getGame(gameId).game();

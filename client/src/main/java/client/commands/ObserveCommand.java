@@ -48,7 +48,7 @@ public class ObserveCommand extends BaseCommand implements NotificationHandler {
         try {
             serverFacade.observeGame(gameId, userStateData.getActiveGames());
             UserGameCommand connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userStateData.getAuthToken(),
-                    Integer.parseInt(gameId), "observer");
+                    Integer.parseInt(gameId), null);
             WebsocketFacade websocketFacade = new WebsocketFacade(String.format("http://%s:%s", userStateData.getHost(),
                     userStateData.getPort()), serverFacade, this);
             userStateData.setWebsocketFacade(websocketFacade);

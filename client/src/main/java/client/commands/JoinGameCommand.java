@@ -69,7 +69,7 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
             userStateData.setWebsocketFacade(websocketFacade);
             serverFacade.joinGame("localhost", 8080, "/game", userStateData.getAuthToken(), gameId, teamColor);
             UserGameCommand connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userStateData.getAuthToken(),
-                    Integer.parseInt(gameId), "player");
+                    Integer.parseInt(gameId), null);
 
             websocketFacade.sendMessage(new Gson().toJson(connectCommand));
             userStateData.setClientState(ClientState.PLAYING_GAME);

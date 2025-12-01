@@ -2,6 +2,8 @@ package client.commands;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
@@ -13,8 +15,10 @@ import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 
@@ -61,7 +65,30 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
     public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery) {
         userStateData = userState;
         String[] moveParts = args[0].split(",");
-        ChessMove
+        List<ChessPosition> positions = new ArrayList<>(List.of());
+        ChessPiece.PieceType promotionalPiece = null;
+        if (moveParts.length > 2) {
+            switch (moveParts[2].toLowerCase()) {
+                case "queen" -> promotionalPiece = ChessPiece.PieceType.QUEEN;
+                case "rook" -> promotionalPiece = ChessPiece.PieceType.ROOK;
+                case "knight" -> promotionalPiece = ChessPiece.PieceType.KNIGHT;
+                case "bishop" -> promotionalPiece = ChessPiece.PieceType.BISHOP;
+            }
+        }
+        int index = 0;
+        while (index <= 2) {
+            for (var position : moveParts) {
+                String input = position.trim().toLowerCase();
+                char yChar = input.charAt(0);
+                char xChar = input.charAt(1);
+                int yInt = (yChar - 'a') + 1;
+                int xInt = (xChar - '1') + 1;
+                positions.add(new ChessPosition(xInt, yInt));
+                index++;
+            }
+        }
+
+        ChessMove chessMove = new ChessMove(positions.getFirst(), positions.getLast(), promotionalPiece);
 
         // TODO - Move needs to be converted into an actual chess move BEFORE sending to the websocket. ie. here.
 
@@ -73,7 +100,7 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
             websocketFacade.setNotificationHandler(this);
 //            System.out.println("DEBUG: Set handler to MakeMoveCommand");
             UserGameCommand moveCommand = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, userStateData.getAuthToken(),
-                    userStateData.getActiveGameId(), move);
+                    userStateData.getActiveGameId(), chessMove);
             websocketFacade.sendMessage(new Gson().toJson(moveCommand));
 
             return new CommandResult(true, "");

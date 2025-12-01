@@ -82,7 +82,7 @@ public class ChessGame {
         ChessPosition startingPosition = move.getStartPosition();
         ChessPiece piece = getBoard().getPiece(startingPosition);
         if (piece == null || piece.getTeamColor() != currentTurn) {
-            throw new InvalidMoveException("That isn't a valid move!");
+            throw new InvalidMoveException("It's not your turn");
         }
 
         // scans through entire collection. Look into streams for other parts of this project.

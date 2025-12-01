@@ -58,12 +58,10 @@ public class LeaveGameCommand implements CommandInterface, NotificationHandler {
     public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery) {
         userStateData = userState;
 
-        String state = userStateData.clientState() == ClientState.PLAYING_GAME ? "player" : "observer";
-
         try {
             websocketFacade = userStateData.getWebsocketFacade();
             UserGameCommand leaveCommand = new UserGameCommand(UserGameCommand.CommandType.LEAVE, userStateData.getAuthToken(),
-                    userStateData.getActiveGameId(), state);
+                    userStateData.getActiveGameId(), null);
             websocketFacade.sendMessage(new Gson().toJson(leaveCommand));
             // reset character state.
             userStateData.setClientState(ClientState.LOGGED_IN);
