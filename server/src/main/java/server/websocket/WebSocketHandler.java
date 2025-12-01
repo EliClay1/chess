@@ -5,6 +5,7 @@ import chess.InvalidMoveException;
 import chess.NotUsersTurnException;
 import com.google.gson.Gson;
 import dataaccess.MySQLDataAccess;
+import exceptions.DataAccessException;
 import io.javalin.websocket.*;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
@@ -61,30 +62,78 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void connectUserToGame(String authToken, int gameId, Session session) {
-        connections.addSessionToGame(gameId, session);
-
         try {
-            String user = db.getAuth(authToken).username();
-            String userColor = Objects.equals(db.getGame(gameId).whiteUsername(), user) ? "White" : "Black";
-            ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                    String.format("Successfully joined %s user: %s \n", userColor, user));
-            String serializedMessage = serializer.toJson(serverMessage);
+            String username = db.getAuth(authToken).username();
+            GameData gameData = db.getGame(gameId);
+            String userType;
+            ServerMessage joinNotificationMessage;
 
-            ChessGame game = db.getGame(gameId).game();
-            ServerMessage notificationMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
-            String serializedGame = serializer.toJson(notificationMessage);
+            if (Objects.equals(gameData.whiteUsername(), username)) {
+                userType = "white";
+            } else if (Objects.equals(gameData.blackUsername(), username)) {
+                userType = "black";
+            } else {
+                userType = "observer";
+            }
 
-            // Prevents duplicate printing
-            session.getRemote().sendString(serializedGame);
+            connections.addSessionToGame(gameId, session);
 
+            // sends game to only the joining user
+            ServerMessage loadGameMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game());
+            session.getRemote().sendString(serializer.toJson(loadGameMessage));
+
+            // sends join message to all users within the game
+            joinNotificationMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                    String.format("%s has joined as %s.\n", username, userType));
             for (var sesh : connections.getSessionsForGame(gameId)) {
-                if (sesh.isOpen()) {
-//                    sesh.getRemote().sendString(serializedMessage);
+                if (sesh.isOpen() && sesh != session) {
+                    sesh.getRemote().sendString(serializer.toJson(joinNotificationMessage));
                 }
             }
         } catch (Exception e) {
         }
     }
+
+    private void disconnectUserFromGame(String authToken, int gameId, Session session) {
+        try {
+            String username = db.getAuth(authToken).username();
+            GameData gameData = db.getGame(gameId);
+            String userType;
+
+            if (Objects.equals(gameData.whiteUsername(), username)) {
+                userType = "white";
+            } else if (Objects.equals(gameData.blackUsername(), username)) {
+                userType = "black";
+            } else {
+                userType = "observer";
+            }
+
+            connections.removeSessionFromGame(gameId, session);
+
+            // updates the game users
+            if (Objects.equals(userType, "white") || Objects.equals(userType, "black")) {
+                GameData updatedGameData;
+                if (Objects.equals(userType, "white")) {
+                    updatedGameData = new GameData(gameData.gameID(), null, gameData.blackUsername(),
+                            gameData.gameName(), gameData.game());
+                } else {
+                    updatedGameData = new GameData(gameData.gameID(), gameData.whiteUsername(), null,
+                            gameData.gameName(), gameData.game());
+                }
+                db.updateGame(updatedGameData);
+            }
+
+            ServerMessage leaveGameNotificationMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                    String.format("%s has left the game. \n", username));
+            for (var sesh : connections.getSessionsForGame(gameId)) {
+                if (sesh.isOpen() && sesh != session) {
+                    sesh.getRemote().sendString(serializer.toJson(leaveGameNotificationMessage));
+                }
+            }
+        } catch (Exception e) {
+        }
+    }
+
 
     private void makeMove(String authToken, int gameId, List<String> additionalArgs, Session session) {
         // This should have two components in it.
@@ -135,42 +184,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void disconnectUserFromGame(String authToken, int gameId, Session session) {
-        connections.removeSessionFromGame(gameId, session);
-
-        try {
-            String user = db.getAuth(authToken).username();
-            GameData gameData = db.getGame(gameId);
-            GameData updatedGameData;
-
-            if (Objects.equals(gameData.blackUsername(), user)) {
-                updatedGameData = new GameData(gameData.gameID(), gameData.whiteUsername(), null,
-                        gameData.gameName(), gameData.game());
-            } else {
-                updatedGameData = new GameData(gameData.gameID(), null, gameData.blackUsername(),
-                        gameData.gameName(), gameData.game());
-            }
-
-            db.updateGame(updatedGameData);
-
-            ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                    String.format("%s has left the game. \n", user));
-            String serializedMessage = serializer.toJson(serverMessage);
-
-            for (var sesh : connections.getSessionsForGame(gameId)) {
-                if (sesh.isOpen()) {
-                    sesh.getRemote().sendString(serializedMessage);
-                }
-            }
-
-            session.close();
-
-        } catch (Exception e) {
-            // TODO - remove AFTER testing.
-            System.out.printf("Erorr, %s", e.getMessage());
-        }
-
-    }
 
     private void resignUser(String authToken, int gameID, Session ctx) {
         // technically this should simutaneously disconnect the user from the game.

@@ -170,7 +170,7 @@ public class ServerFacade {
         // TODO - 11/28/2025 - parse the game and print the game. Code should be functioning now.
 
         if (status >= 200 && status < 300) {
-            System.out.print("");
+            System.out.print("\n");
         } else if (status == 400) {
             throw new NumberFormatException();
         } else if (status == 403) {
@@ -182,42 +182,18 @@ public class ServerFacade {
     }
 
     // FIXME - Error handling for invalid game ID. Check to ensure that the gameID actually exists.
-    public void observeGame(String host, int port, String path, String authToken, String gameID) throws Exception {
+    public void observeGame(String gameID, List<Map<String, String>> activeGames) throws Exception {
 
-        String url = String.format(Locale.getDefault(), "http://%s:%d%s", host, port, path);
-        HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(
-                String.format("{\"gameID\": \"%s\"}", gameID));
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(new URI(url))
-                .timeout(Duration.ofMillis(5000))
-                .PUT(body)
-                .header("Authorization", authToken)
-                .build();
-
-        HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        status = response.statusCode();
-
-        if (status >= 200 && status < 300) {
-            System.out.print("\n");
-        } else if (status == 400) {
-            throw new NumberFormatException();
-        } else if (status == 403) {
-            throw new AlreadyTakenException();
+        if (activeGames == null || activeGames.isEmpty()) {
+            throw new InvalidException();
         }
-        else {
-            throw new Exception("Invalid");
-        }
-
 
         if (gameID == null || gameID.isEmpty()) {
-            status = 400;
             throw new Exception("GameID doesn't exist.");
         } else {
             try {
                 Integer.parseInt(gameID);
             } catch (NumberFormatException e) {
-                status = 400;
                 throw new Exception("GameID must be a number.");
             }
         }
@@ -233,8 +209,6 @@ public class ServerFacade {
         if (!found) {
             throw new Exception("GameID doesn't exist.");
         }
-
-//        printBoard("white", new ChessGame());
     }
 
     public void printBoard(String color, ChessGame chessGame) {

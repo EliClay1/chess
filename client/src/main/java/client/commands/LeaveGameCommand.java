@@ -1,7 +1,6 @@
 package client.commands;
 
 import client.ClientState;
-import client.ServerFacade;
 import client.UserStateData;
 import client.results.CommandResult;
 import client.results.ValidationResult;
@@ -42,7 +41,7 @@ public class LeaveGameCommand implements CommandInterface, NotificationHandler {
 
     @Override
     public Collection<ClientState> allowedStates() {
-        return List.of(ClientState.PLAYING_GAME);
+        return List.of(ClientState.PLAYING_GAME, ClientState.OBSERVING_GAME);
     }
 
     @Override
@@ -59,10 +58,12 @@ public class LeaveGameCommand implements CommandInterface, NotificationHandler {
     public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery) {
         userStateData = userState;
 
+        String state = userStateData.clientState() == ClientState.PLAYING_GAME ? "player" : "observer";
+
         try {
             websocketFacade = userStateData.getWebsocketFacade();
             UserGameCommand leaveCommand = new UserGameCommand(UserGameCommand.CommandType.LEAVE, userStateData.getAuthToken(),
-                    userStateData.getActiveGameId(), "");
+                    userStateData.getActiveGameId(), state);
             websocketFacade.sendMessage(new Gson().toJson(leaveCommand));
             // reset character state.
             userStateData.setClientState(ClientState.LOGGED_IN);

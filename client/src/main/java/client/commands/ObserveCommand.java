@@ -8,7 +8,6 @@ import client.results.CommandResult;
 import client.websocket.NotificationHandler;
 import client.websocket.WebsocketFacade;
 import com.google.gson.Gson;
-import exceptions.AlreadyTakenException;
 import exceptions.InvalidException;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
@@ -39,16 +38,26 @@ public class ObserveCommand extends BaseCommand implements NotificationHandler {
 
     @Override
     public Collection<ClientState> allowedStates() {
-        return List.of(ClientState.OBSERVING_GAME);
+        return List.of(ClientState.LOGGED_IN);
     }
 
     @Override
     public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
-        String gameID = args[0];
+        String gameId = args[0];
 
         try {
-            serverFacade.observeGame(gameID, userStateData.getActiveGames());
+            serverFacade.observeGame(gameId, userStateData.getActiveGames());
+            UserGameCommand connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userStateData.getAuthToken(),
+                    Integer.parseInt(gameId), "observer");
+            WebsocketFacade websocketFacade = new WebsocketFacade(String.format("http://%s:%s", userStateData.getHost(),
+                    userStateData.getPort()), serverFacade, this);
+            userStateData.setWebsocketFacade(websocketFacade);
+
+            websocketFacade.sendMessage(new Gson().toJson(connectCommand));
+            userStateData.setClientState(ClientState.OBSERVING_GAME);
+
             return new CommandResult(true, "");
+
         } catch (Exception e) {
             if (e instanceof InvalidException) {
                 return new CommandResult(false, "Please print out a list of games before attempting to observe. (l)");
@@ -58,43 +67,15 @@ public class ObserveCommand extends BaseCommand implements NotificationHandler {
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) throws Exception {
-
-        String gameId = args[0];
-
-        try {
-            WebsocketFacade websocketFacade = new WebsocketFacade(String.format("http://%s:%s", userStateData.getHost(),
-                    userStateData.getPort()), serverFacade, this);
-            userStateData.setWebsocketFacade(websocketFacade);
-            serverFacade.observeGame("localhost", 8080, "/observe", userStateData.getAuthToken(), gameId);
-            UserGameCommand connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userStateData.getAuthToken(),
-                    Integer.parseInt(gameId), "");
-
-            websocketFacade.sendMessage(new Gson().toJson(connectCommand));
-            userStateData.setClientState(ClientState.OBSERVING_GAME);
-
-            return new CommandResult(true, "");
-        } catch (Exception e) {
-            return switch (e) {
-                case InvalidException invalidException -> new CommandResult(false, "Invalid team color.");
-                case NumberFormatException numberFormatException -> new CommandResult(false, "Invalid GameID.");
-                case AlreadyTakenException alreadyTakenException ->
-                        new CommandResult(false, "That team is already taken.");
-                default -> new CommandResult(false, "Error: " + e.getMessage());
-            };
-        }
-    }
-
-    @Override
     public void notify(ServerMessage serverMessage) {
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
             ChessGame chessGame = serverMessage.getGame();
-            serverFacade.printBoard(teamColor, chessGame);
+            serverFacade.printBoard("white", chessGame);
         } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
             String message = serverMessage.getMessage();
             System.out.printf("\n\u001b[38;5;%dm%s%s", 4, message, RESET_TEXT_COLOR);
 
-            System.out.printf("\u001b[38;5;%dm%s%s", 6, "[Playing] >>> ", RESET_TEXT_COLOR);
+            System.out.printf("\u001b[38;5;%dm%s%s", 6, "[Observing] >>> ", RESET_TEXT_COLOR);
 
         }
     }
