@@ -164,59 +164,79 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         try {
             // TODO - check for authentication
             if (db.getAuth(authToken) == null) {
-                // throw error
+                throw new Exception("Invalid Authorization");
             }
             String user = db.getAuth(authToken).username();
             GameData gameData = db.getGame(gameId);
 
             if (gameData.whiteUsername() == null || gameData.blackUsername() == null) {
-                // throw error
+                throw new NotUsersTurnException();
             }
 
-            try {
-                gameData.game().makeMove(move);
-            } catch (InvalidMoveException e) {
-                // throw error
+            gameData.game().makeMove(move);
+
+            ServerMessage moveMessage;
+
+            // TODO - The inverse may be needed for the team turn, not entirely sure yet.
+            if (gameData.game().isInCheck(gameData.game().getTeamTurn())) {
+                // send notification that game is in check
+                moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                        // TODO - may need to change getTeamTurn string to be lowercase or something.
+                        String.format("%s (%s) has made the move, %s to %s.\nThe game is in now in check.\n", user,
+                                gameData.game().getTeamTurn().toString(), move.getStartPosition(), move.getEndPosition()));
+            } else if (gameData.game().isInCheckmate(gameData.game().getTeamTurn())) {
+                // send notification that the game is over, run end game functionality.
+                moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                        // TODO - may need to change getTeamTurn string to be lowercase or something.
+                        String.format("%s (%s) has made the move, %s to %s.\nCheckmate.\n", user,
+                                gameData.game().getTeamTurn().toString(), move.getStartPosition(), move.getEndPosition()));
+            } else if (gameData.game().isInStalemate(gameData.game().getTeamTurn())) {
+                // send notification that game is at a stalemate, run end game functionality
+                moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                        // TODO - may need to change getTeamTurn string to be lowercase or something.
+                        String.format("%s (%s) has made the move, %s to %s.\nThe game has entered into a stalemate.\n", user,
+                                gameData.game().getTeamTurn().toString(), move.getStartPosition(), move.getEndPosition()));
+            } else {
+                // send default notification for chess move.
+                moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                        // TODO - may need to change getTeamTurn string to be lowercase or something.
+                        String.format("%s (%s) has made the move, %s to %s. \n", user,
+                                gameData.game().getTeamTurn().toString(), move.getStartPosition(), move.getEndPosition()));
             }
 
-            if (gameData.game().isInCheck())
+            ServerMessage updateGameMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game());
 
-
-            ServerMessage moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                    String.format("%s has made the move, %s to %s. \n", user, move.getStartPosition(), move.getEndPosition()));
-            String serializedMoveMessage = serializer.toJson(moveMessage);
-
-            ChessGame chessGame = db.getGame(gameId).game();
-            ServerMessage notificationMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, chessGame);
-            String serializedGame = serializer.toJson(notificationMessage);
             for (var sesh : connections.getSessionsForGame(gameId)) {
                 if (sesh.isOpen()) {
-                    sesh.getRemote().sendString(serializedGame);
-                    sesh.getRemote().sendString(serializedMoveMessage);
+                    sesh.getRemote().sendString(serializer.toJson(updateGameMessage));
+                    sesh.getRemote().sendString(serializer.toJson(moveMessage));
 
                 }
             }
         } catch (Exception e) {
-            ServerMessage errorMessage = null;
-            if (e instanceof InvalidMoveException) {
-                errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR,
-                        String.format("Sorry, the move %s to %s is not valid. Please try again. \n",
-                                moveParts.getFirst(), moveParts.getLast()));
-            } else if (e instanceof NotUsersTurnException) {
-                errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, e.getMessage());
-            } else {
-                errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR,
-                        "An unexpected error occurred: " + e.getMessage());
-            }
+            ServerMessage errorMessage = getErrorMessage(move, e);
             try {
-                // FIXME - Breaks when attempting to serialize the error message. not exactly sure what could be causing this.
-                String jsonError = serializer.toJson(errorMessage);
-                session.getRemote().sendString(jsonError);
+                session.getRemote().sendString(serializer.toJson(errorMessage));
             } catch (Exception ex) {
-                String test = ex.getMessage();
-                System.out.print("SERVER ERROR: " + test);
             }
         }
+    }
+
+    @NotNull
+    private static ServerMessage getErrorMessage(ChessMove move, Exception e) {
+        ServerMessage errorMessage;
+        if (e instanceof InvalidMoveException) {
+            errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, (String) null);
+            errorMessage.setErrorMessage(String.format("Sorry, the move %s to %s is not valid. Please try again.\n",
+                    move.getStartPosition(), move.getEndPosition()));
+        } else if (e instanceof NotUsersTurnException) {
+            errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, (String) null);
+            errorMessage.setErrorMessage("It's not your turn.\n");
+        } else {
+            errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, (String) null);
+            errorMessage.setErrorMessage(String.format("%s\n", e.getMessage()));
+        }
+        return errorMessage;
     }
 
 
