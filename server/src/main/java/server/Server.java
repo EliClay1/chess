@@ -23,6 +23,7 @@ public class Server {
             javalinServer.post("game", handlers::createGameHandler);
             javalinServer.put("game", handlers::joinGameHandler);
             javalinServer.get("game", handlers::listGamesHandler);
+            javalinServer.put("observe", handlers::observeGameHandler);
             javalinServer.ws("/ws", ws -> {
                 ws.onConnect(webSocketHandler);
                 ws.onMessage(webSocketHandler);

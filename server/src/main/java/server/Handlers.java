@@ -165,6 +165,35 @@ public class Handlers {
 
     }
 
+    void observeGameHandler(Context ctx) {
+        String requestHeader = ctx.header("authorization");
+        String requestJson = ctx.body();
+        // gets access to the request data without having to create a new record object to map the data to. Update, Just make a stupid record object...
+        Type type = new TypeToken<Map<String, String>>() {}.getType();
+        Map<String, String> request = serializer.fromJson(requestJson, type);
+
+        int gameID = 0;
+        String idAsString = request.get("gameID");
+        if (idAsString != null && !idAsString.isEmpty()) {
+            try {
+                gameID = Integer.parseInt(request.get("gameID"));
+            } catch (NumberFormatException e) {
+                errorReturnHandling(ctx, e);
+            }
+        }
+
+        try {
+            GameData gameData = db.getGame(gameID);
+            if (gameData == null) {
+                throw new NumberFormatException();
+            }
+            ctx.result("{}");
+        } catch (Exception e) {
+            errorReturnHandling(ctx, e);
+        }
+
+    }
+
     void listGamesHandler(Context ctx) {
         String requestHeader = ctx.header("authorization");
         try {
