@@ -91,7 +91,7 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
     @Override
     public void notify(ServerMessage serverMessage) {
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-            ChessGame chessGame = serverMessage.getChessGame();
+            ChessGame chessGame = serverMessage.getGame();
             serverFacade.printBoard(teamColor, chessGame);
         } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
             String message = serverMessage.getMessage();

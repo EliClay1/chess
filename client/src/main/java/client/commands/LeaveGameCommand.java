@@ -42,7 +42,7 @@ public class LeaveGameCommand implements CommandInterface, NotificationHandler {
 
     @Override
     public Collection<ClientState> allowedStates() {
-        return List.of(ClientState.LOGGED_IN, ClientState.PLAYING_GAME);
+        return List.of(ClientState.PLAYING_GAME);
     }
 
     @Override

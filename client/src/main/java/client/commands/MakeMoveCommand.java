@@ -44,7 +44,7 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
 
     @Override
     public Collection<ClientState> allowedStates() {
-        return List.of(ClientState.LOGGED_IN, ClientState.PLAYING_GAME);
+        return List.of(ClientState.PLAYING_GAME);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
     @Override
     public void notify(ServerMessage serverMessage) {
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-            ChessGame chessGame = serverMessage.getChessGame();
+            ChessGame chessGame = serverMessage.getGame();
             serverFacade.printBoard(userStateData.getActiveTeamColor(), chessGame);
         } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
             String message = serverMessage.getMessage();

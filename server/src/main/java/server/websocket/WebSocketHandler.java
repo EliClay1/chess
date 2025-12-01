@@ -70,8 +70,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     String.format("Successfully joined %s user: %s \n", userColor, user));
             String serializedMessage = serializer.toJson(serverMessage);
 
-            ChessGame chessGame = db.getGame(gameId).game();
-            ServerMessage notificationMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, chessGame);
+            ChessGame game = db.getGame(gameId).game();
+            ServerMessage notificationMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
             String serializedGame = serializer.toJson(notificationMessage);
 
             // Prevents duplicate printing
@@ -79,7 +79,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             for (var sesh : connections.getSessionsForGame(gameId)) {
                 if (sesh.isOpen()) {
-                    sesh.getRemote().sendString(serializedMessage);
+//                    sesh.getRemote().sendString(serializedMessage);
                 }
             }
         } catch (Exception e) {
