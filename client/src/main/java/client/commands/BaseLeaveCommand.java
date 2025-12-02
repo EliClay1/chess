@@ -52,6 +52,10 @@ public class BaseLeaveCommand implements CommandInterface, NotificationHandler {
     @Override
     public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery,
                                  UserGameCommand.CommandType commandType) {
+        return null;
+    }
+
+    protected CommandResult executeCommand(UserStateData userState, UserGameCommand.CommandType commandType) {
         userStateData = userState;
         try {
             websocketFacade = userStateData.getWebsocketFacade();
