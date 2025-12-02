@@ -16,6 +16,7 @@ import websocket.commands.UserGameCommand;
 import websocket.commands.UserGameCommand.CommandType.*;
 import websocket.messages.ServerMessage;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -154,14 +155,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
 
     private void makeMove(String authToken, int gameId, ChessMove move, Session session) {
-
-        // TODO - check if the correct user is in the game, right players turn, etc, here within the handler.
-
-        // TODO - add messages for Check, Checkmate, and Stalemate. Make sure that moves are prevented and the game is completed if this happens.
-
-
         try {
-            // TODO - check for authentication
             if (db.getAuth(authToken) == null) {
                 throw new Exception("Invalid Authorization");
             }
@@ -186,29 +180,24 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             ServerMessage moveMessage;
 
-            // TODO - The inverse may be needed for the team turn, not entirely sure yet.
             if (gameData.game().isInCheck(gameData.game().getTeamTurn())) {
                 // send notification that game is in check
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                        // TODO - may need to change getTeamTurn string to be lowercase or something.
                         String.format("%s (%s) has made the move, %s to %s.\nThe game is in now in check.\n", user,
                                 gameData.game().getTeamTurn().toString(), move.getStartPosition(), move.getEndPosition()));
             } else if (gameData.game().isInCheckmate(gameData.game().getTeamTurn())) {
                 // send notification that the game is over, run end game functionality.
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                        // TODO - may need to change getTeamTurn string to be lowercase or something.
                         String.format("%s (%s) has made the move, %s to %s.\nCheckmate.\n", user,
                                 gameData.game().getTeamTurn().toString(), move.getStartPosition(), move.getEndPosition()));
             } else if (gameData.game().isInStalemate(gameData.game().getTeamTurn())) {
                 // send notification that game is at a stalemate, run end game functionality
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                        // TODO - may need to change getTeamTurn string to be lowercase or something.
                         String.format("%s (%s) has made the move, %s to %s.\nThe game has entered into a stalemate.\n", user,
                                 gameData.game().getTeamTurn().toString(), move.getStartPosition(), move.getEndPosition()));
             } else {
                 // send default notification for chess move.
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                        // TODO - may need to change getTeamTurn string to be lowercase or something.
                         String.format("%s (%s) has made the move, %s to %s. \n", user,
                                 gameData.game().getTeamTurn().toString(), move.getStartPosition(), move.getEndPosition()));
             }
@@ -250,11 +239,48 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
 
-    private void resignUser(String authToken, int gameID, Session ctx) {
-        // technically this should simutaneously disconnect the user from the game.
-        System.out.print("User has resigned from the game.\n");
-    }
+    private void resignUser(String authToken, int gameId, Session ctx) {
+        try {
+            if (db.getAuth(authToken) == null) {
+                throw new Exception("Invalid Authorization");
+            }
+            String user = db.getAuth(authToken).username();
+            GameData gameData = db.getGame(gameId);
+            ChessGame.TeamColor playerColor;
 
+            if (Objects.equals(gameData.blackUsername(), user)) {
+                playerColor = ChessGame.TeamColor.BLACK;
+            } else if (Objects.equals(gameData.whiteUsername(), user)) {
+                playerColor = ChessGame.TeamColor.WHITE;
+            } else {
+                throw new Exception("Observers cannot resign! Use 'leave' instead.");
+            }
+
+            if (gameData.game().getGameStatus() != ChessGame.GameStatus.ACTIVE) {
+                throw new Exception("Game is already over!");
+            }
+
+            // Resign should end the game completely, resulting in the opposite team as the winner.
+
+            if (playerColor == ChessGame.TeamColor.BLACK) {
+                // White wins the game. Notification message
+            } else {
+                // Black wins the game. Notification message
+            }
+
+
+
+            // keeps the user in the game.
+
+
+        } catch (NotUsersTurnException e) {
+            throw new RuntimeException(e);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
 }

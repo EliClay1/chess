@@ -1,5 +1,6 @@
 package chess;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -15,6 +16,7 @@ public class ChessGame {
 
     private ChessBoard startingBoard = new ChessBoard().createStartingBoard();
     private TeamColor currentTurn = TeamColor.WHITE;
+    private GameStatus gameStatus = GameStatus.ACTIVE;
 
     public ChessGame() {
 
@@ -42,6 +44,22 @@ public class ChessGame {
     public enum TeamColor {
         WHITE,
         BLACK
+    }
+
+    public enum GameStatus {
+        ACTIVE,
+        WHITE_RESIGNED,
+        BLACK_RESIGNED,
+        CHECKMATE,
+        STALEMATE
+    }
+
+    public GameStatus getGameStatus() {
+        return gameStatus;
+    }
+
+    public void setGameStatus(GameStatus status) {
+        this.gameStatus = status;
     }
 
     /**
