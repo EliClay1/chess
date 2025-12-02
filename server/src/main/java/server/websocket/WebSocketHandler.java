@@ -149,6 +149,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     sesh.getRemote().sendString(serializer.toJson(leaveGameNotificationMessage));
                 }
             }
+            session.close();
         } catch (Exception e) {
         }
     }

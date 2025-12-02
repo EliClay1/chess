@@ -92,7 +92,7 @@ public class ChessClient {
                     break;
                 }
 
-                CommandResult commandResult = command.execute(arguments, userStateData, commandRegistry);
+                CommandResult commandResult = command.execute(arguments, userStateData, commandRegistry, null);
                 if (commandResult == null) {
                     simplePrint(1, "failed command." + "\n");
                     continue;
