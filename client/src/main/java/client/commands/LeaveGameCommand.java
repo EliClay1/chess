@@ -3,6 +3,7 @@ package client.commands;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
+import client.commands.command_implementation.BaseCommand;
 import client.commands.command_implementation.CommandRegistry;
 import client.results.CommandResult;
 import client.websocket.WebsocketFacade;
@@ -13,7 +14,7 @@ import websocket.messages.ServerMessage;
 import java.util.Collection;
 import java.util.List;
 
-public class LeaveGameCommand extends WebsocketCommand {
+public class LeaveGameCommand extends BaseCommand {
 
     private final ServerFacade serverFacade = new ServerFacade();
     private WebsocketFacade websocketFacade;
@@ -66,6 +67,6 @@ public class LeaveGameCommand extends WebsocketCommand {
 
     @Override
     public void notify(ServerMessage serverMessage) {
-        WebsocketCommand.notifyMethod(serverMessage);
+        BaseCommand.notifyMethod(serverMessage);
     }
 }

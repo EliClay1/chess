@@ -3,6 +3,7 @@ package client.commands;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
+import client.commands.command_implementation.BaseCommand;
 import client.commands.command_implementation.CommandRegistry;
 import client.results.CommandResult;
 import client.results.ValidationResult;
@@ -14,7 +15,7 @@ import websocket.messages.ServerMessage;
 import java.util.Collection;
 import java.util.List;
 
-public class ResignCommand extends WebsocketCommand {
+public class ResignCommand extends BaseCommand {
 
     private final ServerFacade serverFacade = new ServerFacade();
     private WebsocketFacade websocketFacade;
@@ -75,6 +76,6 @@ public class ResignCommand extends WebsocketCommand {
 
     @Override
     public void notify(ServerMessage serverMessage) {
-        WebsocketCommand.notifyMethod(serverMessage);
+        BaseCommand.notifyMethod(serverMessage);
     }
 }
