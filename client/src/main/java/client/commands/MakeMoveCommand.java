@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static ui.EscapeSequences.RESET_TEXT_COLOR;
-
 public class MakeMoveCommand implements CommandInterface, NotificationHandler {
 
     private final ServerFacade serverFacade = new ServerFacade();

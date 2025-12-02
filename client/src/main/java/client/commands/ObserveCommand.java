@@ -17,8 +17,6 @@ import websocket.messages.ServerMessage;
 import java.util.Collection;
 import java.util.List;
 
-import static ui.EscapeSequences.RESET_TEXT_COLOR;
-
 public class ObserveCommand extends BaseCommand implements NotificationHandler {
 
     private final ServerFacade serverFacade = new ServerFacade();
