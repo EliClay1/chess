@@ -163,6 +163,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             GameData gameData = db.getGame(gameId);
             ChessGame.TeamColor playerColor;
 
+            if (gameData.game().getGameStatus() != ChessGame.GameStatus.ACTIVE) {
+                throw new Exception("Game is already over");
+            }
+
             if (Objects.equals(gameData.blackUsername(), user)) {
                 playerColor = ChessGame.TeamColor.BLACK;
             } else if (Objects.equals(gameData.whiteUsername(), user)) {
@@ -176,31 +180,29 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             }
 
             gameData.game().makeMove(move);
-            db.updateGame(gameData);
-
             ServerMessage moveMessage;
 
             if (gameData.game().isInCheck(gameData.game().getTeamTurn())) {
-                // send notification that game is in check
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                         String.format("%s (%s) has made the move, %s to %s.\nThe game is in now in check.\n", user,
                                 gameData.game().getTeamTurn().toString(), move.getStartPosition(), move.getEndPosition()));
             } else if (gameData.game().isInCheckmate(gameData.game().getTeamTurn())) {
-                // send notification that the game is over, run end game functionality.
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                         String.format("%s (%s) has made the move, %s to %s.\nCheckmate.\n", user,
                                 gameData.game().getTeamTurn().toString(), move.getStartPosition(), move.getEndPosition()));
+                gameData.game().setGameStatus(ChessGame.GameStatus.CHECKMATE);
             } else if (gameData.game().isInStalemate(gameData.game().getTeamTurn())) {
-                // send notification that game is at a stalemate, run end game functionality
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                         String.format("%s (%s) has made the move, %s to %s.\nThe game has entered into a stalemate.\n", user,
                                 gameData.game().getTeamTurn().toString(), move.getStartPosition(), move.getEndPosition()));
+                gameData.game().setGameStatus(ChessGame.GameStatus.STALEMATE);
             } else {
-                // send default notification for chess move.
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                         String.format("%s (%s) has made the move, %s to %s. \n", user,
                                 gameData.game().getTeamTurn().toString(), move.getStartPosition(), move.getEndPosition()));
             }
+
+            db.updateGame(gameData);
 
             ServerMessage updateGameMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game());
             session.getRemote().sendString(serializer.toJson(updateGameMessage));
@@ -214,6 +216,54 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             }
         } catch (Exception e) {
             ServerMessage errorMessage = getErrorMessage(move, e);
+            try {
+                session.getRemote().sendString(serializer.toJson(errorMessage));
+            } catch (Exception ex) {
+            }
+        }
+    }
+
+
+    private void resignUser(String authToken, int gameId, Session session) {
+        try {
+
+            if (db.getAuth(authToken) == null) {
+                throw new Exception("Invalid Authorization");
+            }
+
+            String user = db.getAuth(authToken).username();
+            GameData gameData = db.getGame(gameId);
+            ChessGame.TeamColor playerColor;
+
+            if (Objects.equals(gameData.blackUsername(), user)) {
+                playerColor = ChessGame.TeamColor.BLACK;
+            } else if (Objects.equals(gameData.whiteUsername(), user)) {
+                playerColor = ChessGame.TeamColor.WHITE;
+            } else {
+                throw new Exception("Observers cannot resign! Use 'leave' instead.");
+            }
+
+            if (gameData.game().getGameStatus() != ChessGame.GameStatus.ACTIVE) {
+                throw new Exception("Game is already over!");
+            }
+
+            if (playerColor == ChessGame.TeamColor.BLACK) {
+                gameData.game().setGameStatus(ChessGame.GameStatus.BLACK_RESIGNED);
+            } else {
+                gameData.game().setGameStatus(ChessGame.GameStatus.WHITE_RESIGNED);
+            }
+
+            db.updateGame(gameData);
+
+            ServerMessage resignNotificationMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                    String.format("%s has resigned.\n", user));
+            for (var sesh : connections.getSessionsForGame(gameId)) {
+                if (sesh.isOpen()) {
+                    sesh.getRemote().sendString(serializer.toJson(resignNotificationMessage));
+                }
+            }
+        } catch (Exception e) {
+            ServerMessage errorMessage = getErrorMessage(null, e);
             try {
                 session.getRemote().sendString(serializer.toJson(errorMessage));
             } catch (Exception ex) {
@@ -237,50 +287,5 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
         return errorMessage;
     }
-
-
-    private void resignUser(String authToken, int gameId, Session ctx) {
-        try {
-            if (db.getAuth(authToken) == null) {
-                throw new Exception("Invalid Authorization");
-            }
-            String user = db.getAuth(authToken).username();
-            GameData gameData = db.getGame(gameId);
-            ChessGame.TeamColor playerColor;
-
-            if (Objects.equals(gameData.blackUsername(), user)) {
-                playerColor = ChessGame.TeamColor.BLACK;
-            } else if (Objects.equals(gameData.whiteUsername(), user)) {
-                playerColor = ChessGame.TeamColor.WHITE;
-            } else {
-                throw new Exception("Observers cannot resign! Use 'leave' instead.");
-            }
-
-            if (gameData.game().getGameStatus() != ChessGame.GameStatus.ACTIVE) {
-                throw new Exception("Game is already over!");
-            }
-
-            // Resign should end the game completely, resulting in the opposite team as the winner.
-
-            if (playerColor == ChessGame.TeamColor.BLACK) {
-                // White wins the game. Notification message
-            } else {
-                // Black wins the game. Notification message
-            }
-
-
-
-            // keeps the user in the game.
-
-
-        } catch (NotUsersTurnException e) {
-            throw new RuntimeException(e);
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 
 }
