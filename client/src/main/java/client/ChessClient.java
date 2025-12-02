@@ -61,11 +61,10 @@ public class ChessClient {
 
             // Prevents the Playing state from printing. It's handled on the command level.
             // That may be a coupling issue or something, but honestly I don't care.
-            if (userStateData.clientState() == ClientState.LOGGED_OUT || userStateData.clientState() == ClientState.LOGGED_IN
-            || userStateData.clientState() == ClientState.OBSERVING_GAME) {
+            if (userStateData.clientState() == ClientState.LOGGED_OUT ||
+                    userStateData.clientState() == ClientState.LOGGED_IN) {
                 simplePrint(6, String.format("[%s] >>> ", statePrintValue));
             }
-
 
             String line = scanner.nextLine();
             var inputData = line.split(" ");
@@ -94,7 +93,7 @@ public class ChessClient {
 
                 CommandResult commandResult = command.execute(arguments, userStateData, commandRegistry, null);
                 if (commandResult == null) {
-                    simplePrint(1, "failed command." + "\n");
+                    simplePrint(1, "failed command.\n");
                     continue;
                 }
                 if (commandResult.ok()) {
@@ -103,7 +102,12 @@ public class ChessClient {
                     simplePrint(1, commandResult.message() + "\n");
                 }
             } else {
-                simplePrint(1, "You must be logged in to use that command.\n");
+                simplePrint(1, "You must be logged in or playing a game to use that command.\n");
+                if (userStateData.clientState() == ClientState.OBSERVING_GAME) {
+                    simplePrint(6, "[Observing] >>> ");
+                } else if (userStateData.clientState() == ClientState.PLAYING_GAME) {
+                    simplePrint(6, "[Playing] >>> ");
+                }
             }
         }
     }

@@ -30,7 +30,7 @@ public class ResignCommand extends BaseLeaveCommand {
 
     @Override
     public Collection<ClientState> allowedStates() {
-        return List.of(ClientState.PLAYING_GAME);
+        return List.of(ClientState.PLAYING_GAME, ClientState.OBSERVING_GAME);
     }
 
     @Override

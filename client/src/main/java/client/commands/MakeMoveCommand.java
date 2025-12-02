@@ -48,7 +48,7 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
 
     @Override
     public Collection<ClientState> allowedStates() {
-        return List.of(ClientState.PLAYING_GAME);
+        return List.of(ClientState.PLAYING_GAME, ClientState.OBSERVING_GAME);
     }
 
     @Override
@@ -115,10 +115,10 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
             serverFacade.printBoard(userStateData.getActiveTeamColor(), chessGame);
         } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
             String message = serverMessage.getMessage();
-            System.out.printf("\u001b[38;5;%dm%s%s\n", 4, message, RESET_TEXT_COLOR);
+            System.out.printf("\n\u001b[38;5;%dm%s%s\n", 4, message, RESET_TEXT_COLOR);
         } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
             String message = serverMessage.getErrorMessage();
-            System.out.printf("\u001b[38;5;%dm%s%s\n", 1, message, RESET_TEXT_COLOR);
+            System.out.printf("\n\u001b[38;5;%dm%s%s\n", 1, message, RESET_TEXT_COLOR);
         }
         System.out.printf("\u001b[38;5;%dm%s%s", 6, "[Playing] >>> ", RESET_TEXT_COLOR);
     }

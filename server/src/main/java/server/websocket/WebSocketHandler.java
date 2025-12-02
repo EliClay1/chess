@@ -90,7 +90,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             // sends join message to all users within the game
             joinNotificationMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                    String.format("%s has joined as %s.\n", username, userType));
+                    String.format("%s has joined as %s.", username, userType));
             for (var sesh : connections.getSessionsForGame(gameId)) {
                 if (sesh.isOpen() && sesh != session) {
                     sesh.getRemote().sendString(serializer.toJson(joinNotificationMessage));
@@ -137,7 +137,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             }
 
             ServerMessage leaveGameNotificationMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                    String.format("%s has left the game. \n", username));
+                    String.format("%s has left the game.", username));
             for (var sesh : connections.getSessionsForGame(gameId)) {
                 if (sesh.isOpen() && sesh != session) {
                     sesh.getRemote().sendString(serializer.toJson(leaveGameNotificationMessage));
@@ -178,24 +178,27 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             ServerMessage moveMessage;
 
+            // TODO - convert the move back into letter positions when printing.
+
             if (gameData.game().isInCheck(gameData.game().getTeamTurn())) {
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                        String.format("%s (%s) has made the move, %s to %s.\nThe game is in now in check.\n", user,
+                        String.format("%s (%s) has made the move %s to %s.\n - The game is in now in check. - ", user,
                                 playerColor, move.getStartPosition(), move.getEndPosition()));
             } else if (gameData.game().isInCheckmate(gameData.game().getTeamTurn())) {
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                        String.format("%s (%s) has made the move, %s to %s.\nCheckmate.\n", user,
+                        String.format("%s (%s) has made the move %s to %s.\n - Checkmate, Game Over - ", user,
                                 playerColor, move.getStartPosition(), move.getEndPosition()));
                 gameData.game().setGameStatus(ChessGame.GameStatus.CHECKMATE);
             } else if (gameData.game().isInStalemate(gameData.game().getTeamTurn())) {
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                        String.format("%s (%s) has made the move, %s to %s.\nThe game has entered into a stalemate.\n", user,
+                        String.format("%s (%s) has made the move %s to %s." +
+                                        "\n - The game has entered into a stalemate. Game Over - ", user,
                                 playerColor, move.getStartPosition(), move.getEndPosition()));
                 gameData.game().setGameStatus(ChessGame.GameStatus.STALEMATE);
             } else {
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                        String.format("%s (%s) has made the move, %s to %s. \n", user,
-                                gameData.game().getTeamTurn().toString(), move.getStartPosition(), move.getEndPosition()));
+                        String.format("%s (%s) has made the move %s to %s.", user,
+                                playerColor, move.getStartPosition(), move.getEndPosition()));
             }
 
             db.updateGame(gameData);
@@ -207,7 +210,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 if (sesh.isOpen() && sesh != session) {
                     sesh.getRemote().sendString(serializer.toJson(updateGameMessage));
                     sesh.getRemote().sendString(serializer.toJson(moveMessage));
-
                 }
             }
         } catch (Exception e) {
@@ -252,11 +254,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             db.updateGame(gameData);
 
             ServerMessage resignNotificationMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                    String.format("%s has resigned.\n", user));
+                    String.format("%s has resigned.", user));
             for (var sesh : connections.getSessionsForGame(gameId)) {
                 if (sesh.isOpen()) {
                     sesh.getRemote().sendString(serializer.toJson(resignNotificationMessage));
                 }
+                session.close();
             }
         } catch (Exception e) {
             ServerMessage errorMessage = getErrorMessage(null, e);
@@ -272,14 +275,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         ServerMessage errorMessage;
         if (e instanceof InvalidMoveException) {
             errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, (String) null);
-            errorMessage.setErrorMessage(String.format("Sorry, the move %s to %s is not valid. Please try again.\n",
+            errorMessage.setErrorMessage(String.format("Sorry, the move %s to %s is not valid. Please try again.",
                     move.getStartPosition(), move.getEndPosition()));
         } else if (e instanceof NotUsersTurnException) {
             errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, (String) null);
-            errorMessage.setErrorMessage("It's not your turn.\n");
+            errorMessage.setErrorMessage("It's not your turn.");
         } else {
             errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, (String) null);
-            errorMessage.setErrorMessage(String.format("%s\n", e.getMessage()));
+            errorMessage.setErrorMessage(String.format("%s", e.getMessage()));
         }
         return errorMessage;
     }

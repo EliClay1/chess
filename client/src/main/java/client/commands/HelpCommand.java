@@ -54,6 +54,8 @@ public class HelpCommand implements CommandInterface{
         }
         if (userStateData.clientState() == ClientState.PLAYING_GAME) {
             System.out.printf("\u001b[38;5;%dm%s%s", 6, "[Playing] >>> ", RESET_TEXT_COLOR);
+        } else if (userStateData.clientState() == ClientState.OBSERVING_GAME) {
+            System.out.printf("\u001b[38;5;%dm%s%s", 6, "[Observing] >>> ", RESET_TEXT_COLOR);
         }
         return new CommandResult(true, "");
     }
