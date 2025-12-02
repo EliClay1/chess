@@ -21,6 +21,7 @@ public class UserGameCommand {
 
     private final ChessMove move;
 
+    // TODO - separate move functionality to a different class.
     public UserGameCommand(CommandType commandType, String authToken, Integer gameID, ChessMove move) {
         this.commandType = commandType;
         this.authToken = authToken;

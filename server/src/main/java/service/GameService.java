@@ -2,7 +2,6 @@ package service;
 
 import chess.*;
 import com.google.gson.Gson;
-import com.google.gson.JsonSerializer;
 import dataaccess.DataAccess;
 import exceptions.AlreadyTakenException;
 import exceptions.InvalidException;
@@ -12,7 +11,6 @@ import model.GameData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public record GameService(DataAccess dataAccess) {
@@ -72,45 +70,6 @@ public record GameService(DataAccess dataAccess) {
             arrayOfGameData.add(mapOfGameData);
         }
         return arrayOfGameData;
-    }
-
-    public void makeMove(String authToken, List<String> chessMove, int gameId, ChessPiece.PieceType promo) throws Exception {
-        AuthData userByAuth = dataAccess.getAuth(authToken);
-        if (userByAuth == null) {
-            throw new UnauthorizedException();
-        }
-
-        GameData gameData = dataAccess.getGame(gameId);
-        if (gameData.whiteUsername() == null || gameData.blackUsername() == null) {
-            // TODO - make it return an error of some kind, not neough players to start the game, something.
-            throw new NotUsersTurnException("Not enough players to begin the game!");
-        }
-
-
-        // parses the information into positional moves.
-        List<ChessPosition> positions = new ArrayList<>(List.of());
-
-        for (var position : chessMove) {
-            String input = position.trim().toLowerCase();
-            char yChar = input.charAt(0);
-            char xChar = input.charAt(1);
-            int yInt = (yChar - 'a') + 1;
-            int xInt = (xChar - '1') + 1;
-            positions.add(new ChessPosition(xInt, yInt));
-        }
-
-        // TODO - Send an error if it isn't the user's turn.
-        ChessMove move;
-        if (promo == null) {
-            move = new ChessMove(positions.getFirst(), positions.getLast(), null);
-        } else {
-            move = new ChessMove(positions.getFirst(), positions.getLast(), promo);
-        }
-
-        ChessGame game = gameData.game();
-        game.makeMove(move);
-        dataAccess.updateGame(new GameData(gameData.gameID(), gameData.whiteUsername(),
-                gameData.blackUsername(), gameData.gameName(), game));
     }
 
     private String serializeFromGameObject(ChessGame chessGame) {

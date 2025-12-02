@@ -83,6 +83,11 @@ public class ChessClient {
                 ValidationResult validationResult = command.validate(arguments, userStateData);
                 if (!validationResult.ok) {
                     simplePrint(1, validationResult.message + "\n");
+                    if (userStateData.clientState() == ClientState.OBSERVING_GAME) {
+                        simplePrint(6, "[Observing] >>> ");
+                    } else if (userStateData.clientState() == ClientState.PLAYING_GAME) {
+                        simplePrint(6, "[Playing] >>> ");
+                    }
                     continue;
                 }
                 // check for quit command
@@ -91,7 +96,7 @@ public class ChessClient {
                     break;
                 }
 
-                CommandResult commandResult = command.execute(arguments, userStateData, commandRegistry, null);
+                CommandResult commandResult = command.execute(arguments, userStateData, commandRegistry);
                 if (commandResult == null) {
                     simplePrint(1, "failed command.\n");
                     continue;

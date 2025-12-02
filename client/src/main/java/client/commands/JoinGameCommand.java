@@ -6,7 +6,6 @@ import client.ServerFacade;
 import client.UserStateData;
 import client.results.CommandResult;
 import client.results.ValidationResult;
-import client.websocket.NotificationHandler;
 import client.websocket.WebsocketFacade;
 import com.google.gson.Gson;
 import exceptions.AlreadyTakenException;
@@ -19,11 +18,12 @@ import java.util.List;
 
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 
-public class JoinGameCommand implements CommandInterface, NotificationHandler {
+public class JoinGameCommand extends WebsocketCommand {
 
     private final ServerFacade serverFacade = new ServerFacade();
+    private WebsocketFacade websocketFacade;
     private final int argumentCount = 2;
-    private String teamColor;
+    private UserStateData userStateData;
 
     public JoinGameCommand() {
     }
@@ -50,7 +50,6 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
 
     @Override
     public ValidationResult validate(String[] args, UserStateData userStateData) {
-        // argument length check
         if (args.length == argumentCount) {
             return new ValidationResult(true, "");
         }
@@ -58,23 +57,26 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) throws Exception {
-
+    public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery) throws Exception {
+        this.userStateData = userState;
         String gameId = args[0];
-        teamColor = args[1];
+        String teamColor = args[1];
 
         try {
             WebsocketFacade websocketFacade = new WebsocketFacade(String.format("http://%s:%s", userStateData.getHost(),
                     userStateData.getPort()), serverFacade, this);
             userStateData.setWebsocketFacade(websocketFacade);
-            serverFacade.joinGame("localhost", 8080, "/game", userStateData.getAuthToken(), gameId, teamColor);
-            UserGameCommand connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, userStateData.getAuthToken(),
-                    Integer.parseInt(gameId), null);
+            serverFacade.joinGame("localhost", 8080, "/game", userStateData.getAuthToken(),
+                    gameId, teamColor);
+            UserGameCommand connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT,
+                    userStateData.getAuthToken(), Integer.parseInt(gameId), null);
 
-            websocketFacade.sendMessage(new Gson().toJson(connectCommand));
             userStateData.setClientState(ClientState.PLAYING_GAME);
             userStateData.setActiveGameId(Integer.parseInt(gameId));
             userStateData.setActiveTeamColor(teamColor);
+
+            websocketFacade.sendMessage(new Gson().toJson(connectCommand));
+
 
             return new CommandResult(true, "");
         } catch (Exception e) {
@@ -92,13 +94,9 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
     public void notify(ServerMessage serverMessage) {
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
             ChessGame chessGame = serverMessage.getGame();
-            serverFacade.printBoard(teamColor, chessGame);
-        } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
-            String message = serverMessage.getMessage();
-            System.out.printf("\n\u001b[38;5;%dm%s%s\n", 4, message, RESET_TEXT_COLOR);
-        } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
-            String errorMessage = serverMessage.getErrorMessage();
-            System.out.printf("\n\u001b[38;5;%dm%s%s\n", 1, errorMessage, RESET_TEXT_COLOR);
+            serverFacade.printBoard(userStateData.getActiveTeamColor(), chessGame);
+        } else {
+            WebsocketCommand.notifyMethod(serverMessage);
         }
         System.out.printf("\u001b[38;5;%dm%s%s", 6, "[Playing] >>> ", RESET_TEXT_COLOR);
     }
