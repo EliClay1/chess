@@ -47,7 +47,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     public void handleMessage(@NotNull WsMessageContext ctx) {
 
         UserGameCommand command = serializer.fromJson(ctx.message(), UserGameCommand.class);
-
         int gameId = command.getGameID();
         String authToken = command.getAuthToken();
         var commandType = command.getCommandType();
@@ -205,9 +204,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             }
 
             ServerMessage updateGameMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game());
+            session.getRemote().sendString(serializer.toJson(updateGameMessage));
 
             for (var sesh : connections.getSessionsForGame(gameId)) {
-                if (sesh.isOpen()) {
+                if (sesh.isOpen() && sesh != session) {
                     sesh.getRemote().sendString(serializer.toJson(updateGameMessage));
                     sesh.getRemote().sendString(serializer.toJson(moveMessage));
 

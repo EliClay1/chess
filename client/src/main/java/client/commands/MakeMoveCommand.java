@@ -18,7 +18,6 @@ import websocket.messages.ServerMessage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 
@@ -90,15 +89,10 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
 
         ChessMove chessMove = new ChessMove(positions.getFirst(), positions.getLast(), promotionalPiece);
 
-        // TODO - Move needs to be converted into an actual chess move BEFORE sending to the websocket. ie. here.
-
-
-//        System.out.println("DEBUG: About to get websocketFacade");
         try {
             websocketFacade = userStateData.getWebsocketFacade();
-//            System.out.println("DEBUG: Got websocketFacade: " + (websocketFacade != null));
             websocketFacade.setNotificationHandler(this);
-//            System.out.println("DEBUG: Set handler to MakeMoveCommand");
+            // TODO - serialize the chess move before sending
             UserGameCommand moveCommand = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, userStateData.getAuthToken(),
                     userStateData.getActiveGameId(), chessMove);
             websocketFacade.sendMessage(new Gson().toJson(moveCommand));
