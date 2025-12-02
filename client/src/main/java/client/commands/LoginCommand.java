@@ -7,15 +7,12 @@ import client.results.CommandResult;
 import client.results.ValidationResult;
 import exceptions.InvalidException;
 import exceptions.UnauthorizedException;
-import websocket.commands.UserGameCommand;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class LoginCommand implements CommandInterface{
-
-    // TODO - allow login and list to both use l. Essentially block running auth-required commands. Figure this out.
+public class LoginCommand implements CommandInterface {
 
     private final int argumentCount = 2;
     private final ServerFacade serverFacade = new ServerFacade();
@@ -27,12 +24,12 @@ public class LoginCommand implements CommandInterface{
 
     @Override
     public List<String> getAliases() {
-        return List.of();
+        return List.of("l");
     }
 
     @Override
     public String getUsage() {
-        return "Login as an existing user: \"login\" <USERNAME> <PASSWORD>\n";
+        return "Login as an existing user: \"login\", \"l\" <USERNAME> <PASSWORD>\n";
     }
 
     @Override

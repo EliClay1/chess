@@ -1,10 +1,12 @@
 package client.commands;
 
 import chess.ChessGame;
+import client.ChessClient;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
 import client.results.CommandResult;
+import client.results.ValidationResult;
 import client.websocket.NotificationHandler;
 import client.websocket.WebsocketFacade;
 import com.google.gson.Gson;
@@ -20,6 +22,9 @@ import static ui.EscapeSequences.RESET_TEXT_COLOR;
 public class ObserveCommand extends BaseCommand implements NotificationHandler {
 
     private final ServerFacade serverFacade = new ServerFacade();
+    private WebsocketFacade websocketFacade;
+    private final int argumentCount = 1;
+    private UserStateData userStateData;
 
     @Override
     public String getName() {
@@ -42,8 +47,17 @@ public class ObserveCommand extends BaseCommand implements NotificationHandler {
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
+    public ValidationResult validate(String[] args, UserStateData userStateData) {
+        if (args.length == argumentCount) {
+            return new ValidationResult(true, "");
+        }
+        return new ValidationResult(false, String.format("Incorrect amount of arguments, expected %d.", argumentCount));
+    }
+
+    @Override
+    public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery) {
         String gameId = args[0];
+        this.userStateData = userState;
 
         try {
             serverFacade.observeGame(gameId, userStateData.getActiveGames());
@@ -55,6 +69,7 @@ public class ObserveCommand extends BaseCommand implements NotificationHandler {
 
             websocketFacade.sendMessage(new Gson().toJson(connectCommand));
             userStateData.setClientState(ClientState.OBSERVING_GAME);
+            userStateData.setActiveGameId(Integer.parseInt(gameId));
 
             return new CommandResult(true, "");
 
@@ -72,6 +87,6 @@ public class ObserveCommand extends BaseCommand implements NotificationHandler {
             ChessGame chessGame = serverMessage.getGame();
             serverFacade.printBoard("white", chessGame);
         } else WebsocketCommand.notifyMethod(serverMessage);
-        System.out.printf("\u001b[38;5;%dm%s%s", 6, "[Observing] >>> ", RESET_TEXT_COLOR);
+        ChessClient.printAdditionalCommandUI(userStateData);
     }
 }

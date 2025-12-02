@@ -30,7 +30,7 @@ public class RegisterCommand implements CommandInterface{
 
     @Override
     public String getUsage() {
-        return "Register as a new user: \"register\" <USERNAME> <PASSWORD> <EMAIL>\n";
+        return "Register as a new user: \"register\", \"r\" <USERNAME> <PASSWORD> <EMAIL>\n";
     }
 
     @Override

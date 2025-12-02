@@ -74,20 +74,16 @@ public class ChessClient {
             // First check to see if a command is even there.
             if (command == null) {
                 simplePrint(1, "Please enter a valid command. Type \"help\" for assistance.\n");
+                printAdditionalCommandUI(userStateData);
                 continue;
             }
             // gets hold of the remaining arguments inputted.
             String[] arguments = Arrays.copyOfRange(inputData, 1, inputData.length);
-            // TODO - Change the requirement for printing and allowing.
             if (command.allowedStates().contains(userStateData.clientState())) {
                 ValidationResult validationResult = command.validate(arguments, userStateData);
                 if (!validationResult.ok) {
                     simplePrint(1, validationResult.message + "\n");
-                    if (userStateData.clientState() == ClientState.OBSERVING_GAME) {
-                        simplePrint(6, "[Observing] >>> ");
-                    } else if (userStateData.clientState() == ClientState.PLAYING_GAME) {
-                        simplePrint(6, "[Playing] >>> ");
-                    }
+                    printAdditionalCommandUI(userStateData);
                     continue;
                 }
                 // check for quit command
@@ -108,12 +104,16 @@ public class ChessClient {
                 }
             } else {
                 simplePrint(1, "You must be logged in or playing a game to use that command.\n");
-                if (userStateData.clientState() == ClientState.OBSERVING_GAME) {
-                    simplePrint(6, "[Observing] >>> ");
-                } else if (userStateData.clientState() == ClientState.PLAYING_GAME) {
-                    simplePrint(6, "[Playing] >>> ");
-                }
+                printAdditionalCommandUI(userStateData);
             }
+        }
+    }
+
+    public static void printAdditionalCommandUI(UserStateData userStateData) {
+        if (userStateData.clientState() == ClientState.OBSERVING_GAME) {
+            simplePrint(6, "[Observing] >>> ");
+        } else if (userStateData.clientState() == ClientState.PLAYING_GAME) {
+            simplePrint(6, "[Playing] >>> ");
         }
     }
 

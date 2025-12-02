@@ -4,6 +4,7 @@ import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
 import client.results.CommandResult;
+import client.results.ValidationResult;
 import client.websocket.WebsocketFacade;
 import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
@@ -35,6 +36,14 @@ public class ResignCommand extends WebsocketCommand {
     @Override
     public Collection<ClientState> allowedStates() {
         return List.of(ClientState.PLAYING_GAME, ClientState.OBSERVING_GAME);
+    }
+
+    @Override
+    public ValidationResult validate(String[] args, UserStateData userStateData) {
+        if (args.length == argumentCount) {
+            return new ValidationResult(true, "");
+        }
+        return new ValidationResult(false, String.format("Incorrect amount of arguments, expected %d.", argumentCount));
     }
 
     // TODO - this is completely different from leaving. The game states don't change or anything like that.

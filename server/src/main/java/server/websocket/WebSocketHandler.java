@@ -149,6 +149,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
 
+    // TODO - make sure the player can't move unless both players are in the game.
+
     private void makeMove(String authToken, int gameId, ChessMove move, Session session) {
         try {
             if (db.getAuth(authToken) == null) {

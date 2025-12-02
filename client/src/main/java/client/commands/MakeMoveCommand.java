@@ -4,6 +4,7 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
+import client.ChessClient;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
@@ -43,7 +44,7 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
 
     @Override
     public String getUsage() {
-        return "Make a move: \"m\", \"move\" <move1,move2>\n";
+        return "Make a move: \"m\", \"move\" <move1,move2,promo piece>\n";
     }
 
     @Override
@@ -62,7 +63,8 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
 
     @Override
     public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery) {
-        userStateData = userState;
+        this.userStateData = userState;
+
         String[] moveParts = args[0].split(",");
         List<ChessPosition> positions = new ArrayList<>(List.of());
         ChessPiece.PieceType promotionalPiece = null;
@@ -86,13 +88,11 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
                 index++;
             }
         }
-
         ChessMove chessMove = new ChessMove(positions.getFirst(), positions.getLast(), promotionalPiece);
 
         try {
             websocketFacade = userStateData.getWebsocketFacade();
             websocketFacade.setNotificationHandler(this);
-            // TODO - serialize the chess move before sending
             UserGameCommand moveCommand = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, userStateData.getAuthToken(),
                     userStateData.getActiveGameId(), chessMove);
             websocketFacade.sendMessage(new Gson().toJson(moveCommand));
@@ -113,6 +113,6 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
             ChessGame chessGame = serverMessage.getGame();
             serverFacade.printBoard(userStateData.getActiveTeamColor(), chessGame);
         } else WebsocketCommand.notifyMethod(serverMessage);
-        System.out.printf("\u001b[38;5;%dm%s%s", 6, "[Playing] >>> ", RESET_TEXT_COLOR);
+        ChessClient.printAdditionalCommandUI(userStateData);
     }
 }
