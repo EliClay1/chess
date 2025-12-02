@@ -26,7 +26,7 @@ public class RegisterCommand implements CommandInterface {
 
     @Override
     public List<String> getAliases() {
-        return List.of();
+        return List.of("r");
     }
 
     @Override

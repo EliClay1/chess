@@ -27,12 +27,12 @@ public class ListGamesCommand implements CommandInterface {
 
     @Override
     public List<String> getAliases() {
-        return List.of("l");
+        return List.of();
     }
 
     @Override
     public String getUsage() {
-        return "List current games: \"l\", \"list\"\n";
+        return "List current games: \"list\"\n";
     }
 
     @Override

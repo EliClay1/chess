@@ -107,7 +107,7 @@ public class ChessClient {
                     simplePrint(1, commandResult.message() + "\n");
                 }
             } else {
-                simplePrint(1, "You must be logged in or playing a game to use that command.\n");
+                simplePrint(1, "You aren't in the correct game state to use that command.\n");
                 printAdditionalCommandUI(userStateData);
             }
         }

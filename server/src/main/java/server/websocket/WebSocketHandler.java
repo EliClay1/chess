@@ -178,10 +178,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 throw new NotUsersTurnException();
             }
 
-            gameData.game().makeMove(move);
-
-            ServerMessage moveMessage;
-
             char startCol = (char) ('a' + move.getStartPosition().getColumn() - 1);
             char startRow = (char) ('1' + move.getStartPosition().getRow() - 1);
             startPosition = String.format("[%s,%s]", startCol, startRow);
@@ -190,15 +186,24 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             char endRow = (char) ('1' + move.getEndPosition().getRow() - 1);
             endPosition = String.format("[%s,%s]", endCol, endRow);
 
+            gameData.game().makeMove(move);
 
+            ServerMessage moveMessage;
+            String checkmateMessage = String.format("%s (%s) has made the move %s to %s.\n - Checkmate, Game Over - ", user,
+                    playerColor.toString().toLowerCase(), startPosition, endPosition);
             if (gameData.game().isInCheck(gameData.game().getTeamTurn())) {
-                moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                        String.format("%s (%s) has made the move %s to %s.\n - The game is in now in check. - ", user,
-                                playerColor.toString().toLowerCase(), startPosition, endPosition));
+                if (gameData.game().isInCheckmate(gameData.game().getTeamTurn())) {
+                    moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                            checkmateMessage);
+                    gameData.game().setGameStatus(ChessGame.GameStatus.CHECKMATE);
+                } else {
+                    moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                            String.format("%s (%s) has made the move %s to %s.\n - The game is in now in check. - ", user,
+                                    playerColor.toString().toLowerCase(), startPosition, endPosition));
+                }
             } else if (gameData.game().isInCheckmate(gameData.game().getTeamTurn())) {
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                        String.format("%s (%s) has made the move %s to %s.\n - Checkmate, Game Over - ", user,
-                                playerColor.toString().toLowerCase(), startPosition, endPosition));
+                        checkmateMessage);
                 gameData.game().setGameStatus(ChessGame.GameStatus.CHECKMATE);
             } else if (gameData.game().isInStalemate(gameData.game().getTeamTurn())) {
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
