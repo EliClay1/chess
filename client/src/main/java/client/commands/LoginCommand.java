@@ -7,6 +7,7 @@ import client.results.CommandResult;
 import client.results.ValidationResult;
 import exceptions.InvalidException;
 import exceptions.UnauthorizedException;
+import websocket.commands.UserGameCommand;
 
 import java.util.Collection;
 import java.util.List;
@@ -49,7 +50,8 @@ public class LoginCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery,
+                                 UserGameCommand.CommandType commandType) {
         String username = args[0];
         String password = args[1];
 

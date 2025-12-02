@@ -5,6 +5,7 @@ import client.ServerFacade;
 import client.UserStateData;
 import client.results.CommandResult;
 import exceptions.InvalidException;
+import websocket.commands.UserGameCommand;
 
 import java.util.Collection;
 import java.util.List;
@@ -34,7 +35,8 @@ public class CreateGameCommand extends BaseCommand {
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery,
+                                 UserGameCommand.CommandType commandType) {
         String gameName = args[0];
 
         try {

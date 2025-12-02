@@ -3,6 +3,7 @@ package client.commands;
 import client.ClientState;
 import client.UserStateData;
 import client.results.*;
+import websocket.commands.UserGameCommand;
 
 import java.util.Collection;
 import java.util.List;
@@ -43,7 +44,8 @@ public class HelpCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery,
+                                 UserGameCommand.CommandType commandType) {
         System.out.printf("%sOptions:\n", SET_TEXT_COLOR_BLUE);
         for (CommandInterface command : registery.getAllCommands()) {
             if (command.allowedStates().contains(userStateData.clientState())) {

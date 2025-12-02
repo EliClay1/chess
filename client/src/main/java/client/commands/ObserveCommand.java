@@ -42,7 +42,8 @@ public class ObserveCommand extends BaseCommand implements NotificationHandler {
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery,
+                                 UserGameCommand.CommandType commandType) {
         String gameId = args[0];
 
         try {

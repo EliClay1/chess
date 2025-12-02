@@ -7,6 +7,7 @@ import client.results.CommandResult;
 import client.results.ValidationResult;
 import exceptions.AlreadyTakenException;
 import exceptions.InvalidException;
+import websocket.commands.UserGameCommand;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,12 +25,12 @@ public class RegisterCommand implements CommandInterface{
 
     @Override
     public List<String> getAliases() {
-        return List.of("r");
+        return List.of();
     }
 
     @Override
     public String getUsage() {
-        return "Register as a new user: \"r\", \"register\" <USERNAME> <PASSWORD> <EMAIL>\n";
+        return "Register as a new user: \"register\" <USERNAME> <PASSWORD> <EMAIL>\n";
     }
 
     @Override
@@ -47,7 +48,8 @@ public class RegisterCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery,
+                                 UserGameCommand.CommandType commandType) {
         String username = args[0];
         String password = args[1];
         String email = args[2];

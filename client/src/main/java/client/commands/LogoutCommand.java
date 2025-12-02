@@ -5,6 +5,7 @@ import client.ServerFacade;
 import client.UserStateData;
 import client.results.CommandResult;
 import client.results.ValidationResult;
+import websocket.commands.UserGameCommand;
 
 import java.util.Collection;
 import java.util.List;
@@ -43,7 +44,8 @@ public class LogoutCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery,
+                                 UserGameCommand.CommandType commandType) {
 
         try {
             serverFacade.logoutUser("localhost", 8080, "/session", userStateData.getAuthToken());

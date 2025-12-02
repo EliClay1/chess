@@ -4,6 +4,7 @@ import client.ClientState;
 import client.UserStateData;
 import client.results.CommandResult;
 import client.results.ValidationResult;
+import websocket.commands.UserGameCommand;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,5 +15,6 @@ public interface CommandInterface {
     String getUsage();
     Collection<ClientState> allowedStates();
     ValidationResult validate(String[] args, UserStateData userStateData);
-    CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) throws Exception;
+    CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery,
+                          UserGameCommand.CommandType commandType) throws Exception;
 }

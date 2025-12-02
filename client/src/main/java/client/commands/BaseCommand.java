@@ -4,6 +4,7 @@ import client.ClientState;
 import client.UserStateData;
 import client.results.CommandResult;
 import client.results.ValidationResult;
+import websocket.commands.UserGameCommand;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,7 +43,8 @@ public class BaseCommand implements CommandInterface {
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery,
+                                 UserGameCommand.CommandType commandType) throws Exception {
         return null;
     }
 }

@@ -4,6 +4,7 @@ import client.ClientState;
 import client.UserStateData;
 import client.results.CommandResult;
 import client.results.ValidationResult;
+import websocket.commands.UserGameCommand;
 
 import java.util.Collection;
 import java.util.List;
@@ -40,7 +41,8 @@ public class QuitCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery,
+                                 UserGameCommand.CommandType commandType) {
         return new CommandResult(true, "");
     }
 }

@@ -61,7 +61,8 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery,
+                                 UserGameCommand.CommandType commandType) {
         userStateData = userState;
         String[] moveParts = args[0].split(",");
         List<ChessPosition> positions = new ArrayList<>(List.of());

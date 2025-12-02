@@ -53,7 +53,8 @@ public class LeaveGameCommand implements CommandInterface, NotificationHandler {
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery,
+                                 UserGameCommand.CommandType commandType) {
         userStateData = userState;
 
         try {

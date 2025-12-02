@@ -5,6 +5,7 @@ import client.ServerFacade;
 import client.UserStateData;
 import client.results.CommandResult;
 import client.results.ValidationResult;
+import websocket.commands.UserGameCommand;
 
 import java.util.Collection;
 import java.util.List;
@@ -48,7 +49,8 @@ public class ListGamesCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery,
+                                 UserGameCommand.CommandType commandType) {
         try {
             var body = serverFacade.listGames("localhost", 8080, "/game", userStateData.getAuthToken());
             for (Map<String, String> gameData : body) {
