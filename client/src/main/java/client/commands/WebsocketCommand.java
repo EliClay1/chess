@@ -62,7 +62,7 @@ public class WebsocketCommand implements CommandInterface, NotificationHandler {
     static void notifyMethod(ServerMessage serverMessage) {
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
             String message = serverMessage.getMessage();
-            System.out.printf("\u001b[38;5;%dm%s%s\n", 4, message, RESET_TEXT_COLOR);
+            System.out.printf("\n\u001b[38;5;%dm%s%s\n", 4, message, RESET_TEXT_COLOR);
         } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
             String message = serverMessage.getErrorMessage();
             System.out.printf("\u001b[38;5;%dm%s%s\n", 1, message, RESET_TEXT_COLOR);

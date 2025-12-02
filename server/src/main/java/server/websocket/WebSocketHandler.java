@@ -1,9 +1,6 @@
 package server.websocket;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.InvalidMoveException;
-import chess.NotUsersTurnException;
+import chess.*;
 import com.google.gson.Gson;
 import dataaccess.MySQLDataAccess;
 import io.javalin.websocket.*;
@@ -148,10 +145,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-
-    // TODO - make sure the player can't move unless both players are in the game.
-
     private void makeMove(String authToken, int gameId, ChessMove move, Session session) {
+        String startPosition = null;
+        String endPosition = null;
         try {
             if (db.getAuth(authToken) == null) {
                 throw new Exception("Invalid Authorization");
@@ -162,6 +158,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             if (gameData.game().getGameStatus() != ChessGame.GameStatus.ACTIVE) {
                 throw new Exception("Game is already over");
+            }
+
+            if (gameData.blackUsername() == null || gameData.whiteUsername() == null) {
+                throw new Exception("You must wait for all players to join the game.");
             }
 
             if (Objects.equals(gameData.blackUsername(), user)) {
@@ -180,27 +180,34 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             ServerMessage moveMessage;
 
-            // TODO - convert the move back into letter positions when printing.
+            char startCol = (char) ('a' + move.getStartPosition().getColumn() - 1);
+            char startRow = (char) ('1' + move.getStartPosition().getRow() - 1);
+            startPosition = String.format("[%s,%s]", startCol, startRow);
+
+            char endCol = (char) ('a' + move.getEndPosition().getColumn() - 1);
+            char endRow = (char) ('1' + move.getEndPosition().getRow() - 1);
+            endPosition = String.format("[%s,%s]", endCol, endRow);
+
 
             if (gameData.game().isInCheck(gameData.game().getTeamTurn())) {
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                         String.format("%s (%s) has made the move %s to %s.\n - The game is in now in check. - ", user,
-                                playerColor, move.getStartPosition(), move.getEndPosition()));
+                                playerColor.toString().toLowerCase(), startPosition, endPosition));
             } else if (gameData.game().isInCheckmate(gameData.game().getTeamTurn())) {
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                         String.format("%s (%s) has made the move %s to %s.\n - Checkmate, Game Over - ", user,
-                                playerColor, move.getStartPosition(), move.getEndPosition()));
+                                playerColor.toString().toLowerCase(), startPosition, endPosition));
                 gameData.game().setGameStatus(ChessGame.GameStatus.CHECKMATE);
             } else if (gameData.game().isInStalemate(gameData.game().getTeamTurn())) {
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                         String.format("%s (%s) has made the move %s to %s." +
                                         "\n - The game has entered into a stalemate. Game Over - ", user,
-                                playerColor, move.getStartPosition(), move.getEndPosition()));
+                                playerColor.toString().toLowerCase(), startPosition, endPosition));
                 gameData.game().setGameStatus(ChessGame.GameStatus.STALEMATE);
             } else {
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                         String.format("%s (%s) has made the move %s to %s.", user,
-                                playerColor, move.getStartPosition(), move.getEndPosition()));
+                                playerColor.toString().toLowerCase(), startPosition, endPosition));
             }
 
             db.updateGame(gameData);
@@ -215,7 +222,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 }
             }
         } catch (Exception e) {
-            ServerMessage errorMessage = getErrorMessage(move, e);
+            ServerMessage errorMessage = getErrorMessage(startPosition, endPosition, e);
             try {
                 session.getRemote().sendString(serializer.toJson(errorMessage));
             } catch (Exception ex) {
@@ -223,9 +230,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-
-    // TODO - once the gameState changes from active,
-    //  the game should probably get deleted once all connected sessions are closed.
     private void resignUser(String authToken, int gameId, Session session) {
         try {
 
@@ -265,7 +269,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 }
             }
         } catch (Exception e) {
-            ServerMessage errorMessage = getErrorMessage(null, e);
+            ServerMessage errorMessage = getErrorMessage(null, null, e);
             try {
                 session.getRemote().sendString(serializer.toJson(errorMessage));
             } catch (Exception ex) {
@@ -274,12 +278,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     @NotNull
-    private static ServerMessage getErrorMessage(ChessMove move, Exception e) {
+    private static ServerMessage getErrorMessage(String startPos, String endPos, Exception e) {
         ServerMessage errorMessage;
         if (e instanceof InvalidMoveException) {
             errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, (String) null);
             errorMessage.setErrorMessage(String.format("Sorry, the move %s to %s is not valid. Please try again.",
-                    move.getStartPosition(), move.getEndPosition()));
+                    startPos, endPos));
         } else if (e instanceof NotUsersTurnException) {
             errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, (String) null);
             errorMessage.setErrorMessage("It's not your turn.");
