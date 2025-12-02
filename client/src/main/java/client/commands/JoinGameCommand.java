@@ -25,7 +25,7 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
     private final int argumentCount = 2;
     private String teamColor;
 
-    public JoinGameCommand() throws Exception {
+    public JoinGameCommand() {
     }
 
     @Override
@@ -96,12 +96,11 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
             serverFacade.printBoard(teamColor, chessGame);
         } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
             String message = serverMessage.getMessage();
-            System.out.printf("\n\u001b[38;5;%dm%s%s", 4, message, RESET_TEXT_COLOR);
-            System.out.printf("\u001b[38;5;%dm%s%s", 6, "[Playing] >>> ", RESET_TEXT_COLOR);
+            System.out.printf("\u001b[38;5;%dm%s%s\n", 4, message, RESET_TEXT_COLOR);
         } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
             String errorMessage = serverMessage.getErrorMessage();
-            System.out.printf("\n\u001b[38;5;%dm%s%s", 1, errorMessage, RESET_TEXT_COLOR);
-            System.out.printf("\u001b[38;5;%dm%s%s", 6, "[Playing] >>> ", RESET_TEXT_COLOR);
+            System.out.printf("\u001b[38;5;%dm%s%s\n", 1, errorMessage, RESET_TEXT_COLOR);
         }
+        System.out.printf("\u001b[38;5;%dm%s%s", 6, "[Playing] >>> ", RESET_TEXT_COLOR);
     }
 }

@@ -74,6 +74,7 @@ public class BaseLeaveCommand implements CommandInterface, NotificationHandler {
                 return new CommandResult(false, "Error: " + e.getMessage());
             }
             else {
+                // TODO - if the connection is closed, it should quit the user out of the game. Basically run leave
                 return new CommandResult(false, "Error: " + e.getMessage());
             }
         }
@@ -85,7 +86,7 @@ public class BaseLeaveCommand implements CommandInterface, NotificationHandler {
             String message = serverMessage.getMessage();
             System.out.printf("\u001b[38;5;%dm%s%s\n", 4, message, RESET_TEXT_COLOR);
         } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
-            String message = serverMessage.getMessage();
+            String message = serverMessage.getErrorMessage();
             System.out.printf("\u001b[38;5;%dm%s%s\n", 1, message, RESET_TEXT_COLOR);
         }
     }

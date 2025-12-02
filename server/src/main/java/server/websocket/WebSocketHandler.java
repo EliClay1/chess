@@ -6,30 +6,24 @@ import chess.InvalidMoveException;
 import chess.NotUsersTurnException;
 import com.google.gson.Gson;
 import dataaccess.MySQLDataAccess;
-import exceptions.DataAccessException;
 import io.javalin.websocket.*;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
-import service.GameService;
 import websocket.commands.UserGameCommand;
 import websocket.commands.UserGameCommand.CommandType.*;
 import websocket.messages.ServerMessage;
 
 import javax.swing.*;
-import java.io.IOException;
-import java.util.List;
 import java.util.Objects;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
-    private final GameService gameService;
     private final MySQLDataAccess db;
     private final Gson serializer = new Gson();
     private final ConnectionManager connections = new ConnectionManager();
 
     public WebSocketHandler(MySQLDataAccess db) {
-        this.gameService = new GameService(db);
         this.db = db;
     }
 
@@ -181,21 +175,22 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             }
 
             gameData.game().makeMove(move);
+
             ServerMessage moveMessage;
 
             if (gameData.game().isInCheck(gameData.game().getTeamTurn())) {
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                         String.format("%s (%s) has made the move, %s to %s.\nThe game is in now in check.\n", user,
-                                gameData.game().getTeamTurn().toString(), move.getStartPosition(), move.getEndPosition()));
+                                playerColor, move.getStartPosition(), move.getEndPosition()));
             } else if (gameData.game().isInCheckmate(gameData.game().getTeamTurn())) {
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                         String.format("%s (%s) has made the move, %s to %s.\nCheckmate.\n", user,
-                                gameData.game().getTeamTurn().toString(), move.getStartPosition(), move.getEndPosition()));
+                                playerColor, move.getStartPosition(), move.getEndPosition()));
                 gameData.game().setGameStatus(ChessGame.GameStatus.CHECKMATE);
             } else if (gameData.game().isInStalemate(gameData.game().getTeamTurn())) {
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                         String.format("%s (%s) has made the move, %s to %s.\nThe game has entered into a stalemate.\n", user,
-                                gameData.game().getTeamTurn().toString(), move.getStartPosition(), move.getEndPosition()));
+                                playerColor, move.getStartPosition(), move.getEndPosition()));
                 gameData.game().setGameStatus(ChessGame.GameStatus.STALEMATE);
             } else {
                 moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,
