@@ -167,12 +167,22 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             }
             String user = db.getAuth(authToken).username();
             GameData gameData = db.getGame(gameId);
+            ChessGame.TeamColor playerColor;
 
-            if (gameData.whiteUsername() == null || gameData.blackUsername() == null) {
+            if (Objects.equals(gameData.blackUsername(), user)) {
+                playerColor = ChessGame.TeamColor.BLACK;
+            } else if (Objects.equals(gameData.whiteUsername(), user)) {
+                playerColor = ChessGame.TeamColor.WHITE;
+            } else {
+                throw new Exception("Observers cannot make moves!");
+            }
+
+            if (playerColor != gameData.game().getTeamTurn()) {
                 throw new NotUsersTurnException();
             }
 
             gameData.game().makeMove(move);
+            db.updateGame(gameData);
 
             ServerMessage moveMessage;
 
