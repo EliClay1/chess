@@ -3,8 +3,8 @@ package client.commands;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
-import client.commands.command_implementation.BaseCommand;
-import client.commands.command_implementation.CommandRegistry;
+import client.commands.implementation.BaseCommand;
+import client.commands.implementation.CommandRegistry;
 import client.results.CommandResult;
 import exceptions.InvalidException;
 

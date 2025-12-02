@@ -2,9 +2,9 @@ package client.commands;
 
 import client.ClientState;
 import client.UserStateData;
-import client.commands.command_implementation.BaseCommand;
-import client.commands.command_implementation.CommandInterface;
-import client.commands.command_implementation.CommandRegistry;
+import client.commands.implementation.BaseCommand;
+import client.commands.implementation.CommandInterface;
+import client.commands.implementation.CommandRegistry;
 import client.results.*;
 
 import java.util.Collection;

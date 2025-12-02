@@ -5,15 +5,14 @@ import client.ChessClient;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
-import client.commands.command_implementation.BaseCommand;
-import client.commands.command_implementation.CommandRegistry;
+import client.commands.implementation.BaseCommand;
+import client.commands.implementation.CommandRegistry;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 import client.websocket.NotificationHandler;
 import client.websocket.WebsocketFacade;
 import com.google.gson.Gson;
 import exceptions.InvalidException;
-import org.glassfish.grizzly.compression.lzma.impl.Base;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 

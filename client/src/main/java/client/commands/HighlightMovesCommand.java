@@ -5,13 +5,11 @@ import chess.ChessPosition;
 import client.ChessClient;
 import client.ServerFacade;
 import client.UserStateData;
-import client.commands.command_implementation.BaseCommand;
-import client.commands.command_implementation.CommandRegistry;
+import client.commands.implementation.BaseCommand;
+import client.commands.implementation.CommandRegistry;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 import client.websocket.WebsocketFacade;
-import com.google.gson.Gson;
-import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
 import java.util.List;
@@ -59,18 +57,7 @@ public class HighlightMovesCommand extends PrintCommand {
 
         position = new ChessPosition(xInt, yInt);
 
-        this.userStateData = userState;
-
-        try {
-            websocketFacade = userStateData.getWebsocketFacade();
-            websocketFacade.setNotificationHandler(this);
-            UserGameCommand drawBoardCommand = new UserGameCommand(UserGameCommand.CommandType.PRINT_BOARD,
-                    userStateData.getAuthToken(), userStateData.getActiveGameId(), null);
-            websocketFacade.sendMessage(new Gson().toJson(drawBoardCommand));
-            return new CommandResult(true, "");
-        } catch (Exception e) {
-            return new CommandResult(false, "Error: " + e.getMessage());
-        }
+        return super.execute(args, userState, registery);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package client.commands.command_implementation;
+package client.commands.implementation;
 
 import client.ClientState;
 import client.ServerFacade;

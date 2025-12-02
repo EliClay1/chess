@@ -3,8 +3,8 @@ package client.commands;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
-import client.commands.command_implementation.BaseCommand;
-import client.commands.command_implementation.CommandRegistry;
+import client.commands.implementation.BaseCommand;
+import client.commands.implementation.CommandRegistry;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 import client.websocket.WebsocketFacade;
@@ -62,15 +62,7 @@ public class ResignCommand extends BaseCommand {
             return new CommandResult(true, "");
 
         } catch (Exception e) {
-            if (e instanceof NumberFormatException) {
-                return new CommandResult(false, "Invalid GameID.");
-            } else if (e instanceof IllegalStateException) {
-                return new CommandResult(false, "Error: " + e.getMessage());
-            }
-            else {
-                // TODO - if the connection is closed, it should quit the user out of the game. Basically run leave
-                return new CommandResult(false, "Error: " + e.getMessage());
-            }
+            return LeaveGameCommand.leaveErrorHandling(e);
         }
     }
 
