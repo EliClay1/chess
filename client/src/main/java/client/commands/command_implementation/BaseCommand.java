@@ -1,4 +1,4 @@
-package client.commands;
+package client.commands.command_implementation;
 
 import client.ClientState;
 import client.ServerFacade;
@@ -14,13 +14,12 @@ import java.util.List;
 
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 
-public class WebsocketCommand implements CommandInterface, NotificationHandler {
+public class BaseCommand implements CommandInterface, NotificationHandler {
 
     private final ServerFacade serverFacade = new ServerFacade();
     private WebsocketFacade websocketFacade;
-    private final int argumentCount = 0;
+    private final int argumentCount = 1;
     private UserStateData userStateData;
-
 
     @Override
     public String getName() {
@@ -52,14 +51,13 @@ public class WebsocketCommand implements CommandInterface, NotificationHandler {
 
     @Override
     public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) throws Exception {
-        this.userStateData = userStateData;
         return null;
     }
 
     @Override
     public void notify(ServerMessage serverMessage) {}
 
-    static void notifyMethod(ServerMessage serverMessage) {
+    static public void notifyMethod(ServerMessage serverMessage) {
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
             String message = serverMessage.getMessage();
             System.out.printf("\n\u001b[38;5;%dm%s%s\n", 4, message, RESET_TEXT_COLOR);
@@ -68,5 +66,4 @@ public class WebsocketCommand implements CommandInterface, NotificationHandler {
             System.out.printf("\u001b[38;5;%dm%s%s\n", 1, message, RESET_TEXT_COLOR);
         }
     }
-
 }

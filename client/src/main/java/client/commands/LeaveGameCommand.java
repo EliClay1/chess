@@ -3,6 +3,7 @@ package client.commands;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
+import client.commands.command_implementation.CommandRegistry;
 import client.results.CommandResult;
 import client.websocket.WebsocketFacade;
 import com.google.gson.Gson;

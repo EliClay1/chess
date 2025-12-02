@@ -1,4 +1,4 @@
-package client.commands;
+package client.commands.command_implementation;
 
 import java.util.*;
 

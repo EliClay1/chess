@@ -3,9 +3,10 @@ package client.commands;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
+import client.commands.command_implementation.CommandInterface;
+import client.commands.command_implementation.CommandRegistry;
 import client.results.CommandResult;
 import client.results.ValidationResult;
-import websocket.commands.UserGameCommand;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.Map;
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 import static ui.EscapeSequences.SET_TEXT_COLOR_MAGENTA;
 
-public class ListGamesCommand implements CommandInterface{
+public class ListGamesCommand implements CommandInterface {
 
     private final ServerFacade serverFacade = new ServerFacade();
     private final int argumentCount = 0;

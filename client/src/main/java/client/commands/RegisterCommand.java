@@ -3,17 +3,18 @@ package client.commands;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
+import client.commands.command_implementation.CommandInterface;
+import client.commands.command_implementation.CommandRegistry;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 import exceptions.AlreadyTakenException;
 import exceptions.InvalidException;
-import websocket.commands.UserGameCommand;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class RegisterCommand implements CommandInterface{
+public class RegisterCommand implements CommandInterface {
 
     private final ServerFacade serverFacade = new ServerFacade();
     private final int argumentCount = 3;

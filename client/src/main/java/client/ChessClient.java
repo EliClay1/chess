@@ -1,6 +1,8 @@
 package client;
 
 import client.commands.*;
+import client.commands.command_implementation.CommandInterface;
+import client.commands.command_implementation.CommandRegistry;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 

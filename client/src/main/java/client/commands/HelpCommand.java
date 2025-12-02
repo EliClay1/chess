@@ -2,8 +2,10 @@ package client.commands;
 
 import client.ClientState;
 import client.UserStateData;
+import client.commands.command_implementation.BaseCommand;
+import client.commands.command_implementation.CommandInterface;
+import client.commands.command_implementation.CommandRegistry;
 import client.results.*;
-import websocket.commands.UserGameCommand;
 
 import java.util.Collection;
 import java.util.List;
@@ -11,7 +13,7 @@ import java.util.List;
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
 
-public class HelpCommand implements CommandInterface{
+public class HelpCommand extends BaseCommand {
 
     private final int argumentCount = 0;
 

@@ -4,6 +4,8 @@ import chess.ChessGame;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
+import client.commands.command_implementation.BaseCommand;
+import client.commands.command_implementation.CommandRegistry;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 import client.websocket.WebsocketFacade;
@@ -18,7 +20,7 @@ import java.util.List;
 
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 
-public class JoinGameCommand extends WebsocketCommand {
+public class JoinGameCommand extends BaseCommand {
 
     private final ServerFacade serverFacade = new ServerFacade();
     private WebsocketFacade websocketFacade;
@@ -94,9 +96,9 @@ public class JoinGameCommand extends WebsocketCommand {
     public void notify(ServerMessage serverMessage) {
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
             ChessGame chessGame = serverMessage.getGame();
-            serverFacade.printBoard(userStateData.getActiveTeamColor(), chessGame);
+            serverFacade.printBoard(userStateData.getActiveTeamColor(), chessGame, null);
         } else {
-            WebsocketCommand.notifyMethod(serverMessage);
+            BaseCommand.notifyMethod(serverMessage);
         }
         System.out.printf("\u001b[38;5;%dm%s%s", 6, "[Playing] >>> ", RESET_TEXT_COLOR);
     }

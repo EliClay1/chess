@@ -8,6 +8,9 @@ import client.ChessClient;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
+import client.commands.command_implementation.BaseCommand;
+import client.commands.command_implementation.CommandInterface;
+import client.commands.command_implementation.CommandRegistry;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 import client.websocket.NotificationHandler;
@@ -109,8 +112,10 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
     public void notify(ServerMessage serverMessage) {
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
             ChessGame chessGame = serverMessage.getGame();
-            serverFacade.printBoard(userStateData.getActiveTeamColor(), chessGame);
-        } else WebsocketCommand.notifyMethod(serverMessage);
+            serverFacade.printBoard(userStateData.getActiveTeamColor(), chessGame, null);
+        } else {
+            BaseCommand.notifyMethod(serverMessage);
+        }
         ChessClient.printAdditionalCommandUI(userStateData);
     }
 }

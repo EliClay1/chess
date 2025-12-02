@@ -5,6 +5,8 @@ import chess.ChessPosition;
 import client.ChessClient;
 import client.ServerFacade;
 import client.UserStateData;
+import client.commands.command_implementation.BaseCommand;
+import client.commands.command_implementation.CommandRegistry;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 import client.websocket.WebsocketFacade;
@@ -75,9 +77,9 @@ public class HighlightMovesCommand extends PrintCommand {
     public void notify(ServerMessage serverMessage) {
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
             ChessGame chessGame = serverMessage.getGame();
-            serverFacade.highlightMoves(userStateData.getActiveTeamColor(), chessGame, position);
+            serverFacade.printBoard(userStateData.getActiveTeamColor(), chessGame, position);
         } else {
-            WebsocketCommand.notifyMethod(serverMessage);
+            BaseCommand.notifyMethod(serverMessage);
         }
         ChessClient.printAdditionalCommandUI(userStateData);
     }

@@ -3,14 +3,15 @@ package client.commands;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
+import client.commands.command_implementation.CommandInterface;
+import client.commands.command_implementation.CommandRegistry;
 import client.results.CommandResult;
 import client.results.ValidationResult;
-import websocket.commands.UserGameCommand;
 
 import java.util.Collection;
 import java.util.List;
 
-public class LogoutCommand implements CommandInterface{
+public class LogoutCommand implements CommandInterface {
 
     private final ServerFacade serverFacade = new ServerFacade();
     private final int argumentCount = 0;

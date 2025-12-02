@@ -5,12 +5,15 @@ import client.ChessClient;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
+import client.commands.command_implementation.BaseCommand;
+import client.commands.command_implementation.CommandRegistry;
 import client.results.CommandResult;
 import client.results.ValidationResult;
 import client.websocket.NotificationHandler;
 import client.websocket.WebsocketFacade;
 import com.google.gson.Gson;
 import exceptions.InvalidException;
+import org.glassfish.grizzly.compression.lzma.impl.Base;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
@@ -83,8 +86,10 @@ public class ObserveCommand extends BaseCommand implements NotificationHandler {
     public void notify(ServerMessage serverMessage) {
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
             ChessGame chessGame = serverMessage.getGame();
-            serverFacade.printBoard("white", chessGame);
-        } else WebsocketCommand.notifyMethod(serverMessage);
+            serverFacade.printBoard("white", chessGame, null);
+        } else {
+            BaseCommand.notifyMethod(serverMessage);
+        }
         ChessClient.printAdditionalCommandUI(userStateData);
     }
 }

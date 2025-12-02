@@ -2,14 +2,15 @@ package client.commands;
 
 import client.ClientState;
 import client.UserStateData;
+import client.commands.command_implementation.CommandInterface;
+import client.commands.command_implementation.CommandRegistry;
 import client.results.CommandResult;
 import client.results.ValidationResult;
-import websocket.commands.UserGameCommand;
 
 import java.util.Collection;
 import java.util.List;
 
-public class QuitCommand implements CommandInterface{
+public class QuitCommand implements CommandInterface {
     private final int argumentCount = 0;
 
     @Override

@@ -3,9 +3,10 @@ package client.commands;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
+import client.commands.command_implementation.BaseCommand;
+import client.commands.command_implementation.CommandRegistry;
 import client.results.CommandResult;
 import exceptions.InvalidException;
-import websocket.commands.UserGameCommand;
 
 import java.util.Collection;
 import java.util.List;

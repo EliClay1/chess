@@ -5,6 +5,8 @@ import client.ChessClient;
 import client.ClientState;
 import client.ServerFacade;
 import client.UserStateData;
+import client.commands.command_implementation.BaseCommand;
+import client.commands.command_implementation.CommandRegistry;
 import client.results.CommandResult;
 import client.websocket.WebsocketFacade;
 import com.google.gson.Gson;
@@ -14,7 +16,7 @@ import websocket.messages.ServerMessage;
 import java.util.Collection;
 import java.util.List;
 
-public class PrintCommand extends WebsocketCommand {
+public class PrintCommand extends BaseCommand {
 
     public final int argumentCount = 0;
     private final ServerFacade serverFacade = new ServerFacade();
@@ -57,12 +59,12 @@ public class PrintCommand extends WebsocketCommand {
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
             ChessGame chessGame = serverMessage.getGame();
             if (userStateData.clientState() == ClientState.PLAYING_GAME) {
-                serverFacade.printBoard(userStateData.getActiveTeamColor(), chessGame);
+                serverFacade.printBoard(userStateData.getActiveTeamColor(), chessGame, null);
             } else {
-                serverFacade.printBoard("white", chessGame);
+                serverFacade.printBoard("white", chessGame, null);
             }
         } else {
-            WebsocketCommand.notifyMethod(serverMessage);
+            BaseCommand.notifyMethod(serverMessage);
         }
         ChessClient.printAdditionalCommandUI(userStateData);
     }
