@@ -132,7 +132,8 @@ public class Handlers {
     void joinGameHandler(Context ctx) {
         String requestHeader = ctx.header("authorization");
         String requestJson = ctx.body();
-        // gets access to the request data without having to create a new record object to map the data to. Update, Just make a stupid record object...
+        // gets access to the request data without having to create a new record object to map the data to. Update,
+        // Just make a stupid record object...
         Type type = new TypeToken<Map<String, String>>() {}.getType();
         Map<String, String> request = serializer.fromJson(requestJson, type);
 
@@ -150,7 +151,9 @@ public class Handlers {
 
         // Check if the piece is a valid color
         try {
-            if (teamColor == null || teamColor.isEmpty() || !availablePieces.contains(teamColor.toLowerCase())) {throw new MissingFieldException();}
+            if (teamColor == null || teamColor.isEmpty() || !availablePieces.contains(teamColor.toLowerCase())) {
+                throw new MissingFieldException();
+            }
         } catch (MissingFieldException e) {
             errorReturnHandling(ctx, e);
             return;
@@ -168,7 +171,8 @@ public class Handlers {
     void observeGameHandler(Context ctx) {
         String requestHeader = ctx.header("authorization");
         String requestJson = ctx.body();
-        // gets access to the request data without having to create a new record object to map the data to. Update, Just make a stupid record object...
+        // gets access to the request data without having to create a new record object to map the data to. Update,
+        // Just make a stupid record object...
         Type type = new TypeToken<Map<String, String>>() {}.getType();
         Map<String, String> request = serializer.fromJson(requestJson, type);
 

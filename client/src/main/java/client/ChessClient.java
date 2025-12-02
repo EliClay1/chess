@@ -5,7 +5,6 @@ import client.results.CommandResult;
 import client.results.ValidationResult;
 
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -30,13 +29,17 @@ public class ChessClient {
             commandRegistry.register(new ObserveCommand());
             commandRegistry.register(new MakeMoveCommand());
             commandRegistry.register(new LeaveGameCommand());
+            commandRegistry.register(new ResignCommand());
+
+            // TODO - Highlight Moves, Re-draw Board,
 
         } catch (Exception e) {
             simplePrint(1, e.getMessage());
         }
 
 
-        // FIXME - change how the commands interpret the userStateData and allow them to pull directly from it. ZERO HARD CODED VALUES
+        // FIXME - change how the commands interpret the userStateData and allow them to pull directly from it.
+        //  ZERO HARD CODED VALUES
         // registers base userStateData
         UserStateData userStateData = new UserStateData("localhost", 8080, null,
                 null, ClientState.LOGGED_OUT, null, 0, null, null);
@@ -45,7 +48,6 @@ public class ChessClient {
                 WHITE_KING, WHITE_QUEEN));
         Scanner scanner = new Scanner(System.in);
 
-        // TODO - playing >>> shows up before the board is printed. this needs to change, I'm just not sure how to change it yet.
         while (true) {
             String statePrintValue;
 
@@ -57,7 +59,8 @@ public class ChessClient {
                 default -> throw new IllegalStateException("Unexpected value: " + userStateData.clientState());
             }
 
-            // Prevents the Playing state from printing. It's handled on the command level. That may be a coupling issue or something, but honestly I don't care.
+            // Prevents the Playing state from printing. It's handled on the command level.
+            // That may be a coupling issue or something, but honestly I don't care.
             if (userStateData.clientState() == ClientState.LOGGED_OUT || userStateData.clientState() == ClientState.LOGGED_IN
             || userStateData.clientState() == ClientState.OBSERVING_GAME) {
                 simplePrint(6, String.format("[%s] >>> ", statePrintValue));

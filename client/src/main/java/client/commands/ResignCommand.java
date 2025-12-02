@@ -7,6 +7,7 @@ import client.results.ValidationResult;
 import client.websocket.NotificationHandler;
 import client.websocket.WebsocketFacade;
 import com.google.gson.Gson;
+import org.jetbrains.annotations.NotNull;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
@@ -70,19 +71,29 @@ public class ResignCommand implements CommandInterface, NotificationHandler {
             return new CommandResult(true, "");
 
         } catch (Exception e) {
-            if (e instanceof NumberFormatException) {
-                return new CommandResult(false, "Invalid GameID.");
-            } else if (e instanceof IllegalStateException) {
-                return new CommandResult(false, "Error: " + e.getMessage());
-            }
-            else {
-                return new CommandResult(false, "Error: " + e.getMessage());
-            }
+            return getErrorResult(e);
         }
     }
 
+    @NotNull
+    static CommandResult getErrorResult(Exception e) {
+        if (e instanceof NumberFormatException) {
+            return new CommandResult(false, "Invalid GameID.");
+        } else if (e instanceof IllegalStateException) {
+            return new CommandResult(false, "Error: " + e.getMessage());
+        }
+        else {
+            return new CommandResult(false, "Error: " + e.getMessage());
+        }
+    }
+
+
     @Override
     public void notify(ServerMessage serverMessage) {
+        notificationCode(serverMessage);
+    }
+
+    static void notificationCode(ServerMessage serverMessage) {
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
             String message = serverMessage.getMessage();
             System.out.printf("\u001b[38;5;%dm%s%s\n", 4, message, RESET_TEXT_COLOR);

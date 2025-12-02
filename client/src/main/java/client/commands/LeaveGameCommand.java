@@ -52,8 +52,6 @@ public class LeaveGameCommand implements CommandInterface, NotificationHandler {
         return new ValidationResult(false, String.format("Incorrect amount of arguments, expected %d.", argumentCount));
     }
 
-    // TODO - When the user leaves, their Websocket Connection is actually closed.
-
     @Override
     public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery) {
         userStateData = userState;
@@ -70,27 +68,12 @@ public class LeaveGameCommand implements CommandInterface, NotificationHandler {
 
             return new CommandResult(true, "");
         } catch (Exception e) {
-            if (e instanceof NumberFormatException) {
-                return new CommandResult(false, "Invalid GameID.");
-            } else if (e instanceof IllegalStateException) {
-                // TODO - figure out some kind of error handling for when the connection gets closed.
-                // could have a kill sequence that will drop all players from the game to prevent continuity issues.
-                return new CommandResult(false, "Error: " + e.getMessage());
-            }
-            else {
-                return new CommandResult(false, "Error: " + e.getMessage());
-            }
+            return ResignCommand.getErrorResult(e);
         }
     }
 
     @Override
     public void notify(ServerMessage serverMessage) {
-        if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
-            String message = serverMessage.getMessage();
-            System.out.printf("\u001b[38;5;%dm%s%s\n", 4, message, RESET_TEXT_COLOR);
-        } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
-            String message = serverMessage.getMessage();
-            System.out.printf("\u001b[38;5;%dm%s%s\n", 1, message, RESET_TEXT_COLOR);
-        }
+        ResignCommand.notificationCode(serverMessage);
     }
 }
