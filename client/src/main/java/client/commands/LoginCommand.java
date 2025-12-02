@@ -50,8 +50,7 @@ public class LoginCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery,
-                                 UserGameCommand.CommandType commandType) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
         String username = args[0];
         String password = args[1];
 

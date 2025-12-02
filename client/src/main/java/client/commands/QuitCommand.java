@@ -41,8 +41,7 @@ public class QuitCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery,
-                                 UserGameCommand.CommandType commandType) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
         return new CommandResult(true, "");
     }
 }

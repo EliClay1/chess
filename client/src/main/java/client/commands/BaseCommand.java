@@ -43,8 +43,7 @@ public class BaseCommand implements CommandInterface {
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery,
-                                 UserGameCommand.CommandType commandType) throws Exception {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) throws Exception {
         return null;
     }
 }

@@ -50,8 +50,7 @@ public class BaseLeaveCommand implements CommandInterface, NotificationHandler {
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery,
-                                 UserGameCommand.CommandType commandType) {
+    public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery) {
         return null;
     }
 

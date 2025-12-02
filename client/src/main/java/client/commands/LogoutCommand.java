@@ -44,8 +44,7 @@ public class LogoutCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery,
-                                 UserGameCommand.CommandType commandType) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
 
         try {
             serverFacade.logoutUser("localhost", 8080, "/session", userStateData.getAuthToken());

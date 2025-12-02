@@ -58,8 +58,7 @@ public class JoinGameCommand implements CommandInterface, NotificationHandler {
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery,
-                                 UserGameCommand.CommandType commandType) throws Exception {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) throws Exception {
 
         String gameId = args[0];
         teamColor = args[1];

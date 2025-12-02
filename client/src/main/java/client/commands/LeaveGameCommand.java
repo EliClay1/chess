@@ -29,8 +29,7 @@ public class LeaveGameCommand extends BaseLeaveCommand {
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery,
-                                 UserGameCommand.CommandType commandType) {
+    public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery) {
         return executeCommand(userState, UserGameCommand.CommandType.LEAVE);
     }
 }

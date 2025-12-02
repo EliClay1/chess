@@ -222,6 +222,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
 
+    // TODO - once the gameState changes from active,
+    //  the game should probably get deleted once all connected sessions are closed.
     private void resignUser(String authToken, int gameId, Session session) {
         try {
 
@@ -259,7 +261,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 if (sesh.isOpen()) {
                     sesh.getRemote().sendString(serializer.toJson(resignNotificationMessage));
                 }
-                session.close();
             }
         } catch (Exception e) {
             ServerMessage errorMessage = getErrorMessage(null, e);

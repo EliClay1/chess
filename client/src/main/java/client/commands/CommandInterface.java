@@ -15,6 +15,5 @@ public interface CommandInterface {
     String getUsage();
     Collection<ClientState> allowedStates();
     ValidationResult validate(String[] args, UserStateData userStateData);
-    CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery,
-                          UserGameCommand.CommandType commandType) throws Exception;
+    CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) throws Exception;
 }

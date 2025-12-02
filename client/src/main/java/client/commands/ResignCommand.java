@@ -33,6 +33,7 @@ public class ResignCommand extends BaseLeaveCommand {
         return List.of(ClientState.PLAYING_GAME, ClientState.OBSERVING_GAME);
     }
 
+    // TODO - this is completely different from leaving. The game states don't change or anything like that.
     @Override
     public CommandResult execute(String[] args, UserStateData userState, CommandRegistry registery,
                                  UserGameCommand.CommandType commandType) {

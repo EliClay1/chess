@@ -49,8 +49,7 @@ public class ListGamesCommand implements CommandInterface{
     }
 
     @Override
-    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery,
-                                 UserGameCommand.CommandType commandType) {
+    public CommandResult execute(String[] args, UserStateData userStateData, CommandRegistry registery) {
         try {
             var body = serverFacade.listGames("localhost", 8080, "/game", userStateData.getAuthToken());
             for (Map<String, String> gameData : body) {
