@@ -47,7 +47,7 @@ public class MakeMoveCommand implements CommandInterface, NotificationHandler {
 
     @Override
     public Collection<ClientState> allowedStates() {
-        return List.of(ClientState.PLAYING_GAME, ClientState.OBSERVING_GAME);
+        return List.of(ClientState.PLAYING_GAME);
     }
 
     @Override

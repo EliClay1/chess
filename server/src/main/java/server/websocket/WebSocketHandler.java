@@ -51,6 +51,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             disconnectUserFromGame(authToken, gameId, ctx.session);
         } else if (commandType == UserGameCommand.CommandType.RESIGN) {
             resignUser(authToken, gameId, ctx.session);
+        } else if (commandType == UserGameCommand.CommandType.PRINT_BOARD) {
+            printBoard(authToken, gameId, ctx.session);
         }
     }
 
@@ -274,6 +276,22 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 session.getRemote().sendString(serializer.toJson(errorMessage));
             } catch (Exception ex) {
             }
+        }
+    }
+
+    private void printBoard(String authToken, int gameId, Session session) {
+        try {
+            if (db.getAuth(authToken) == null) {
+                throw new Exception("Invalid Authorization");
+            }
+            String user = db.getAuth(authToken).username();
+            GameData gameData = db.getGame(gameId);
+
+            ServerMessage gameMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game());
+            session.getRemote().sendString(serializer.toJson(gameMessage));
+
+        } catch (Exception e) {
+            getErrorMessage(null, null, e);
         }
     }
 
