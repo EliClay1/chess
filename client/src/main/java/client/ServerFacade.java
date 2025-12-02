@@ -12,13 +12,14 @@ import exceptions.UnauthorizedException;
 import static ui.EscapeSequences.*;
 
 import java.net.URI;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.*;
 
 public class ServerFacade {
-    public static final java.net.http.HttpClient HTTP_CLIENT = java.net.http.HttpClient.newHttpClient();
+    public static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
     public int status;
 
     // TODO - Cannot send ANY error codes back.
@@ -248,6 +249,109 @@ public class ServerFacade {
 
                 ChessPiece chessPiece = chessGame.getBoard().getPiece(
                         new ChessPosition(xPos, yPos));
+
+                String piece = null;
+                String pieceColor = null;
+
+                if (chessPiece != null) {
+                    switch (chessPiece.getPieceType()) {
+                        case PAWN -> piece = (chessPiece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                                ? WHITE_PAWN : BLACK_PAWN;
+                        case ROOK -> piece = (chessPiece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                                ? WHITE_ROOK : BLACK_ROOK;
+                        case KNIGHT -> piece = (chessPiece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                                ? WHITE_KNIGHT : BLACK_KNIGHT;
+                        case BISHOP -> piece = (chessPiece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                                ? WHITE_BISHOP : BLACK_BISHOP;
+                        case QUEEN -> piece = (chessPiece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                                ? WHITE_QUEEN : BLACK_QUEEN;
+                        case KING -> piece = (chessPiece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                                ? WHITE_KING : BLACK_KING;
+                    }
+
+                    pieceColor = (chessPiece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                            ? SET_PIECE_COLOR_WHITE
+                            : SET_PIECE_COLOR_BLACK;
+                }
+
+                if (piece != null) {
+                    String cell = dark ? piece : piece + HAIRSPACE;
+                    System.out.printf("%s%s%s%s", bg, pieceColor, cell, RESET_BG_COLOR);
+                } else {
+                    System.out.printf("%s%s%s", bg, EMPTY, RESET_BG_COLOR);
+                }
+            }
+            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE,
+                    numbers[x], RESET_TEXT_COLOR, RESET_BG_COLOR);
+        }
+
+        System.out.print("\n");
+        for (var letter : letters) {
+            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE,
+                    letter, RESET_TEXT_COLOR, RESET_BG_COLOR);
+        }
+        System.out.print("\n");
+        System.out.print("\n");
+    }
+
+    public void highlightMoves(String color, ChessGame chessGame, ChessPosition piecePosition) {
+        final boolean blackView = "black".equalsIgnoreCase(color);
+
+
+        var validMoves = chessGame.validMoves(piecePosition);
+        Set<ChessPosition> targetPositions = new HashSet<>(Set.of());
+
+        for (var move : validMoves) {
+            targetPositions.add(move.getEndPosition());
+        }
+
+
+
+        String[] lettersAtoH = {"   ", " \u2009a ", " \u2007b ", " \u2004c ", " \u2007d ", " \u2004e ", " \u2007f ",
+                " \u2004g ", " \u2007h ", "   \u200A"};
+        String[] lettersHtoA = {"   ", " \u2009h ", " \u2007g ", " \u2004f ", " \u2007e ", " \u2004d ", " \u2007c ",
+                " \u2004b ", " \u2007a ", "   \u200A"};
+        String[] letters = blackView ? lettersHtoA : lettersAtoH;
+
+        String[] numsWhite = {" 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 "};
+        String[] numsBlack = {" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 "};
+        String[] numbers = blackView ? numsBlack : numsWhite;
+
+        System.out.print("\n");
+
+        for (var letter : letters) {
+            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE,
+                    letter, RESET_TEXT_COLOR, RESET_BG_COLOR);
+        }
+
+        for (int x = 0; x < 8; x++) {
+            System.out.print("\n");
+
+            System.out.printf("%s%s%s%s%s", SET_BG_COLOR_BORDER, SET_TEXT_COLOR_WHITE,
+                    numbers[x], RESET_TEXT_COLOR, RESET_BG_COLOR);
+            for (int y = 0; y < 8; y++) {
+                int bx = blackView ? x : 7 - x;
+                int by = blackView ? 7 - y : y;
+
+                int xPos = bx + 1;
+                int yPos = by + 1;
+
+                ChessPosition currentPosition = new ChessPosition(xPos, yPos);
+                boolean isSourcePiece = currentPosition.equals(piecePosition);
+                boolean isTargetPiece = targetPositions.contains(currentPosition);
+
+                String bg;
+                boolean dark = ((bx + by) & 1) == 1;
+                bg = dark ? SET_BOARD_BLACK : SET_BOARD_WHITE;
+
+                // TODO - seems like there may be an error here.
+                if (isSourcePiece) {
+                    bg = HIGHLIGHT_SELECTED;
+                } else if (isTargetPiece) {
+                    bg = dark ? HIGHLIGHT_TARGET_BLACK : HIGHLIGHT_TARGET_WHITE;
+                }
+
+                ChessPiece chessPiece = chessGame.getBoard().getPiece(currentPosition);
 
                 String piece = null;
                 String pieceColor = null;

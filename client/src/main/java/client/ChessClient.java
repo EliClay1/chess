@@ -31,6 +31,7 @@ public class ChessClient {
             commandRegistry.register(new LeaveGameCommand());
             commandRegistry.register(new ResignCommand());
             commandRegistry.register(new RedrawBoardCommand());
+            commandRegistry.register(new HighlightMovesCommand());
 
             // TODO - Highlight Moves, Re-draw Board,
 
